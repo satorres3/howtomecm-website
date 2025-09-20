@@ -1,6 +1,6 @@
 import { ContentLibrary } from '../../../lib/content'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
 interface FooterProps {
   siteSettings?: {

@@ -4,7 +4,7 @@ import ContentRenderer from '../../components/ContentRenderer'
 import { notFound } from 'next/navigation'
 import type { Page, ContentSection } from '../../../types/content'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
 // Helper function to convert page content to sections format
 function getPageSections(page: Page): Array<{id: string, type: string, content: any}> {

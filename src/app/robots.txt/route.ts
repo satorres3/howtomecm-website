@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 const BASE_URL = `https://${DOMAIN}`
 
 export async function GET(): Promise<NextResponse> {

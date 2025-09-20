@@ -2,7 +2,7 @@ import { Metadata } from 'next'
 import { ContentLibrary } from '../../../lib/content'
 import type { Post } from '../../../types/content'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
 interface BlogPageProps {
   searchParams: Promise<{

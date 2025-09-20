@@ -1,7 +1,7 @@
 import { ContentLibrary } from '../../../lib/content'
 import Navigation from './Navigation'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
 interface HeaderProps {
   siteSettings?: {

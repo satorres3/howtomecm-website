@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Learn professional content management techniques and tools',
 }
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
 // Helper function to convert page content to sections format
 function getPageSections(page: Page): Array<{id: string, type: string, content: any}> {

@@ -5,7 +5,7 @@ import SocialShare from '../../../components/SocialShare'
 import { notFound } from 'next/navigation'
 import type { Post } from '../../../../types/content'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
 interface BlogPostProps {
   params: Promise<{

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { ContentLibrary } from '../../../lib/content'
 import type { RSSItem } from '../../../types/content'
 
-const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 const BASE_URL = `https://${DOMAIN}`
 
 export async function GET(): Promise<NextResponse> {
