@@ -124,6 +124,29 @@ export class ContentLibrary {
     }
 
     try {
+      // Special handling for 'home' slug - look for homepage
+      if (slug === 'home') {
+        const { data, error } = await supabase
+          .from('pages')
+          .select('*')
+          .eq('website_domain', domain)
+          .eq('is_homepage', true)
+          .eq('status', 'published')
+          .eq('is_published_to_domain', true)
+          .single()
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            return createErrorResult('Homepage not found')
+          }
+          return createErrorResult(`Failed to fetch homepage: ${error.message}`)
+        }
+
+        setCache(cacheKey, data)
+        return createSuccessResult(data)
+      }
+
+      // Regular slug lookup
       const { data, error } = await supabase
         .from('pages')
         .select('*')
