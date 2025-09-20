@@ -147,6 +147,77 @@ export default function ContentRenderer({ title, sections, seo }: ContentRendere
           </section>
         )
 
+      case 'hero-simple':
+        return (
+          <section key={section.id} className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg shadow-lg mb-8 overflow-hidden">
+            <div className="px-8 py-12 text-center">
+              <h1 className="text-4xl font-bold mb-4 leading-tight">{section.content.title}</h1>
+              {section.content.subtitle && (
+                <p className="text-lg opacity-90 max-w-2xl mx-auto leading-relaxed">{section.content.subtitle}</p>
+              )}
+            </div>
+          </section>
+        )
+
+      case 'services-grid':
+        return (
+          <section key={section.id} className="mb-8">
+            {section.content.title && (
+              <h2 className="text-3xl font-bold mb-8 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">{section.content.title}</h2>
+            )}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {section.content.services?.map((service: any, index: number) => (
+                <div key={index} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
+                  <div className="text-4xl mb-4">{service.icon}</div>
+                  <h3 className="text-xl font-semibold mb-3 text-gray-900">{service.title}</h3>
+                  <p className="text-gray-600 mb-4 leading-relaxed">{service.description}</p>
+                  {service.features && (
+                    <ul className="space-y-2">
+                      {service.features.map((feature: string, i: number) => (
+                        <li key={i} className="text-sm text-gray-700 flex items-center">
+                          <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+
+      case 'contact-form':
+        return (
+          <section key={section.id} className="bg-white rounded-lg shadow-sm p-8 mb-8">
+            {section.content.title && (
+              <h2 className="text-3xl font-bold mb-4 text-center bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-transparent">{section.content.title}</h2>
+            )}
+            {section.content.description && (
+              <p className="text-lg text-gray-600 text-center mb-8 max-w-2xl mx-auto">{section.content.description}</p>
+            )}
+            <div className="max-w-md mx-auto">
+              <form className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                  <input type="text" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input type="email" className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                  <textarea rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+                <button type="submit" className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-2 px-4 rounded-lg hover:from-blue-600 hover:to-purple-700 transition-all">
+                  Send Message
+                </button>
+              </form>
+            </div>
+          </section>
+        )
+
       default:
         return (
           <div key={section.id} className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg mb-8 shadow-sm">
