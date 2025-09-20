@@ -12,10 +12,17 @@ const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
 
 // Helper function to convert page content to sections format
 function getPageSections(page: Page): Array<{id: string, type: string, content: any}> {
+  // Priority 1: Check if sections array exists
   if (page.sections && Array.isArray(page.sections)) {
     return page.sections
   }
 
+  // Priority 2: Check if content is already an array of sections
+  if (page.content && Array.isArray(page.content)) {
+    return page.content
+  }
+
+  // Priority 3: Handle legacy string content
   if (page.content && typeof page.content === 'string') {
     return [{
       id: 'legacy-content',
