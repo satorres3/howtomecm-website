@@ -1,7 +1,8 @@
 import { Metadata } from 'next'
-import { getPageBySlug, getPages } from '../../lib/supabase'
+import { ContentLibrary } from '../../../lib/content'
 import ContentRenderer from '../../components/ContentRenderer'
 import { notFound } from 'next/navigation'
+import type { Page } from '../../../types/content'
 
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
 
@@ -13,7 +14,8 @@ interface PageProps {
 
 // Generate static pages at build time
 export async function generateStaticParams() {
-  const pages = await getPages(DOMAIN)
+  const pagesResult = await ContentLibrary.getAllPages(DOMAIN)
+  const pages = pagesResult.success ? pagesResult.data || [] : []
 
   return pages
     .filter(page => page.slug !== 'home') // Exclude home page
@@ -25,7 +27,8 @@ export async function generateStaticParams() {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params
-  const page = await getPageBySlug(DOMAIN, resolvedParams.slug)
+  const pageResult = await ContentLibrary.getPageBySlug(DOMAIN, resolvedParams.slug)
+  const page = pageResult.success ? pageResult.data : null
 
   if (!page) {
     return {
@@ -43,7 +46,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function DynamicPage({ params }: PageProps) {
   const resolvedParams = await params
-  const page = await getPageBySlug(DOMAIN, resolvedParams.slug)
+  const pageResult = await ContentLibrary.getPageBySlug(DOMAIN, resolvedParams.slug)
+  const page = pageResult.success ? pageResult.data : null
 
   if (!page) {
     notFound()

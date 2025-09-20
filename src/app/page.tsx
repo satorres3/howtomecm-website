@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
-import { getPageBySlug, getPosts } from '../lib/supabase'
+import { ContentLibrary } from '../../lib/content'
 import ContentRenderer from '../components/ContentRenderer'
+import type { Page, Post } from '../../types/content'
 
 export const metadata: Metadata = {
   title: 'How to MeCM - Professional Content Management',
@@ -10,9 +11,13 @@ export const metadata: Metadata = {
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
 
 export default async function HomePage() {
-  // Try to get the home page content from CMS
-  const homePage = await getPageBySlug(DOMAIN, 'home')
-  const recentPosts = await getPosts(DOMAIN)
+  // Try to get the home page content from CMS using enhanced content library
+  const homePageResult = await ContentLibrary.getPageBySlug(DOMAIN, 'home')
+  const recentPostsResult = await ContentLibrary.getRecentPosts(DOMAIN, 6)
+
+  // Extract data with error handling
+  const homePage = homePageResult.success ? homePageResult.data : null
+  const recentPosts = recentPostsResult.success ? recentPostsResult.data || [] : []
 
   // If we have CMS content, render it
   if (homePage) {
@@ -30,7 +35,7 @@ export default async function HomePage() {
             <div className="container mx-auto px-4">
               <h2 className="text-3xl font-bold text-center mb-8">Latest Posts</h2>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recentPosts.slice(0, 6).map((post) => (
+                {recentPosts.map((post) => (
                   <div key={post.id} className="bg-white rounded-lg shadow-md p-6">
                     <h3 className="text-xl font-semibold mb-2">{post.title}</h3>
                     <p className="text-gray-600 text-sm mb-4">

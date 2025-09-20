@@ -1,7 +1,8 @@
 import { Metadata } from 'next'
-import { getPostBySlug, getPosts } from '../../../lib/supabase'
+import { ContentLibrary } from '../../../../lib/content'
 import ContentRenderer from '../../../components/ContentRenderer'
 import { notFound } from 'next/navigation'
+import type { Post } from '../../../../types/content'
 
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
 
@@ -13,7 +14,8 @@ interface BlogPostProps {
 
 // Generate static pages at build time
 export async function generateStaticParams() {
-  const posts = await getPosts(DOMAIN)
+  const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
+  const posts = postsResult.success ? postsResult.data || [] : []
 
   return posts.map(post => ({
     slug: post.slug,
@@ -23,7 +25,8 @@ export async function generateStaticParams() {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
   const resolvedParams = await params
-  const post = await getPostBySlug(DOMAIN, resolvedParams.slug)
+  const postResult = await ContentLibrary.getPostBySlug(DOMAIN, resolvedParams.slug)
+  const post = postResult.success ? postResult.data : null
 
   if (!post) {
     return {
@@ -41,7 +44,8 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
 
 export default async function BlogPost({ params }: BlogPostProps) {
   const resolvedParams = await params
-  const post = await getPostBySlug(DOMAIN, resolvedParams.slug)
+  const postResult = await ContentLibrary.getPostBySlug(DOMAIN, resolvedParams.slug)
+  const post = postResult.success ? postResult.data : null
 
   if (!post) {
     notFound()

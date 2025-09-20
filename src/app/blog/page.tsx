@@ -1,5 +1,6 @@
 import { Metadata } from 'next'
-import { getPosts } from '../../lib/supabase'
+import { ContentLibrary } from '../../../lib/content'
+import type { Post } from '../../../types/content'
 
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
 
@@ -9,7 +10,8 @@ export const metadata: Metadata = {
 }
 
 export default async function BlogPage() {
-  const posts = await getPosts(DOMAIN)
+  const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
+  const posts = postsResult.success ? postsResult.data || [] : []
 
   return (
     <main className="min-h-screen bg-gray-50">
