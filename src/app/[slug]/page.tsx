@@ -38,14 +38,34 @@ interface PageProps {
 
 // Generate static pages at build time
 export async function generateStaticParams() {
+  console.log('[BUILD] generateStaticParams - Domain:', DOMAIN)
+  console.log('[BUILD] Environment check:', {
+    WEBSITE_DOMAIN: process.env.WEBSITE_DOMAIN,
+    SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL?.substring(0, 20) + '...',
+    HAS_SUPABASE_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  })
+
   const pagesResult = await ContentLibrary.getAllPages(DOMAIN)
+  console.log('[BUILD] Pages fetch result:', {
+    success: pagesResult.success,
+    error: pagesResult.error,
+    pageCount: pagesResult.data?.length || 0
+  })
+
   const pages = pagesResult.success ? pagesResult.data || [] : []
 
-  return pages
+  if (pages.length > 0) {
+    console.log('[BUILD] Found pages:', pages.map(p => ({ slug: p.slug, title: p.title })))
+  }
+
+  const staticParams = pages
     .filter(page => page.slug !== 'home') // Exclude home page
     .map(page => ({
       slug: page.slug,
     }))
+
+  console.log('[BUILD] Generated static params:', staticParams)
+  return staticParams
 }
 
 // Generate metadata for SEO
