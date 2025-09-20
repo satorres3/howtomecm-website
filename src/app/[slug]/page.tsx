@@ -2,9 +2,26 @@ import { Metadata } from 'next'
 import { ContentLibrary } from '../../../lib/content'
 import ContentRenderer from '../../components/ContentRenderer'
 import { notFound } from 'next/navigation'
-import type { Page } from '../../../types/content'
+import type { Page, ContentSection } from '../../../types/content'
 
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+
+// Helper function to convert page content to sections format
+function getPageSections(page: Page): Array<{id: string, type: string, content: any}> {
+  if (page.sections && Array.isArray(page.sections)) {
+    return page.sections
+  }
+
+  if (page.content && typeof page.content === 'string') {
+    return [{
+      id: 'legacy-content',
+      type: 'text',
+      content: { text: page.content }
+    }]
+  }
+
+  return []
+}
 
 interface PageProps {
   params: Promise<{
@@ -56,7 +73,7 @@ export default async function DynamicPage({ params }: PageProps) {
   return (
     <ContentRenderer
       title={page.title}
-      sections={page.content || page.sections || []}
+      sections={getPageSections(page)}
       seo={page.seo}
     />
   )

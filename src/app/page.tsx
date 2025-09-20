@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { ContentLibrary } from '../../lib/content'
 import ContentRenderer from '../components/ContentRenderer'
-import type { Page, Post } from '../../types/content'
+import type { Page, Post, ContentSection } from '../../types/content'
 
 export const metadata: Metadata = {
   title: 'How to MeCM - Professional Content Management',
@@ -9,6 +9,23 @@ export const metadata: Metadata = {
 }
 
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
+
+// Helper function to convert page content to sections format
+function getPageSections(page: Page): Array<{id: string, type: string, content: any}> {
+  if (page.sections && Array.isArray(page.sections)) {
+    return page.sections
+  }
+
+  if (page.content && typeof page.content === 'string') {
+    return [{
+      id: 'legacy-content',
+      type: 'text',
+      content: { text: page.content }
+    }]
+  }
+
+  return []
+}
 
 export default async function HomePage() {
   // Try to get the home page content from CMS using enhanced content library
@@ -25,7 +42,7 @@ export default async function HomePage() {
       <main className="min-h-screen">
         <ContentRenderer
           title={homePage.title}
-          sections={homePage.content || homePage.sections || []}
+          sections={getPageSections(homePage)}
           seo={homePage.seo}
         />
 
