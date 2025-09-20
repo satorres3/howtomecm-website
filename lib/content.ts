@@ -56,10 +56,7 @@ export class ContentLibrary {
     try {
       const { data, error } = await supabase
         .from('pages')
-        .select(`
-          *,
-          author:user_profiles(id, full_name, avatar_url)
-        `)
+        .select('*')
         .eq('website_domain', domain)
         .eq('status', 'published')
         .eq('is_published_to_domain', true)
@@ -94,7 +91,6 @@ export class ContentLibrary {
         .from('posts')
         .select(`
           *,
-          author:user_profiles(id, full_name, avatar_url),
           categories(*),
           post_tags(tags(*))
         `)
@@ -130,10 +126,7 @@ export class ContentLibrary {
     try {
       const { data, error } = await supabase
         .from('pages')
-        .select(`
-          *,
-          author:user_profiles(id, full_name, avatar_url)
-        `)
+        .select('*')
         .eq('website_domain', domain)
         .eq('slug', slug)
         .eq('status', 'published')
@@ -170,7 +163,6 @@ export class ContentLibrary {
         .from('posts')
         .select(`
           *,
-          author:user_profiles(id, full_name, avatar_url),
           categories(*),
           post_tags(tags(*))
         `)
@@ -249,7 +241,6 @@ export class ContentLibrary {
         .from('posts')
         .select(`
           *,
-          author:user_profiles(id, full_name, avatar_url),
           categories(*),
           post_tags!inner(tags!inner(*))
         `)
@@ -288,7 +279,6 @@ export class ContentLibrary {
         .from('posts')
         .select(`
           *,
-          author:user_profiles(id, full_name, avatar_url),
           categories(*),
           post_tags(tags(*))
         `)
@@ -365,7 +355,6 @@ export class ContentLibrary {
           .from('posts')
           .select(`
             *,
-            author:user_profiles(id, full_name, avatar_url),
             categories(*),
             post_tags(tags(*))
           `)
@@ -377,10 +366,7 @@ export class ContentLibrary {
 
         supabase
           .from('pages')
-          .select(`
-            *,
-            author:user_profiles(id, full_name, avatar_url)
-          `)
+          .select('*')
           .eq('website_domain', domain)
           .eq('status', 'published')
           .eq('is_published_to_domain', true)
