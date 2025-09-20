@@ -409,11 +409,13 @@ export class ContentLibrary {
   static clearCache(domain?: string): void {
     if (domain) {
       // Clear cache entries for specific domain
-      for (const [key] of contentCache) {
+      const keysToDelete: string[] = []
+      contentCache.forEach((_, key) => {
         if (key.includes(domain)) {
-          contentCache.delete(key)
+          keysToDelete.push(key)
         }
-      }
+      })
+      keysToDelete.forEach(key => contentCache.delete(key))
     } else {
       // Clear all cache
       contentCache.clear()

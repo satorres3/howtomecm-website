@@ -367,7 +367,7 @@ async function testErrorHandling(): Promise<TestResult> {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...errorTest.headers
+            ...(errorTest.headers as Record<string, string>)
           },
           body: errorTest.body
         })

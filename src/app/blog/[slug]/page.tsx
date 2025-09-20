@@ -42,7 +42,7 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
   return {
     title: post.seo?.metaTitle || post.title,
     description: post.seo?.metaDescription || post.excerpt || `Read about ${post.title}`,
-    keywords: post.seo?.focusKeyword ? [post.seo.focusKeyword] : post.tags,
+    keywords: post.seo?.focusKeyword ? [post.seo.focusKeyword] : post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name),
     authors: post.author?.full_name ? [{ name: post.author.full_name }] : undefined,
     openGraph: {
       title: post.seo?.metaTitle || post.title,
@@ -60,7 +60,7 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
       publishedTime: post.date || post.created_at,
       modifiedTime: post.updated_at,
       authors: post.author?.full_name ? [post.author.full_name] : undefined,
-      tags: post.tags,
+      tags: post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name),
     },
     twitter: {
       card: 'summary_large_image',
@@ -171,15 +171,18 @@ export default async function BlogPost({ params }: BlogPostProps) {
             <div className="mt-8 pt-8 border-t">
               <h3 className="text-lg font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag: string, index: number) => (
+                {post.tags.map((tag, index: number) => {
+                  const tagName = typeof tag === 'string' ? tag : tag.name
+                  return (
                   <a
                     key={index}
-                    href={`/blog?tag=${encodeURIComponent(tag)}`}
+                    href={`/blog?tag=${encodeURIComponent(tagName)}`}
                     className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
                   >
-                    #{tag}
+                    #{tagName}
                   </a>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
@@ -197,9 +200,6 @@ export default async function BlogPost({ params }: BlogPostProps) {
                 )}
                 <div>
                   <h4 className="font-semibold text-gray-900">{post.author.full_name}</h4>
-                  {post.author.bio && (
-                    <p className="text-gray-600 text-sm mt-1">{post.author.bio}</p>
-                  )}
                 </div>
               </div>
             </div>

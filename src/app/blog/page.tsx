@@ -67,7 +67,10 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   // Filter by tag if specified
   if (tag) {
     posts = posts.filter(post =>
-      post.tags?.some(postTag => postTag.toLowerCase() === tag.toLowerCase())
+      post.tags?.some(postTag => {
+        const tagName = typeof postTag === 'string' ? postTag : postTag.name
+        return tagName.toLowerCase() === tag.toLowerCase()
+      })
     )
   }
 
@@ -79,8 +82,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const currentPosts = posts.slice(startIndex, endIndex)
 
   // Get all categories and tags for filters
-  const allCategories = [...new Set(posts.map(post => post.category?.name).filter(Boolean))]
-  const allTags = [...new Set(posts.flatMap(post => post.tags || []))]
+  const categorySet = new Set(posts.map(post => post.category?.name).filter((name): name is string => Boolean(name)))
+  const allCategories = Array.from(categorySet)
+
+  const tagSet = new Set(posts.flatMap(post => (post.tags || []).map(tag => typeof tag === 'string' ? tag : tag.name)))
+  const allTags = Array.from(tagSet)
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -218,15 +224,18 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           {post.category.name}
                         </a>
                       )}
-                      {post.tags?.slice(0, 3).map((tagName) => (
+                      {post.tags?.slice(0, 3).map((tag, index) => {
+                        const tagName = typeof tag === 'string' ? tag : tag.name
+                        return (
                         <a
-                          key={tagName}
+                          key={index}
                           href={`/blog?tag=${encodeURIComponent(tagName)}`}
                           className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded hover:bg-gray-200"
                         >
                           #{tagName}
                         </a>
-                      ))}
+                        )
+                      })}
                     </div>
                     <a
                       href={`/blog/${post.slug}`}
