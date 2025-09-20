@@ -1,41 +1,60 @@
-# How to MeCM - Website
+# HowToMeCM Website
 
-This is the public website repository for howtomecm.com.
-Built with Next.js and deployed to Vercel.
+Static website generator for staging.howtomecm.com (and production howtomecm.com).
 
-## Deployment Domains
-- **Production:** howtomecm.com
-- **Staging:** staging.howtomecm.com
+This Next.js application dynamically generates static websites from content stored in Supabase CMS.
 
-## Project Structure
+## Features
+
+- **Dynamic Content**: Pulls pages and posts from Supabase based on `website_domain`
+- **Static Generation**: Pre-renders pages at build time for optimal performance
+- **Multi-Domain Support**: Configurable for different domains (staging/production)
+- **SEO Optimized**: Generates metadata from CMS content
+- **Responsive Design**: Built with Tailwind CSS
+- **Content Types**: Supports various section types (hero, text, images, FAQ, etc.)
+
+## Environment Variables
+
+Create a `.env.local` file with:
+
 ```
-src/
-├── app/                 # Next.js App Router
-├── components/website/  # Website-specific components
-├── lib/                # Utilities and content fetching
-└── types/              # TypeScript types
-
-api/                    # API routes (to be added)
-├── public/             # Public API endpoints
-└── webhooks/           # Build webhooks
-```
-
-## Content Source
-Content is dynamically generated from the CMS at cms.howtomecm.com via:
-- Supabase database queries
-- Real-time updates via webhooks
-- Static site generation with ISR
-
-## Development
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run type-check   # Check TypeScript
+NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+WEBSITE_DOMAIN=staging.howtomecm.com
 ```
 
 ## Deployment
-- **Platform:** Vercel
-- **Build Trigger:** Webhook from CMS
-- **Content Source:** Supabase database
-- **Updates:** Real-time via revalidation
+
+This repository is configured to deploy to:
+- **Staging**: `staging.howtomecm.com`
+- **Production**: `howtomecm.com` (when replicated)
+
+### Vercel Deployment
+
+1. Connect this repository to Vercel project
+2. Configure environment variables in Vercel dashboard
+3. Deploy automatically on push to main branch
+
+## Content Workflow
+
+1. User creates content in CMS admin (`cms.howtomecm.com`)
+2. Content is saved to Supabase with `website_domain` field
+3. This website queries Supabase for domain-specific content
+4. Static pages are generated and deployed
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Visit `http://localhost:3000` to see the site.
+
+## Architecture
+
+```
+CMS Admin → Supabase → This Website → Static Site
+```
+
+This solves the "staging creates nothing" issue by ensuring content actually gets deployed to the target domain.

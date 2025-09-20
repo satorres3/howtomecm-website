@@ -6,9 +6,9 @@ import { notFound } from 'next/navigation'
 const DOMAIN = process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com'
 
 interface PageProps {
-  params: {
+  params: Promise<{
     slug: string
-  }
+  }>
 }
 
 // Generate static pages at build time
@@ -24,7 +24,8 @@ export async function generateStaticParams() {
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const page = await getPageBySlug(DOMAIN, params.slug)
+  const resolvedParams = await params
+  const page = await getPageBySlug(DOMAIN, resolvedParams.slug)
 
   if (!page) {
     return {
@@ -41,7 +42,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DynamicPage({ params }: PageProps) {
-  const page = await getPageBySlug(DOMAIN, params.slug)
+  const resolvedParams = await params
+  const page = await getPageBySlug(DOMAIN, resolvedParams.slug)
 
   if (!page) {
     notFound()
