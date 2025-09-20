@@ -56,7 +56,7 @@ export default async function DynamicPage({ params }: PageProps) {
   return (
     <ContentRenderer
       title={page.title}
-      sections={page.sections || []}
+      sections={page.content || page.sections || []}
       seo={page.seo}
     />
   )

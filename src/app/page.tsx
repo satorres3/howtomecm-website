@@ -25,7 +25,7 @@ export default async function HomePage() {
       <main className="min-h-screen">
         <ContentRenderer
           title={homePage.title}
-          sections={homePage.sections || []}
+          sections={homePage.content || homePage.sections || []}
           seo={homePage.seo}
         />
 
