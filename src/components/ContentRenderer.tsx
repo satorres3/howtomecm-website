@@ -1,5 +1,7 @@
 'use client'
 
+import { useState, useRef, useEffect } from 'react'
+
 interface Section {
   id: string
   type: string
@@ -21,8 +23,8 @@ export default function ContentRenderer({ title, sections, seo }: ContentRendere
     switch (section.type) {
       case 'text':
         return (
-          <div key={section.id} className="bg-white rounded-lg shadow-sm p-8 mb-8">
-            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-gray-900"
+          <div key={section.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
+            <div className="prose prose-lg max-w-none prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-invert dark:prose-invert"
                  dangerouslySetInnerHTML={{ __html: section.content.text || '' }} />
           </div>
         )
@@ -52,14 +54,14 @@ export default function ContentRenderer({ title, sections, seo }: ContentRendere
 
       case 'image':
         return (
-          <div key={section.id} className="bg-white rounded-lg shadow-sm p-6 mb-8">
+          <div key={section.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 mb-8">
             <img
               src={section.content.url}
               alt={section.content.alt || ''}
               className="w-full h-auto rounded-lg shadow-md"
             />
             {section.content.caption && (
-              <p className="text-sm text-gray-600 mt-4 text-center italic">{section.content.caption}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400 mt-4 text-center italic">{section.content.caption}</p>
             )}
           </div>
         )
@@ -216,6 +218,131 @@ export default function ContentRenderer({ title, sections, seo }: ContentRendere
               </form>
             </div>
           </section>
+        )
+
+      case 'code':
+        return (
+          <div key={section.id} className="mb-8">
+            <div className="bg-gray-900 dark:bg-gray-800 rounded-lg overflow-hidden shadow-lg">
+              {section.content.title && (
+                <div className="bg-gray-800 dark:bg-gray-700 px-4 py-2 border-b border-gray-700">
+                  <span className="text-gray-300 text-sm font-medium">{section.content.title}</span>
+                </div>
+              )}
+              <div className="relative">
+                <pre className="p-4 overflow-x-auto text-sm">
+                  <code className={`language-${section.content.language || 'text'} text-gray-100`}>
+                    {section.content.code}
+                  </code>
+                </pre>
+                <button
+                  onClick={() => navigator.clipboard.writeText(section.content.code)}
+                  className="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-gray-300 px-3 py-1 rounded text-xs transition-colors"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+
+      case 'video':
+        return (
+          <div key={section.id} className="mb-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              {section.content.title && (
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{section.content.title}</h3>
+                </div>
+              )}
+              <div className="aspect-video">
+                <video
+                  controls
+                  className="w-full h-full"
+                  poster={section.content.poster}
+                  preload="metadata"
+                >
+                  <source src={section.content.url} type={section.content.type || 'video/mp4'} />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+              {section.content.caption && (
+                <div className="p-4 bg-gray-50 dark:bg-gray-700">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{section.content.caption}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )
+
+      case 'embed':
+        return (
+          <div key={section.id} className="mb-8">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              {section.content.title && (
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{section.content.title}</h3>
+                </div>
+              )}
+              <div className="aspect-video">
+                <iframe
+                  src={section.content.url}
+                  className="w-full h-full"
+                  allowFullScreen
+                  title={section.content.title || 'Embedded content'}
+                />
+              </div>
+            </div>
+          </div>
+        )
+
+      case 'quote':
+        return (
+          <div key={section.id} className="mb-8">
+            <blockquote className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-l-4 border-blue-500 p-6 rounded-r-lg">
+              <p className="text-lg italic text-gray-800 dark:text-gray-200 mb-4">"{section.content.text}"</p>
+              {section.content.author && (
+                <cite className="text-gray-600 dark:text-gray-400 text-sm font-medium">— {section.content.author}</cite>
+              )}
+            </blockquote>
+          </div>
+        )
+
+      case 'table':
+        return (
+          <div key={section.id} className="mb-8 overflow-x-auto">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+              {section.content.title && (
+                <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{section.content.title}</h3>
+                </div>
+              )}
+              <table className="w-full">
+                {section.content.headers && (
+                  <thead className="bg-gray-50 dark:bg-gray-700">
+                    <tr>
+                      {section.content.headers.map((header: string, index: number) => (
+                        <th key={index} className="px-4 py-3 text-left text-sm font-medium text-gray-900 dark:text-white">
+                          {header}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                )}
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  {section.content.rows?.map((row: string[], rowIndex: number) => (
+                    <tr key={rowIndex} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      {row.map((cell: string, cellIndex: number) => (
+                        <td key={cellIndex} className="px-4 py-3 text-sm text-gray-700 dark:text-gray-300">
+                          {cell}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )
 
       default:
