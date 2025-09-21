@@ -238,11 +238,10 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   return (
     <article className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Clean, Structured Header */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="container mx-auto px-6 py-6">
-          {/* Navigation and Dark Mode Toggle */}
-          <div className="flex justify-between items-center mb-8">
+      {/* Navigation Header - Simplified */}
+      <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-screen-2xl mx-auto px-6 py-4">
+          <div className="flex justify-between items-center">
             <nav>
               <a href="/blog" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -251,67 +250,15 @@ export default async function BlogPost({ params }: BlogPostProps) {
                 Back to Blog
               </a>
             </nav>
-            <DarkModeToggle />
-          </div>
-
-          {/* Title Section - Full Width */}
-          <div className="max-w-5xl mx-auto mb-8">
-            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              {post.title}
-            </h1>
-
-            {/* Post Metadata */}
-            <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600 dark:text-gray-400 mb-6">
-              <span className="flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                {new Date(post.date || post.created_at).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </span>
-              {post.author?.full_name && (
-                <span className="flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                  by {post.author.full_name}
-                </span>
-              )}
-              <span className="flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {formatReadingTime(readingTime)}
-              </span>
-              {post.category?.name && (
-                <a
-                  href={`/blog?category=${encodeURIComponent(post.category.name)}`}
-                  className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-3 py-1 rounded-full hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
-                >
-                  {post.category.name}
-                </a>
-              )}
+            <div className="flex items-center space-x-4">
+              <EngagementMetrics
+                postId={post.id}
+                title={post.title}
+                url={postUrl}
+                className=""
+              />
+              <DarkModeToggle />
             </div>
-
-            {/* Excerpt */}
-            {post.excerpt && (
-              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed mb-8 max-w-4xl">
-                {post.excerpt}
-              </p>
-            )}
-          </div>
-
-          {/* Engagement Metrics */}
-          <div className="max-w-5xl mx-auto">
-            <EngagementMetrics
-              postId={post.id}
-              title={post.title}
-              url={postUrl}
-              className="mb-6"
-            />
           </div>
         </div>
       </header>
@@ -337,17 +284,6 @@ export default async function BlogPost({ params }: BlogPostProps) {
             <aside className="lg:col-span-1 bg-white dark:bg-gray-800 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto order-2 lg:order-1">
               <div className="p-6 space-y-8">
 
-                {/* Reading Progress */}
-                <div className="text-center">
-                  <div className="relative w-16 h-16 mx-auto mb-4">
-                    <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
-                    <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-pulse"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">85%</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Reading Progress</p>
-                </div>
 
                 {/* Dynamic Table of Contents */}
                 <div>
@@ -367,7 +303,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
                   </div>
                   <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">Watch related content on our YouTube channel</p>
                   <a
-                    href="https://youtube.com/@howtomecm"
+                    href="https://youtube.com/channel/UCAceM2bfmSUfCwJ03TB2cjg"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-2 px-3 rounded-lg text-xs font-medium transition-colors"
@@ -380,23 +316,43 @@ export default async function BlogPost({ params }: BlogPostProps) {
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Related Posts</h3>
                   <div className="space-y-4">
-                    {relatedPosts.slice(0, 3).map((relatedPost, index) => (
+                    {/* Show more related posts */}
+                    {allPosts
+                      .filter(p => p.id !== post.id)
+                      .filter(p =>
+                        (post.category?.name && p.category?.name === post.category.name) ||
+                        (post.tags && post.tags.some(tag => {
+                          const tagName = typeof tag === 'string' ? tag : tag.name;
+                          return p.tags?.some(pTag => {
+                            const pTagName = typeof pTag === 'string' ? pTag : pTag.name;
+                            return pTagName === tagName;
+                          });
+                        }))
+                      )
+                      .slice(0, 5)
+                      .map((relatedPost, index) => (
                       <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="block group">
-                        <article className="flex space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                          <div className="w-16 h-12 bg-gray-200 dark:bg-gray-600 rounded-md flex-shrink-0 overflow-hidden">
+                        <article className="bg-white dark:bg-gray-700 rounded-xl p-4 shadow-sm hover:shadow-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-all border border-gray-100 dark:border-gray-600">
+                          <div className="w-full h-24 bg-gray-200 dark:bg-gray-600 rounded-lg mb-3 overflow-hidden">
                             <img
-                              src={relatedPost.featured_image || 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=200&h=150&fit=crop'}
+                              src={relatedPost.featured_image || `https://images.unsplash.com/photo-${['1517180102446-f3ece451e9d8', '1560520653-a1f9e72bbaa5', '1573496359142-b8b25c0c5ee7', '1498050108023-c5e6f2bdc15b', '1451187580459-43d4fe3f14a5'][index % 5]}?w=300&h=200&fit=crop`}
                               alt={relatedPost.title}
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             />
                           </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                          <div>
+                            <h4 className="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                               {relatedPost.title}
                             </h4>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                               {new Date(relatedPost.date).toLocaleDateString()}
                             </p>
+                            <div className="flex items-center text-xs text-gray-400 dark:text-gray-500">
+                              <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              {Math.ceil(Math.random() * 8 + 2)} min read
+                            </div>
                           </div>
                         </article>
                       </Link>
@@ -412,7 +368,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
               <div className="bg-white dark:bg-gray-800 min-h-screen">
                 <div className="max-w-4xl mx-auto px-8 py-12">
 
-                  {/* Content Header */}
+                  {/* Content Header - Streamlined */}
                   <div className="mb-12">
                     <div className="flex items-center space-x-2 mb-6">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
@@ -433,19 +389,41 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
                     <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-8">
                       <div className="flex items-center space-x-2">
-                        <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                        {post.author?.avatar_url ? (
+                          <img
+                            src={post.author.avatar_url}
+                            alt={post.author.full_name}
+                            className="w-8 h-8 rounded-full"
+                          />
+                        ) : (
+                          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                            {post.author?.full_name?.charAt(0) || 'A'}
+                          </div>
+                        )}
                         <span>By {post.author?.full_name || 'Anonymous'}</span>
                       </div>
                       <span>•</span>
-                      <span>8 min read</span>
+                      <span>{formatReadingTime(readingTime)}</span>
                       <span>•</span>
                       <span>Last updated {new Date(post.updated_at || post.date).toLocaleDateString()}</span>
                     </div>
 
                     {post.excerpt && (
-                      <p className="text-xl leading-relaxed text-gray-700 dark:text-gray-300">
+                      <p className="text-xl leading-relaxed text-gray-700 dark:text-gray-300 mb-8">
                         {post.excerpt}
                       </p>
+                    )}
+
+                    {/* Featured Image */}
+                    {post.featured_image && (
+                      <div className="w-full h-64 md:h-80 relative overflow-hidden rounded-xl mb-8">
+                        <img
+                          src={post.featured_image}
+                          alt={post.title}
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                      </div>
                     )}
                   </div>
 
