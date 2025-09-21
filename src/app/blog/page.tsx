@@ -113,12 +113,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const endIndex = startIndex + postsPerPage
   const currentPosts = posts.slice(startIndex, endIndex)
 
-  // Get all categories and tags for filters
+  // Get only categories for filters (simplified)
   const categorySet = new Set(posts.map(post => post.category?.name).filter((name): name is string => Boolean(name)))
   const allCategories = Array.from(categorySet)
-
-  const tagSet = new Set(posts.flatMap(post => (post.tags || []).map(tag => typeof tag === 'string' ? tag : tag.name)))
-  const allTags = Array.from(tagSet)
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
@@ -187,7 +184,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
         </nav>
 
         {/* Modern Filters */}
-        {(allCategories.length > 0 || allTags.length > 0) && (
+        {allCategories.length > 0 && (
           <div className="mb-12 card-modern p-8 animate-slide-up stagger-delay-1">
             <div className="flex flex-wrap gap-6">
               {/* Category filters */}
@@ -222,27 +219,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 </div>
               )}
 
-              {/* Tag filters */}
-              {allTags.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-4 text-lg">Popular Tags</h3>
-                  <div className="flex flex-wrap gap-3">
-                    {allTags.slice(0, 10).map((tagName) => (
-                      <a
-                        key={tagName}
-                        href={`/blog?tag=${encodeURIComponent(tagName)}`}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          tag === tagName
-                            ? 'bg-emerald-600 text-white shadow-lg transform scale-105'
-                            : 'bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 hover:scale-105'
-                        }`}
-                      >
-                        #{tagName}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
