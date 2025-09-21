@@ -20,6 +20,264 @@ export interface SamplePost {
 
 export const samplePosts: SamplePost[] = [
   {
+    id: "7",
+    title: "How to Configure Microsoft Edge Start & Home Page via Intune",
+    slug: "how-to-configure-microsoft-edge-start-home-page-intune",
+    excerpt: "Complete step-by-step guide for configuring Microsoft Edge start and home pages for Windows 10/11 devices using Microsoft Intune Settings Catalog.",
+    content: `
+<div class="mb-8">
+  <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop" alt="Microsoft Intune Edge Configuration" class="w-full h-64 object-cover rounded-xl shadow-lg mb-4">
+</div>
+
+<h2>Overview</h2>
+<p>Managing Microsoft Edge browser settings across your organization is crucial for maintaining consistency and productivity. In this comprehensive guide, I'll walk you through configuring the Microsoft Edge Start and Home page for Windows 10/11 devices managed by Microsoft Intune using the Settings Catalog approach.</p>
+
+<div class="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-6 my-8 border border-green-200 dark:border-green-800">
+  <h4 class="text-lg font-semibold text-green-900 dark:text-green-100 mb-4 flex items-center">
+    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+    </svg>
+    What You'll Learn
+  </h4>
+  <ul class="space-y-2 text-green-800 dark:text-green-200">
+    <li class="flex items-start"><span class="w-2 h-2 bg-green-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Create and configure Intune device configuration profiles</li>
+    <li class="flex items-start"><span class="w-2 h-2 bg-green-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Use Settings Catalog for Microsoft Edge policies</li>
+    <li class="flex items-start"><span class="w-2 h-2 bg-green-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Configure startup pages and home page URLs</li>
+    <li class="flex items-start"><span class="w-2 h-2 bg-green-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Assign policies to device groups</li>
+  </ul>
+</div>
+
+<h2>Prerequisites</h2>
+<p>Before you begin, ensure you have:</p>
+<ul class="list-disc list-inside space-y-2 mb-6">
+  <li>Microsoft Intune administrator access</li>
+  <li>Windows 10/11 devices enrolled in Intune</li>
+  <li>Microsoft Edge installed on target devices</li>
+  <li>Device groups created for policy assignment</li>
+</ul>
+
+<h2>Step 1: Access Intune Administration Center</h2>
+<p>First, navigate to the Microsoft Intune admin center:</p>
+<ol class="list-decimal list-inside space-y-2 mb-6">
+  <li>Go to <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">https://intune.microsoft.com</code></li>
+  <li>Navigate to <strong>Devices > Windows > Configuration</strong></li>
+  <li>Click <strong>Create > New Policy</strong></li>
+</ol>
+
+<h2>Step 2: Set Up the Configuration Profile</h2>
+<p>Configure the basic profile settings:</p>
+<ol class="list-decimal list-inside space-y-2 mb-6">
+  <li>Select <strong>Platform</strong> as <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Windows 10 and later</code></li>
+  <li>Choose <strong>Profile type</strong> as <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Settings catalog</code></li>
+  <li>Click <strong>Create</strong></li>
+  <li>Provide a descriptive <strong>Name</strong> (e.g., "Microsoft Edge Start & Home Page Configuration")</li>
+  <li>Add a detailed <strong>Description</strong> explaining the policy purpose</li>
+  <li>Click <strong>Next</strong></li>
+</ol>
+
+<div class="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4 my-6">
+  <div class="flex items-start">
+    <svg class="w-5 h-5 text-yellow-600 dark:text-yellow-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+    </svg>
+    <div>
+      <h4 class="text-yellow-800 dark:text-yellow-200 font-semibold mb-1">Important Note</h4>
+      <p class="text-yellow-700 dark:text-yellow-300 text-sm">We'll use device-level settings (locked configuration) instead of user-level settings to prevent users from overriding organizational policies.</p>
+    </div>
+  </div>
+</div>
+
+<h2>Step 3: Add Microsoft Edge Configuration Settings</h2>
+<p>Now we'll add the specific Edge browser settings:</p>
+<ol class="list-decimal list-inside space-y-2 mb-6">
+  <li>Click <strong>Add settings</strong></li>
+  <li>In the search box, type <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Microsoft Edge</code></li>
+  <li>Expand <strong>Microsoft Edge > Startup, home page and new tab page</strong></li>
+  <li>Select the device-level settings (without "(User)" suffix) for policy enforcement</li>
+</ol>
+
+<h2>Step 4: Configure Startup Page Settings</h2>
+<p>Configure the browser startup behavior:</p>
+
+<div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 my-6">
+  <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Required Settings Configuration:</h4>
+
+  <div class="space-y-4">
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h5 class="font-medium text-gray-900 dark:text-white">Action to take on startup</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Controls what happens when Edge starts</p>
+      <code class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-sm">Status: Enabled</code>
+    </div>
+
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h5 class="font-medium text-gray-900 dark:text-white">Action to take on startup (Device)</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Specify the startup action</p>
+      <code class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-sm">Value: Open a list of URLs</code>
+    </div>
+
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h5 class="font-medium text-gray-900 dark:text-white">Sites to open when the browser starts</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Define startup URLs</p>
+      <code class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-sm">Status: Enabled</code>
+      <p class="text-xs text-gray-500 mt-1">Example: https://www.howtomecm.com</p>
+    </div>
+  </div>
+</div>
+
+<h2>Step 5: Configure Home Page Settings</h2>
+<p>Set up the home page configuration:</p>
+
+<div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 my-6">
+  <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Home Page Configuration:</h4>
+
+  <div class="space-y-4">
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h5 class="font-medium text-gray-900 dark:text-white">Configure the home page URL</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Enable home page configuration</p>
+      <code class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Status: Enabled</code>
+    </div>
+
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h5 class="font-medium text-gray-900 dark:text-white">Home page URL (Device)</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Specify the home page URL</p>
+      <code class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Value: https://www.howtomecm.com</code>
+    </div>
+
+    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+      <h5 class="font-medium text-gray-900 dark:text-white">Set the new tab page as the home page</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Control new tab behavior</p>
+      <code class="bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 px-2 py-1 rounded text-sm">Status: Disabled</code>
+    </div>
+
+    <div>
+      <h5 class="font-medium text-gray-900 dark:text-white">Show Home button on toolbar</h5>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Display home button in toolbar</p>
+      <code class="bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-2 py-1 rounded text-sm">Status: Enabled</code>
+    </div>
+  </div>
+</div>
+
+<p>Once all settings are configured, click <strong>Next</strong> to proceed.</p>
+
+<h2>Step 6: Set Scope Tags (Optional)</h2>
+<p>If your organization uses scope tags for role-based access control:</p>
+<ol class="list-decimal list-inside space-y-2 mb-6">
+  <li>Add appropriate scope tags if needed</li>
+  <li>Click <strong>Next</strong> to continue</li>
+</ol>
+
+<h2>Step 7: Assign the Configuration Profile</h2>
+<p>Target the policy to specific groups:</p>
+<ol class="list-decimal list-inside space-y-2 mb-6">
+  <li>Click <strong>Add groups</strong> under Assignments</li>
+  <li>Select the target <strong>device groups</strong> or <strong>user groups</strong></li>
+  <li>Configure any exclusions if necessary</li>
+  <li>Click <strong>Next</strong></li>
+</ol>
+
+<div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 my-6">
+  <div class="flex items-start">
+    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400 mr-3 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+      <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+    </svg>
+    <div>
+      <h4 class="text-blue-800 dark:text-blue-200 font-semibold mb-1">Best Practice</h4>
+      <p class="text-blue-700 dark:text-blue-300 text-sm">Start with a pilot group of devices to test the configuration before rolling out to all devices in your organization.</p>
+    </div>
+  </div>
+</div>
+
+<h2>Step 8: Review and Create</h2>
+<p>Finalize the configuration:</p>
+<ol class="list-decimal list-inside space-y-2 mb-6">
+  <li>Review all configuration settings in the summary</li>
+  <li>Verify the assigned groups are correct</li>
+  <li>Click <strong>Create</strong> to deploy the policy</li>
+</ol>
+
+<h2>Verification and Troubleshooting</h2>
+<p>After deploying the policy, verify it's working correctly:</p>
+
+<h3>Policy Status Check</h3>
+<ul class="list-disc list-inside space-y-2 mb-6">
+  <li>Navigate to <strong>Devices > Monitor > Device configuration</strong></li>
+  <li>Find your Edge configuration policy</li>
+  <li>Review the deployment status and any errors</li>
+</ul>
+
+<h3>End-User Verification</h3>
+<ul class="list-disc list-inside space-y-2 mb-6">
+  <li>On a target device, open Microsoft Edge</li>
+  <li>Verify the configured URLs open on startup</li>
+  <li>Check that the home button appears in the toolbar</li>
+  <li>Confirm the home button navigates to the configured URL</li>
+</ul>
+
+<h2>Common Troubleshooting Tips</h2>
+
+<div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 my-6">
+  <h4 class="text-red-800 dark:text-red-200 font-semibold mb-3">Common Issues & Solutions</h4>
+  <div class="space-y-3 text-sm">
+    <div>
+      <strong class="text-red-700 dark:text-red-300">Issue:</strong> Policy not applying to devices
+      <br>
+      <strong class="text-red-700 dark:text-red-300">Solution:</strong> Check device group membership and policy assignment scope
+    </div>
+    <div>
+      <strong class="text-red-700 dark:text-red-300">Issue:</strong> Users can still override settings
+      <br>
+      <strong class="text-red-700 dark:text-red-300">Solution:</strong> Ensure you're using device-level settings, not user-level settings
+    </div>
+    <div>
+      <strong class="text-red-700 dark:text-red-300">Issue:</strong> Settings not taking effect immediately
+      <br>
+      <strong class="text-red-700 dark:text-red-300">Solution:</strong> Allow up to 8 hours for policy application or force sync from Company Portal
+    </div>
+  </div>
+</div>
+
+<h2>Conclusion</h2>
+<p>Configuring Microsoft Edge start and home pages through Intune provides centralized control over browser behavior across your organization. Using the Settings Catalog approach with device-level configurations ensures consistent user experience while preventing unauthorized modifications.</p>
+
+<p>This configuration is particularly valuable for:</p>
+<ul class="list-disc list-inside space-y-2 mb-6">
+  <li><strong>Corporate branding:</strong> Direct users to company portals and resources</li>
+  <li><strong>Productivity:</strong> Provide quick access to frequently used applications</li>
+  <li><strong>Security:</strong> Ensure users start with trusted, approved websites</li>
+  <li><strong>Compliance:</strong> Maintain consistent browser configurations across the organization</li>
+</ul>
+
+<div class="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-6 my-8 border border-purple-200 dark:border-purple-800">
+  <h4 class="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-4 flex items-center">
+    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    Next Steps
+  </h4>
+  <ul class="space-y-2 text-purple-800 dark:text-purple-200">
+    <li class="flex items-start"><span class="w-2 h-2 bg-purple-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Explore additional Edge policies for security and productivity</li>
+    <li class="flex items-start"><span class="w-2 h-2 bg-purple-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Configure Edge extension management through Intune</li>
+    <li class="flex items-start"><span class="w-2 h-2 bg-purple-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Set up comprehensive browser security policies</li>
+    <li class="flex items-start"><span class="w-2 h-2 bg-purple-500 rounded-full mr-3 mt-2 flex-shrink-0"></span>Monitor Edge policy compliance and reporting</li>
+  </ul>
+</div>
+
+<p class="text-gray-600 dark:text-gray-400 text-sm italic">Have questions about Microsoft Edge configuration in Intune? Feel free to reach out through the contact form or connect with me on LinkedIn for more detailed assistance with your specific requirements.</p>
+`,
+    date: "2024-12-08",
+    created_at: "2024-12-08T12:00:00Z",
+    category: {
+      name: "Intune",
+      slug: "intune"
+    },
+    tags: ["Microsoft Intune", "Microsoft Edge", "Device Configuration", "Windows 10", "Windows 11", "Browser Management", "Settings Catalog"],
+    featured_image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&h=400&fit=crop",
+    author: {
+      full_name: "Saulo Alves Torres",
+      email: "saulo@howtomecm.com"
+    }
+  },
+  {
     id: "1",
     title: "MECM Co-Management: Bridging Traditional and Modern IT",
     slug: "mecm-co-management-hybrid-cloud",
