@@ -21,7 +21,31 @@ export async function generateStaticParams() {
 
   // If no CMS posts available, use sample posts
   if (posts.length === 0) {
-    posts = samplePosts
+    posts = samplePosts.map(post => ({
+      ...post,
+      status: 'published' as const,
+      website_domain: DOMAIN,
+      is_published_to_domain: true,
+      updated_at: post.date,
+      author: {
+        ...post.author,
+        id: `author-${post.author.email.split('@')[0]}`
+      },
+      tags: post.tags.map(tag => ({
+        id: `tag-${tag.toLowerCase().replace(/\s+/g, '-')}`,
+        name: tag,
+        slug: tag.toLowerCase().replace(/\s+/g, '-'),
+        website_domain: DOMAIN,
+        created_at: post.date
+      })),
+      category: post.category ? {
+        id: `cat-${post.category.slug}`,
+        name: post.category.name,
+        slug: post.category.slug,
+        website_domain: DOMAIN,
+        created_at: post.date
+      } : undefined
+    }))
   }
 
   return posts.map(post => ({
@@ -41,7 +65,28 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
     if (samplePost) {
       post = {
         ...samplePost,
-        tags: samplePost.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+        status: 'published' as const,
+        website_domain: DOMAIN,
+        is_published_to_domain: true,
+        updated_at: samplePost.date,
+        author: {
+          ...samplePost.author,
+          id: `author-${samplePost.author.email.split('@')[0]}`
+        },
+        tags: samplePost.tags.map(tag => ({
+          id: `tag-${tag.toLowerCase().replace(/\s+/g, '-')}`,
+          name: tag,
+          slug: tag.toLowerCase().replace(/\s+/g, '-'),
+          website_domain: DOMAIN,
+          created_at: samplePost.date
+        })),
+        category: samplePost.category ? {
+          id: `cat-${samplePost.category.slug}`,
+          name: samplePost.category.name,
+          slug: samplePost.category.slug,
+          website_domain: DOMAIN,
+          created_at: samplePost.date
+        } : undefined
       }
     }
   }
@@ -106,7 +151,28 @@ export default async function BlogPost({ params }: BlogPostProps) {
     if (samplePost) {
       post = {
         ...samplePost,
-        tags: samplePost.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+        status: 'published' as const,
+        website_domain: DOMAIN,
+        is_published_to_domain: true,
+        updated_at: samplePost.date,
+        author: {
+          ...samplePost.author,
+          id: `author-${samplePost.author.email.split('@')[0]}`
+        },
+        tags: samplePost.tags.map(tag => ({
+          id: `tag-${tag.toLowerCase().replace(/\s+/g, '-')}`,
+          name: tag,
+          slug: tag.toLowerCase().replace(/\s+/g, '-'),
+          website_domain: DOMAIN,
+          created_at: samplePost.date
+        })),
+        category: samplePost.category ? {
+          id: `cat-${samplePost.category.slug}`,
+          name: samplePost.category.name,
+          slug: samplePost.category.slug,
+          website_domain: DOMAIN,
+          created_at: samplePost.date
+        } : undefined
       }
     }
   }
@@ -123,7 +189,28 @@ export default async function BlogPost({ params }: BlogPostProps) {
   if (allPosts.length === 0) {
     allPosts = samplePosts.map(p => ({
       ...p,
-      tags: p.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+      status: 'published' as const,
+      website_domain: DOMAIN,
+      is_published_to_domain: true,
+      updated_at: p.date,
+      author: {
+        ...p.author,
+        id: `author-${p.author.email.split('@')[0]}`
+      },
+      tags: p.tags.map(tag => ({
+        id: `tag-${tag.toLowerCase().replace(/\s+/g, '-')}`,
+        name: tag,
+        slug: tag.toLowerCase().replace(/\s+/g, '-'),
+        website_domain: DOMAIN,
+        created_at: p.date
+      })),
+      category: p.category ? {
+        id: `cat-${p.category.slug}`,
+        name: p.category.name,
+        slug: p.category.slug,
+        website_domain: DOMAIN,
+        created_at: p.date
+      } : undefined
     }))
   }
 

@@ -4,9 +4,10 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { SamplePost } from '../data/samplePosts'
+import type { Post } from '../../types/content'
 
 interface ModernBlogCardProps {
-  post: SamplePost
+  post: SamplePost | Post
   variant?: 'default' | 'featured' | 'compact' | 'minimal'
   imageUrl?: string
   showAuthor?: boolean
@@ -35,7 +36,7 @@ export default function ModernBlogCard({
            'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=800&h=500&fit=crop&crop=center'
   }
 
-  const finalImageUrl = imageUrl || post.featured_image || getPlaceholderImage(post.category.name)
+  const finalImageUrl = imageUrl || post.featured_image || getPlaceholderImage(post.category?.name || 'general')
 
   // Calculate reading time
   const calculateReadingTime = (content: string) => {
@@ -74,8 +75,8 @@ export default function ModernBlogCard({
 
             {/* Category Badge */}
             <div className="absolute top-6 left-6">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryStyles(post.category.name)}`}>
-                {post.category.name}
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryStyles(post.category?.name || 'general')}`}>
+                {post.category?.name || 'General'}
               </span>
             </div>
           </div>
@@ -88,7 +89,7 @@ export default function ModernBlogCard({
 
             {showExcerpt && (
               <p className="text-gray-200 mb-4 line-clamp-2 leading-relaxed">
-                {post.excerpt}
+                {post.excerpt || 'No excerpt available'}
               </p>
             )}
 
@@ -98,11 +99,11 @@ export default function ModernBlogCard({
                 {showAuthor && (
                   <>
                     <span>•</span>
-                    <span>{post.author.full_name}</span>
+                    <span>{post.author?.full_name || 'Anonymous'}</span>
                   </>
                 )}
                 <span>•</span>
-                <span>{calculateReadingTime(post.content)}</span>
+                <span>{calculateReadingTime(post.content || '')}</span>
               </div>
 
               <div className="flex items-center text-blue-300 group-hover:text-white transition-colors duration-200">
@@ -137,8 +138,8 @@ export default function ModernBlogCard({
             {/* Content */}
             <div className="flex-1 p-4">
               <div className="mb-2">
-                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(post.category.name)}`}>
-                  {post.category.name}
+                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(post.category?.name || 'general')}`}>
+                  {post.category?.name || 'General'}
                 </span>
               </div>
 
@@ -149,7 +150,7 @@ export default function ModernBlogCard({
               <div className="flex items-center text-xs text-gray-500 space-x-2">
                 <span>{new Date(post.date).toLocaleDateString()}</span>
                 <span>•</span>
-                <span>{calculateReadingTime(post.content)}</span>
+                <span>{calculateReadingTime(post.content || '')}</span>
               </div>
             </div>
           </div>
@@ -163,10 +164,10 @@ export default function ModernBlogCard({
       <Link href={`/blog/${post.slug}`} className={`block group ${className}`}>
         <article className="py-4 border-b border-gray-100 hover:border-gray-200 transition-colors duration-200">
           <div className="flex items-center justify-between mb-2">
-            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(post.category.name)}`}>
-              {post.category.name}
+            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(post.category?.name || 'general')}`}>
+              {post.category?.name || 'General'}
             </span>
-            <span className="text-xs text-gray-500">{calculateReadingTime(post.content)}</span>
+            <span className="text-xs text-gray-500">{calculateReadingTime(post.content || '')}</span>
           </div>
 
           <h3 className="font-semibold text-gray-900 group-hover:text-blue-600 transition-colors duration-200 mb-2">
@@ -178,7 +179,7 @@ export default function ModernBlogCard({
             {showAuthor && (
               <>
                 <span>•</span>
-                <span>{post.author.full_name}</span>
+                <span>{post.author?.full_name || 'Anonymous'}</span>
               </>
             )}
           </div>
@@ -207,8 +208,8 @@ export default function ModernBlogCard({
         <div className="p-6">
           {/* Category */}
           <div className="mb-3">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getCategoryStyles(post.category.name)}`}>
-              {post.category.name}
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getCategoryStyles(post.category?.name || 'general')}`}>
+              {post.category?.name || 'General'}
             </span>
           </div>
 
@@ -231,11 +232,11 @@ export default function ModernBlogCard({
               {showAuthor && (
                 <>
                   <span>•</span>
-                  <span>{post.author.full_name}</span>
+                  <span>{post.author?.full_name || 'Anonymous'}</span>
                 </>
               )}
             </div>
-            <span>{calculateReadingTime(post.content)}</span>
+            <span>{calculateReadingTime(post.content || '')}</span>
           </div>
         </div>
 
