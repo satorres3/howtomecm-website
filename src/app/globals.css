@@ -126,6 +126,10 @@
     animation: scaleIn 0.4s ease-out forwards;
   }
 
+  .animate-slide-right {
+    animation: slideRight 0.8s ease-out forwards;
+  }
+
   /* Custom Scroll */
   .scroll-smooth {
     scroll-behavior: smooth;
@@ -176,6 +180,17 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes slideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }
 
