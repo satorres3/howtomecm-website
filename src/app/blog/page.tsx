@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 import { ContentLibrary } from '../../../lib/content'
 import type { Post } from '../../../types/content'
 import { calculateReadingTime, formatReadingTime } from '../../utils/readingTime'
+import { samplePosts } from '../../data/samplePosts'
+import ModernBlogCard from '../../components/ModernBlogCard'
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
@@ -58,6 +60,14 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
   let posts = postsResult.success ? postsResult.data || [] : []
 
+  // If no CMS posts available, use sample posts
+  if (posts.length === 0) {
+    posts = samplePosts.map(post => ({
+      ...post,
+      tags: post.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+    }))
+  }
+
   // Filter by category if specified
   if (category) {
     posts = posts.filter(post =>
@@ -90,15 +100,20 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
   const allTags = Array.from(tagSet)
 
   return (
-    <main className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Modern Hero Section */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white section-padding">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]\"></div>
+        </div>
+
+        <div className="container-modern relative z-10">
+          <div className="max-w-4xl mx-auto text-center animate-fade-in">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
               {category ? `${category} Articles` : tag ? `Posts tagged "${tag}"` : 'Professional Tech Blog'}
             </h1>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto">
+            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               {category
                 ? `Expert insights and best practices in ${category}`
                 : tag
@@ -106,59 +121,75 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                 : 'Discover the latest in Microsoft technologies, configuration management, and enterprise solutions'
               }
             </p>
+
+            {/* Floating Elements */}
+            <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
           </div>
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-12">
-        {/* Breadcrumb */}
-        <nav className="mb-8 text-sm">
-          <ol className="flex items-center space-x-2 text-gray-500">
-            <li><a href="/" className="hover:text-blue-600">Home</a></li>
-            <li>/</li>
-            <li><a href="/blog" className="hover:text-blue-600">Blog</a></li>
+      <div className="container-modern section-padding">
+        {/* Modern Breadcrumb */}
+        <nav className="mb-8 animate-slide-up">
+          <ol className="flex items-center space-x-2 text-sm text-gray-500">
+            <li><a href="/" className="hover:text-blue-600 transition-colors duration-200">Home</a></li>
+            <li>
+              <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+            </li>
+            <li><a href="/blog" className="hover:text-blue-600 transition-colors duration-200">Blog</a></li>
             {category && (
               <>
-                <li>/</li>
-                <li className="text-gray-900">{category}</li>
+                <li>
+                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </li>
+                <li className="text-gray-900 font-medium">{category}</li>
               </>
             )}
             {tag && (
               <>
-                <li>/</li>
-                <li className="text-gray-900">#{tag}</li>
+                <li>
+                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                  </svg>
+                </li>
+                <li className="text-gray-900 font-medium">#{tag}</li>
               </>
             )}
           </ol>
         </nav>
 
-        {/* Filters */}
+        {/* Modern Filters */}
         {(allCategories.length > 0 || allTags.length > 0) && (
-          <div className="mb-8 bg-white rounded-lg shadow-sm p-6">
-            <div className="flex flex-wrap gap-4">
+          <div className="mb-12 card-modern p-8 animate-slide-up stagger-delay-1">
+            <div className="flex flex-wrap gap-6">
               {/* Category filters */}
               {allCategories.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Categories:</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <h3 className="font-semibold text-gray-900 mb-4 text-lg">Categories</h3>
+                  <div className="flex flex-wrap gap-3">
                     <a
                       href="/blog"
-                      className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                         !category && !tag
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                          : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-105'
                       }`}
                     >
-                      All
+                      All Posts
                     </a>
                     {allCategories.map((cat) => (
                       <a
                         key={cat}
                         href={`/blog?category=${encodeURIComponent(cat)}`}
-                        className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                           category === cat
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-blue-600 text-white shadow-lg transform scale-105'
+                            : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-105'
                         }`}
                       >
                         {cat}
@@ -171,16 +202,16 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
               {/* Tag filters */}
               {allTags.length > 0 && (
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-2">Tags:</h3>
-                  <div className="flex flex-wrap gap-2">
+                  <h3 className="font-semibold text-gray-900 mb-4 text-lg">Popular Tags</h3>
+                  <div className="flex flex-wrap gap-3">
                     {allTags.slice(0, 10).map((tagName) => (
                       <a
                         key={tagName}
                         href={`/blog?tag=${encodeURIComponent(tagName)}`}
-                        className={`px-3 py-1 rounded-full text-sm transition-colors ${
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                           tag === tagName
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            ? 'bg-emerald-600 text-white shadow-lg transform scale-105'
+                            : 'bg-gray-100 text-gray-700 hover:bg-emerald-50 hover:text-emerald-600 hover:scale-105'
                         }`}
                       >
                         #{tagName}
@@ -193,218 +224,130 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           </div>
         )}
 
-        {/* Results summary */}
-        <div className="mb-6 text-sm text-gray-600">
-          Showing {currentPosts.length} of {totalPosts} posts
-          {totalPages > 1 && ` (page ${page} of ${totalPages})`}
+        {/* Modern Results Summary */}
+        <div className="mb-8 flex items-center justify-between animate-slide-up stagger-delay-2">
+          <div className="text-sm text-gray-600">
+            Showing <span className="font-semibold text-gray-900">{currentPosts.length}</span> of <span className="font-semibold text-gray-900">{totalPosts}</span> posts
+            {totalPages > 1 && (
+              <span className="text-gray-400"> • Page {page} of {totalPages}</span>
+            )}
+          </div>
+
+          {/* View Toggle (for future enhancement) */}
+          <div className="hidden sm:flex items-center space-x-2">
+            <span className="text-xs text-gray-500 uppercase tracking-wide">View</span>
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button className="p-1 rounded bg-white shadow-sm">
+                <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
 
         {currentPosts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">
-              {category || tag ? 'No posts found matching your filter.' : 'No blog posts available yet.'}
-            </p>
-            {(category || tag) && (
-              <a href="/blog" className="text-blue-600 hover:text-blue-800 mt-2 inline-block">
-                ← View all posts
-              </a>
-            )}
-            <p className="text-sm text-gray-500 mt-2">
-              Domain: {DOMAIN}
-            </p>
+          <div className="text-center py-20 animate-fade-in">
+            <div className="max-w-md mx-auto">
+              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {category || tag ? 'No posts found' : 'No posts available'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {category || tag ? 'No posts found matching your filter criteria.' : 'No blog posts available yet. Check back soon!'}
+              </p>
+              {(category || tag) && (
+                <a href="/blog" className="btn-primary">
+                  ← View all posts
+                </a>
+              )}
+            </div>
           </div>
         ) : (
           <>
-            {/* Featured Post (first post) */}
+            {/* Featured Post */}
             {currentPosts.length > 0 && (
-              <article className="mb-12 bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-                <div className="md:flex">
-                  {currentPosts[0].featured_image && (
-                    <div className="md:w-1/2">
-                      <img
-                        src={currentPosts[0].featured_image}
-                        alt={currentPosts[0].title}
-                        className="w-full h-64 md:h-full object-cover"
-                      />
-                    </div>
-                  )}
-                  <div className={`p-8 ${currentPosts[0].featured_image ? 'md:w-1/2' : 'w-full'}`}>
-                    <div className="flex items-center text-sm text-gray-500 mb-3 flex-wrap gap-2">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
-                        Featured
-                      </span>
-                      <time dateTime={currentPosts[0].date || currentPosts[0].created_at}>
-                        {new Date(currentPosts[0].date || currentPosts[0].created_at).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long',
-                          day: 'numeric'
-                        })}
-                      </time>
-                      {currentPosts[0].author?.full_name && (
-                        <span>by {currentPosts[0].author.full_name}</span>
-                      )}
-                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                      <span className="text-blue-600 font-medium">
-                        {formatReadingTime(calculateReadingTime(currentPosts[0].content || currentPosts[0].excerpt || ''))}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">
-                      <a href={`/blog/${currentPosts[0].slug}`} className="hover:text-blue-600 transition-colors">
-                        {currentPosts[0].title}
-                      </a>
-                    </h2>
-                    {currentPosts[0].excerpt && (
-                      <p className="text-gray-700 text-lg mb-6 leading-relaxed">
-                        {currentPosts[0].excerpt}
-                      </p>
-                    )}
-                    <div className="flex flex-wrap gap-2 mb-6">
-                      {currentPosts[0].category?.name && (
-                        <a
-                          href={`/blog?category=${encodeURIComponent(currentPosts[0].category.name)}`}
-                          className="inline-block bg-blue-100 text-blue-800 text-sm px-3 py-1 rounded-full hover:bg-blue-200 transition-colors"
-                        >
-                          {currentPosts[0].category.name}
-                        </a>
-                      )}
-                      {currentPosts[0].tags?.slice(0, 3).map((tag, index) => {
-                        const tagName = typeof tag === 'string' ? tag : tag.name
-                        return (
-                        <a
-                          key={index}
-                          href={`/blog?tag=${encodeURIComponent(tagName)}`}
-                          className="inline-block bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-full hover:bg-gray-200 transition-colors"
-                        >
-                          #{tagName}
-                        </a>
-                        )
-                      })}
-                    </div>
-                    <a
-                      href={`/blog/${currentPosts[0].slug}`}
-                      className="inline-flex items-center text-blue-600 hover:text-blue-800 font-semibold transition-colors"
-                    >
-                      Read Full Article
-                      <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </article>
+              <div className="mb-16 animate-fade-in">
+                <ModernBlogCard
+                  post={currentPosts[0]}
+                  variant="featured"
+                  className="stagger-delay-1"
+                />
+              </div>
             )}
 
             {/* Regular Posts Grid */}
             {currentPosts.length > 1 && (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-                {currentPosts.slice(1).map((post) => (
-                  <article key={post.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-100">
-                    {post.featured_image && (
-                      <div className="relative overflow-hidden">
-                        <img
-                          src={post.featured_image}
-                          alt={post.title}
-                          className="w-full h-48 object-cover transition-transform duration-300 hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                      </div>
-                    )}
-                    <div className="p-6">
-                      <div className="flex items-center text-xs text-gray-500 mb-3 flex-wrap gap-2">
-                        <time dateTime={post.date || post.created_at}>
-                          {new Date(post.date || post.created_at).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: 'short',
-                            day: 'numeric'
-                          })}
-                        </time>
-                        {post.author?.full_name && (
-                          <span>by {post.author.full_name}</span>
-                        )}
-                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
-                        <span className="text-blue-600 font-medium">
-                          {formatReadingTime(calculateReadingTime(post.content || post.excerpt || ''))}
-                        </span>
-                      </div>
-                      <h2 className="text-xl font-semibold mb-3 text-gray-900 leading-tight">
-                        <a href={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">
-                          {post.title}
-                        </a>
-                      </h2>
-                      {post.excerpt && (
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
-                          {post.excerpt}
-                        </p>
-                      )}
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {post.category?.name && (
-                          <a
-                            href={`/blog?category=${encodeURIComponent(post.category.name)}`}
-                            className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full hover:bg-blue-200 transition-colors"
-                          >
-                            {post.category.name}
-                          </a>
-                        )}
-                        {post.tags?.slice(0, 2).map((tag, index) => {
-                          const tagName = typeof tag === 'string' ? tag : tag.name
-                          return (
-                          <a
-                            key={index}
-                            href={`/blog?tag=${encodeURIComponent(tagName)}`}
-                            className="inline-block bg-gray-100 text-gray-700 text-xs px-2 py-1 rounded-full hover:bg-gray-200 transition-colors"
-                          >
-                            #{tagName}
-                          </a>
-                          )
-                        })}
-                      </div>
-                      <a
-                        href={`/blog/${post.slug}`}
-                        className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors text-sm"
-                      >
-                        Read More
-                        <svg className="ml-1 w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                        </svg>
-                      </a>
-                    </div>
-                  </article>
+              <div className="grid-auto-fit mb-16">
+                {currentPosts.slice(1).map((post, index) => (
+                  <div key={post.id} className="animate-slide-up" style={{animationDelay: `${(index + 2) * 100}ms`}}>
+                    <ModernBlogCard
+                      post={post}
+                      variant="default"
+                    />
+                  </div>
                 ))}
               </div>
             )}
 
-            {/* Pagination */}
+            {/* Modern Pagination */}
             {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-2">
+              <div className="flex justify-center items-center space-x-3 animate-fade-in">
                 {page > 1 && (
                   <a
                     href={`/blog?page=${page - 1}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all duration-200 hover:scale-105"
                   >
-                    ← Previous
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                    Previous
                   </a>
                 )}
 
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                  <a
-                    key={pageNum}
-                    href={`/blog?page=${pageNum}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
-                    className={`px-4 py-2 rounded-md transition-colors ${
-                      pageNum === page
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-white border border-gray-300 hover:bg-gray-50'
-                    }`}
-                  >
-                    {pageNum}
-                  </a>
-                ))}
+                {/* Page Numbers */}
+                <div className="flex items-center space-x-2">
+                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 7) {
+                      pageNum = i + 1;
+                    } else if (page <= 4) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 3) {
+                      pageNum = totalPages - 6 + i;
+                    } else {
+                      pageNum = page - 3 + i;
+                    }
+
+                    return (
+                      <a
+                        key={pageNum}
+                        href={`/blog?page=${pageNum}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
+                        className={`w-12 h-12 flex items-center justify-center rounded-xl font-medium transition-all duration-200 ${
+                          pageNum === page
+                            ? 'bg-blue-600 text-white shadow-lg transform scale-110'
+                            : 'bg-white text-gray-700 border-2 border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 hover:scale-105'
+                        }`}
+                      >
+                        {pageNum}
+                      </a>
+                    );
+                  })}
+                </div>
 
                 {page < totalPages && (
                   <a
                     href={`/blog?page=${page + 1}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+                    className="inline-flex items-center px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all duration-200 hover:scale-105"
                   >
-                    Next →
+                    Next
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
                   </a>
                 )}
               </div>

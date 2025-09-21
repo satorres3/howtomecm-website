@@ -4,6 +4,7 @@ import ContentRenderer from '../../../components/ContentRenderer'
 import SocialShare from '../../../components/SocialShare'
 import { notFound } from 'next/navigation'
 import type { Post } from '../../../../types/content'
+import { samplePosts } from '../../../data/samplePosts'
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
@@ -16,7 +17,12 @@ interface BlogPostProps {
 // Generate static pages at build time
 export async function generateStaticParams() {
   const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
-  const posts = postsResult.success ? postsResult.data || [] : []
+  let posts = postsResult.success ? postsResult.data || [] : []
+
+  // If no CMS posts available, use sample posts
+  if (posts.length === 0) {
+    posts = samplePosts
+  }
 
   return posts.map(post => ({
     slug: post.slug,
@@ -27,7 +33,18 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: BlogPostProps): Promise<Metadata> {
   const resolvedParams = await params
   const postResult = await ContentLibrary.getPostBySlug(DOMAIN, resolvedParams.slug)
-  const post = postResult.success ? postResult.data : null
+  let post = postResult.success ? postResult.data : null
+
+  // If no CMS post found, check sample posts
+  if (!post) {
+    const samplePost = samplePosts.find(p => p.slug === resolvedParams.slug)
+    if (samplePost) {
+      post = {
+        ...samplePost,
+        tags: samplePost.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+      }
+    }
+  }
 
   if (!post) {
     return {
@@ -81,7 +98,18 @@ export async function generateMetadata({ params }: BlogPostProps): Promise<Metad
 export default async function BlogPost({ params }: BlogPostProps) {
   const resolvedParams = await params
   const postResult = await ContentLibrary.getPostBySlug(DOMAIN, resolvedParams.slug)
-  const post = postResult.success ? postResult.data : null
+  let post = postResult.success ? postResult.data : null
+
+  // If no CMS post found, check sample posts
+  if (!post) {
+    const samplePost = samplePosts.find(p => p.slug === resolvedParams.slug)
+    if (samplePost) {
+      post = {
+        ...samplePost,
+        tags: samplePost.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+      }
+    }
+  }
 
   if (!post) {
     notFound()
@@ -89,7 +117,15 @@ export default async function BlogPost({ params }: BlogPostProps) {
 
   // Get related posts (same category or tags)
   const allPostsResult = await ContentLibrary.getAllPosts(DOMAIN)
-  const allPosts = allPostsResult.success ? allPostsResult.data || [] : []
+  let allPosts = allPostsResult.success ? allPostsResult.data || [] : []
+
+  // If no CMS posts available, use sample posts
+  if (allPosts.length === 0) {
+    allPosts = samplePosts.map(p => ({
+      ...p,
+      tags: p.tags.map(tag => ({ name: tag })) // Convert string tags to object format
+    }))
+  }
 
   const relatedPosts = allPosts
     .filter(p => p.id !== post.id)

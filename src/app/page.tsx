@@ -1,7 +1,10 @@
 import { Metadata } from 'next'
 import { ContentLibrary } from '../../lib/content'
 import ContentRenderer from '../components/ContentRenderer'
+import RotatingBlogPosts from '../components/RotatingBlogPosts'
+import ModernBlogCard from '../components/ModernBlogCard'
 import type { Page, Post, ContentSection } from '../../types/content'
+import { samplePosts } from '../data/samplePosts'
 
 export const metadata: Metadata = {
   title: 'How to MeCM - Professional Microsoft Technology Consulting',
@@ -115,73 +118,285 @@ export default async function HomePage() {
     )
   }
 
-  // Professional tech blog content matching Azure blog template
+  // Professional tech blog content with dynamic sample posts
+  const featuredPost = samplePosts[0] // MECM Co-Management post
+  const secondaryPosts = samplePosts.slice(1, 3) // Azure Arc and PowerShell DSC
+  const recentPostsSection = samplePosts.slice(3, 6) // Latest 3 posts
+
   return (
-    <main className="min-h-screen bg-white">
-      {/* Hero Section with Featured Content */}
-      <section className="bg-white pt-8 pb-16">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Featured Articles Grid */}
-          <div className="grid lg:grid-cols-12 gap-8 mb-16">
-            {/* Main Featured Article */}
-            <div className="lg:col-span-8">
-              <article className="relative bg-gradient-to-br from-blue-600 to-blue-800 rounded-lg overflow-hidden">
-                <div className="absolute inset-0 bg-black/20"></div>
-                <div className="relative p-8 text-white min-h-[400px] flex flex-col justify-end">
-                  <div className="mb-4">
-                    <span className="inline-block bg-white/20 text-white text-xs px-2 py-1 rounded uppercase tracking-wide font-medium">
-                      Microsoft Configuration Manager
-                    </span>
+    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+      {/* Modern Hero Section with Rotating Blog Posts */}
+      <section className="section-padding">
+        <div className="container-modern">
+          {/* Welcome Message */}
+          <div className="text-center mb-16 animate-fade-in">
+            <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Professional Microsoft Technology{' '}
+              <span className="text-gradient">Consulting</span>
+            </h1>
+            <p className="text-xl md:text-2xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+              Expert insights on Microsoft Configuration Manager (MECM/SCCM), Azure cloud technologies,
+              and enterprise solutions. Professional consulting and best practices for IT professionals.
+            </p>
+          </div>
+
+          {/* Rotating Blog Posts Hero */}
+          <div className="mb-16 animate-slide-up stagger-delay-1">
+            <RotatingBlogPosts
+              posts={samplePosts.slice(0, 4)}
+              autoRotate={true}
+              rotationInterval={7000}
+              showThumbnails={true}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Modern Content Sections */}
+      <section className="section-padding bg-white">
+        <div className="container-modern">
+          {/* Hear from our experts */}
+          <div className="mb-20">
+            <div className="flex items-center justify-between mb-12 animate-fade-in">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                  Hear from our Microsoft experts
+                </h2>
+                <p className="text-gray-600 text-lg">
+                  Latest insights and best practices from our certified professionals
+                </p>
+              </div>
+              <a href="/blog" className="btn-ghost group">
+                See all posts
+                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {recentPostsSection.map((post, index) => (
+                <div key={post.id} className="animate-slide-up" style={{animationDelay: `${index * 100}ms`}}>
+                  <ModernBlogCard
+                    post={post}
+                    variant="default"
+                    showAuthor={true}
+                    showExcerpt={true}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Configuration Manager and cloud technologies */}
+          <div className="mb-20">
+            <div className="flex items-center justify-between mb-12 animate-fade-in">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                  Configuration Manager and cloud technologies
+                </h2>
+                <p className="text-gray-600 text-lg">
+                  Expert guidance on MECM deployment, configuration, and optimization
+                </p>
+              </div>
+              <a href="/blog?category=mecm" className="btn-ghost group">
+                See all MECM posts
+                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
+            </div>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <article className="card-modern overflow-hidden group animate-slide-up">
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=400&h=200&fit=crop&crop=center"
+                    alt="MECM Troubleshooting"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                    MECM Troubleshooting Guide
+                  </h3>
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>December 3, 2024</span>
+                    <span>•</span>
+                    <span>15 min read</span>
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
-                    Modernizing IT Infrastructure with MECM Co-Management
-                  </h1>
-                  <p className="text-blue-100 text-lg mb-6 max-w-2xl">
-                    Discover how organizations are successfully bridging traditional on-premises management with modern cloud-first approaches using Microsoft Configuration Manager and Intune co-management.
-                  </p>
-                  <div className="flex items-center space-x-4 text-sm text-blue-200">
-                    <span>December 18, 2024</span>
+                </div>
+              </article>
+
+              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-1">
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=400&h=200&fit=crop&crop=center"
+                    alt="Co-Management Implementation"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                    Co-Management Implementation
+                  </h3>
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>November 28, 2024</span>
+                    <span>•</span>
+                    <span>11 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-2">
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop&crop=center"
+                    alt="Patch Management"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                    Patch Management Strategies
+                  </h3>
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>November 25, 2024</span>
                     <span>•</span>
                     <span>8 min read</span>
                   </div>
                 </div>
               </article>
+
+              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-3">
+                <div className="relative h-40 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop&crop=center"
+                    alt="Application Deployment"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-lg font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
+                    Application Deployment Automation
+                  </h3>
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>November 22, 2024</span>
+                    <span>•</span>
+                    <span>13 min read</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          {/* PowerShell and automation */}
+          <div className="mb-20">
+            <div className="flex items-center justify-between mb-12 animate-fade-in">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+                  PowerShell and automation
+                </h2>
+                <p className="text-gray-600 text-lg">
+                  Powerful automation solutions and advanced scripting techniques
+                </p>
+              </div>
+              <a href="/blog?category=powershell" className="btn-ghost group">
+                See all PowerShell posts
+                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </a>
             </div>
 
-            {/* Secondary Featured Articles */}
-            <div className="lg:col-span-4 space-y-6">
-              <article className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-emerald-500 to-emerald-600"></div>
+            <div className="grid md:grid-cols-3 gap-8">
+              <article className="card-modern overflow-hidden group animate-slide-up">
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&h=300&fit=crop&crop=center"
+                    alt="PowerShell DSC"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-block bg-violet-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                      PowerShell
+                    </span>
+                  </div>
+                </div>
                 <div className="p-6">
-                  <span className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded mb-3">
-                    Azure Cloud
-                  </span>
-                  <h2 className="text-xl font-bold mb-2 text-gray-900">
-                    Azure Arc: Extending Cloud Management Everywhere
-                  </h2>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Learn how Azure Arc enables unified management across on-premises, multi-cloud, and edge environments.
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-violet-600 transition-colors duration-300">
+                    DSC Configuration Templates
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                    Ready-to-use PowerShell DSC configurations for common enterprise scenarios.
                   </p>
-                  <div className="text-xs text-gray-500">
-                    December 15, 2024 • 6 min read
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>November 20, 2024</span>
+                    <span>•</span>
+                    <span>10 min read</span>
                   </div>
                 </div>
               </article>
 
-              <article className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-purple-500 to-purple-600"></div>
+              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-1">
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=300&fit=crop&crop=center"
+                    alt="Azure Automation"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-block bg-rose-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                      Automation
+                    </span>
+                  </div>
+                </div>
                 <div className="p-6">
-                  <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mb-3">
-                    PowerShell
-                  </span>
-                  <h2 className="text-xl font-bold mb-2 text-gray-900">
-                    PowerShell DSC for Enterprise Configuration
-                  </h2>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Automate and maintain consistent system configurations at scale with Desired State Configuration.
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-rose-600 transition-colors duration-300">
+                    Azure Automation Runbooks
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                    Building robust automation workflows with Azure Automation and PowerShell.
                   </p>
-                  <div className="text-xs text-gray-500">
-                    December 12, 2024 • 10 min read
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>November 18, 2024</span>
+                    <span>•</span>
+                    <span>14 min read</span>
+                  </div>
+                </div>
+              </article>
+
+              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-2">
+                <div className="relative h-48 overflow-hidden">
+                  <img
+                    src="https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=500&h=300&fit=crop&crop=center"
+                    alt="Advanced PowerShell"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                  <div className="absolute top-4 left-4">
+                    <span className="inline-block bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-medium">
+                      Scripts
+                    </span>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-amber-600 transition-colors duration-300">
+                    Advanced PowerShell Techniques
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                    Professional scripting patterns and error handling for production environments.
+                  </p>
+                  <div className="flex items-center text-xs text-gray-500 space-x-2">
+                    <span>November 15, 2024</span>
+                    <span>•</span>
+                    <span>16 min read</span>
                   </div>
                 </div>
               </article>
@@ -190,203 +405,35 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Content Sections - Azure Blog Style */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          {/* Hear from our experts */}
-          <div className="mb-16">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Hear from our Microsoft experts
-              </h2>
-              <a href="/blog" className="text-blue-600 hover:text-blue-800 font-medium">
-                See all recent posts →
+      {/* Modern Call to Action */}
+      <section className="relative section-padding bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fill-rule=\"evenodd\"%3E%3Cg fill=\"%23ffffff\" fill-opacity=\"0.1\"%3E%3Ccircle cx=\"30\" cy=\"30\" r=\"2\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]\"></div>
+        </div>
+
+        <div className="container-modern text-center relative z-10">
+          <div className="max-w-4xl mx-auto animate-fade-in">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+              Ready to accelerate your Microsoft technology journey?
+            </h2>
+            <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
+              Get expert guidance on Configuration Manager, Azure, and modern device management.
+              Transform your IT infrastructure with proven strategies.
+            </p>
+            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+              <a href="/contact" className="btn-secondary bg-white text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100">
+                Get Expert Consultation
               </a>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-blue-500 to-blue-600"></div>
-                <div className="p-6">
-                  <span className="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded mb-3">
-                    MECM
-                  </span>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900">
-                    Advanced MECM Deployment Strategies
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Learn enterprise-grade deployment techniques for large-scale Configuration Manager environments.
-                  </p>
-                  <div className="text-xs text-gray-500">
-                    December 10, 2024 • 12 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-emerald-500 to-emerald-600"></div>
-                <div className="p-6">
-                  <span className="inline-block bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded mb-3">
-                    Azure
-                  </span>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900">
-                    Cloud Migration Best Practices
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Essential strategies for successful Azure migration projects in enterprise environments.
-                  </p>
-                  <div className="text-xs text-gray-500">
-                    December 8, 2024 • 9 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-48 bg-gradient-to-br from-purple-500 to-purple-600"></div>
-                <div className="p-6">
-                  <span className="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded mb-3">
-                    Intune
-                  </span>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900">
-                    Modern Device Management
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Implementing zero-trust security with Microsoft Intune for modern workplace scenarios.
-                  </p>
-                  <div className="text-xs text-gray-500">
-                    December 5, 2024 • 7 min read
-                  </div>
-                </div>
-              </article>
+              <a href="/blog" className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-white rounded-xl font-medium hover:bg-white hover:text-blue-600 transition-all duration-300 hover:scale-105">
+                Explore Our Insights
+              </a>
             </div>
           </div>
 
-          {/* Configuration Manager and cloud technologies */}
-          <div className="mb-16">
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Configuration Manager and cloud technologies
-              </h2>
-              <a href="/blog?category=mecm" className="text-blue-600 hover:text-blue-800 font-medium">
-                See all MECM posts →
-              </a>
-            </div>
-            <div className="grid md:grid-cols-4 gap-6">
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-32 bg-gradient-to-br from-blue-400 to-blue-500"></div>
-                <div className="p-4">
-                  <h3 className="text-sm font-bold mb-2 text-gray-900">
-                    MECM Troubleshooting Guide
-                  </h3>
-                  <div className="text-xs text-gray-500">
-                    December 3, 2024 • 15 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-32 bg-gradient-to-br from-indigo-400 to-indigo-500"></div>
-                <div className="p-4">
-                  <h3 className="text-sm font-bold mb-2 text-gray-900">
-                    Co-Management Implementation
-                  </h3>
-                  <div className="text-xs text-gray-500">
-                    November 28, 2024 • 11 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-32 bg-gradient-to-br from-cyan-400 to-cyan-500"></div>
-                <div className="p-4">
-                  <h3 className="text-sm font-bold mb-2 text-gray-900">
-                    Patch Management Strategies
-                  </h3>
-                  <div className="text-xs text-gray-500">
-                    November 25, 2024 • 8 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-32 bg-gradient-to-br from-teal-400 to-teal-500"></div>
-                <div className="p-4">
-                  <h3 className="text-sm font-bold mb-2 text-gray-900">
-                    Application Deployment Automation
-                  </h3>
-                  <div className="text-xs text-gray-500">
-                    November 22, 2024 • 13 min read
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          {/* PowerShell and automation */}
-          <div>
-            <div className="flex items-center justify-between mb-8">
-              <h2 className="text-2xl font-bold text-gray-900">
-                PowerShell and automation
-              </h2>
-              <a href="/blog?category=powershell" className="text-blue-600 hover:text-blue-800 font-medium">
-                See all PowerShell posts →
-              </a>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-40 bg-gradient-to-br from-violet-500 to-violet-600"></div>
-                <div className="p-6">
-                  <span className="inline-block bg-violet-100 text-violet-800 text-xs px-2 py-1 rounded mb-3">
-                    PowerShell
-                  </span>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900">
-                    DSC Configuration Templates
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Ready-to-use PowerShell DSC configurations for common enterprise scenarios.
-                  </p>
-                  <div className="text-xs text-gray-500">
-                    November 20, 2024 • 10 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-40 bg-gradient-to-br from-rose-500 to-rose-600"></div>
-                <div className="p-6">
-                  <span className="inline-block bg-rose-100 text-rose-800 text-xs px-2 py-1 rounded mb-3">
-                    Automation
-                  </span>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900">
-                    Azure Automation Runbooks
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Building robust automation workflows with Azure Automation and PowerShell.
-                  </p>
-                  <div className="text-xs text-gray-500">
-                    November 18, 2024 • 14 min read
-                  </div>
-                </div>
-              </article>
-
-              <article className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                <div className="h-40 bg-gradient-to-br from-amber-500 to-amber-600"></div>
-                <div className="p-6">
-                  <span className="inline-block bg-amber-100 text-amber-800 text-xs px-2 py-1 rounded mb-3">
-                    Scripts
-                  </span>
-                  <h3 className="text-lg font-bold mb-2 text-gray-900">
-                    Advanced PowerShell Techniques
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Professional scripting patterns and error handling for production environments.
-                  </p>
-                  <div className="text-xs text-gray-500">
-                    November 15, 2024 • 16 min read
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
+          {/* Floating Elements */}
+          <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
         </div>
       </section>
 
