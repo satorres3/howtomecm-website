@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { ContentLibrary } from '../../../lib/content'
 import type { Post } from '../../../types/content'
+import { calculateReadingTime, formatReadingTime } from '../../utils/readingTime'
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
@@ -228,8 +229,8 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                     </div>
                   )}
                   <div className={`p-8 ${currentPosts[0].featured_image ? 'md:w-1/2' : 'w-full'}`}>
-                    <div className="flex items-center text-sm text-gray-500 mb-3">
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium mr-3">
+                    <div className="flex items-center text-sm text-gray-500 mb-3 flex-wrap gap-2">
+                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-medium">
                         Featured
                       </span>
                       <time dateTime={currentPosts[0].date || currentPosts[0].created_at}>
@@ -240,8 +241,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                         })}
                       </time>
                       {currentPosts[0].author?.full_name && (
-                        <span className="ml-2">by {currentPosts[0].author.full_name}</span>
+                        <span>by {currentPosts[0].author.full_name}</span>
                       )}
+                      <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                      <span className="text-blue-600 font-medium">
+                        {formatReadingTime(calculateReadingTime(currentPosts[0].content || currentPosts[0].excerpt || ''))}
+                      </span>
                     </div>
                     <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900">
                       <a href={`/blog/${currentPosts[0].slug}`} className="hover:text-blue-600 transition-colors">
@@ -305,7 +310,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                       </div>
                     )}
                     <div className="p-6">
-                      <div className="flex items-center text-xs text-gray-500 mb-3">
+                      <div className="flex items-center text-xs text-gray-500 mb-3 flex-wrap gap-2">
                         <time dateTime={post.date || post.created_at}>
                           {new Date(post.date || post.created_at).toLocaleDateString('en-US', {
                             year: 'numeric',
@@ -314,8 +319,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
                           })}
                         </time>
                         {post.author?.full_name && (
-                          <span className="ml-2">by {post.author.full_name}</span>
+                          <span>by {post.author.full_name}</span>
                         )}
+                        <span className="w-1 h-1 bg-gray-400 rounded-full"></span>
+                        <span className="text-blue-600 font-medium">
+                          {formatReadingTime(calculateReadingTime(post.content || post.excerpt || ''))}
+                        </span>
                       </div>
                       <h2 className="text-xl font-semibold mb-3 text-gray-900 leading-tight">
                         <a href={`/blog/${post.slug}`} className="hover:text-blue-600 transition-colors">

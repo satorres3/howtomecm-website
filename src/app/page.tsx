@@ -118,76 +118,199 @@ export default async function HomePage() {
   // Professional tech blog fallback content inspired by Azure blog
   return (
     <main className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-600 to-purple-700 text-white">
-        <div className="container mx-auto px-4 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">
-              How to MeCM
-            </h1>
-            <p className="text-xl mb-8 text-blue-100">
-              Professional Microsoft Technology Consulting and Content Management Insights
-            </p>
-            <p className="text-lg text-blue-200 max-w-3xl mx-auto">
-              Discover the latest in Microsoft Configuration Manager, cloud technologies,
-              and enterprise solutions. Expert insights, best practices, and real-world implementations.
-            </p>
+      {/* Featured Article Hero Section - Azure Style */}
+      <section className="relative bg-white">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 to-purple-800/90"></div>
+        <div className="relative bg-cover bg-center bg-no-repeat" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.03"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")'}}>
+          <div className="relative container mx-auto px-4 py-24">
+            <div className="max-w-4xl">
+              <div className="text-sm font-semibold text-blue-300 mb-3 uppercase tracking-wide">
+                Featured Article
+              </div>
+              <h1 className="text-6xl font-bold text-white mb-6 leading-tight">
+                The Future of Microsoft Configuration Manager
+              </h1>
+              <p className="text-xl text-blue-100 mb-8 max-w-2xl leading-relaxed">
+                Discover how MECM is evolving to meet modern enterprise needs with cloud integration,
+                co-management strategies, and next-generation device management capabilities.
+              </p>
+              <div className="flex items-center space-x-6 mb-8">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                    <span className="text-white font-semibold text-sm">HM</span>
+                  </div>
+                  <div>
+                    <div className="text-white font-medium">How to MeCM Team</div>
+                    <div className="text-blue-200 text-sm">Microsoft Technology Experts</div>
+                  </div>
+                </div>
+                <div className="text-blue-200 text-sm">
+                  <span>5 min read</span> • <span>Updated 2 days ago</span>
+                </div>
+              </div>
+              <div className="flex space-x-4">
+                <a
+                  href="/blog/future-of-mecm"
+                  className="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors inline-flex items-center"
+                >
+                  Read Full Article
+                  <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </a>
+                <a
+                  href="/blog"
+                  className="border border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-900 transition-colors"
+                >
+                  View All Articles
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Featured Content Categories */}
-      <section className="py-16 bg-gray-50">
+      {/* Trending Topics - Azure Style */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">
-            Explore Our Content
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Trending Topics
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Stay ahead with the latest Microsoft technologies, implementation strategies, and enterprise solutions
+            </p>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Primary Feature Card */}
+            <div className="lg:col-span-2">
+              <div className="relative bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl p-8 text-white overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+                <div className="relative">
+                  <div className="text-sm font-semibold text-blue-200 mb-3 uppercase tracking-wide">
+                    Configuration Manager
+                  </div>
+                  <h3 className="text-3xl font-bold mb-4 leading-tight">
+                    MECM Co-Management: Bridging On-Premises and Cloud
+                  </h3>
+                  <p className="text-blue-100 mb-6 text-lg leading-relaxed">
+                    Learn how to implement co-management strategies that seamlessly integrate traditional SCCM with modern Intune capabilities for hybrid device management.
+                  </p>
+                  <div className="flex items-center space-x-4 mb-6">
+                    <span className="text-blue-200 text-sm">12 min read</span>
+                    <span className="w-1 h-1 bg-blue-300 rounded-full"></span>
+                    <span className="text-blue-200 text-sm">Expert Level</span>
+                  </div>
+                  <a href="/blog?category=mecm" className="inline-flex items-center bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+                    Read More
+                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* Secondary Cards */}
+            <div className="space-y-8">
+              <div className="bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl p-6 text-white">
+                <div className="text-sm font-semibold text-emerald-200 mb-2 uppercase tracking-wide">
+                  Azure Solutions
+                </div>
+                <h3 className="text-xl font-bold mb-3 leading-tight">
+                  Azure Arc for Hybrid Infrastructure
+                </h3>
+                <p className="text-emerald-100 mb-4 text-sm">
+                  Extend Azure services and management to any infrastructure with Azure Arc's unified control plane.
+                </p>
+                <a href="/blog?category=azure" className="text-white font-medium hover:text-emerald-200 transition-colors">
+                  Learn More →
+                </a>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl p-6 text-white">
+                <div className="text-sm font-semibold text-purple-200 mb-2 uppercase tracking-wide">
+                  PowerShell
+                </div>
+                <h3 className="text-xl font-bold mb-3 leading-tight">
+                  PowerShell DSC for Configuration Management
+                </h3>
+                <p className="text-purple-100 mb-4 text-sm">
+                  Automate and maintain system configurations at scale using Desired State Configuration.
+                </p>
+                <a href="/blog?category=powershell" className="text-white font-medium hover:text-purple-200 transition-colors">
+                  Explore Scripts →
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Solutions Categories */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Solutions by Technology
+            </h2>
+            <p className="text-xl text-gray-600">
+              Deep dive into specific Microsoft technologies and implementation approaches
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-blue-200 transition-all group">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
                 <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Configuration Manager</h3>
-              <p className="text-gray-600 mb-4">
-                Deep dives into Microsoft Configuration Manager (MECM/SCCM), deployment strategies,
-                and enterprise management solutions.
-              </p>
-              <a href="/blog?category=mecm" className="text-blue-600 hover:text-blue-800 font-medium">
-                Explore MECM Articles →
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">Configuration Manager</h3>
+              <p className="text-gray-600 text-sm mb-4">MECM/SCCM deployment, management, and optimization strategies</p>
+              <a href="/blog?category=mecm" className="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                View Articles →
               </a>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-emerald-200 transition-all group">
+              <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-emerald-200 transition-colors">
+                <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Cloud Technologies</h3>
-              <p className="text-gray-600 mb-4">
-                Azure, Microsoft 365, and cloud-first approaches to modern IT infrastructure
-                and application deployment.
-              </p>
-              <a href="/blog?category=cloud" className="text-blue-600 hover:text-blue-800 font-medium">
-                Discover Cloud Solutions →
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">Azure Cloud</h3>
+              <p className="text-gray-600 text-sm mb-4">Modern cloud solutions, migration strategies, and hybrid setups</p>
+              <a href="/blog?category=azure" className="text-emerald-600 hover:text-emerald-800 font-medium text-sm">
+                Explore Azure →
               </a>
             </div>
 
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition-shadow">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-purple-200 transition-all group">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-purple-200 transition-colors">
                 <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.78 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 9.172V5L8 4z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Best Practices</h3>
-              <p className="text-gray-600 mb-4">
-                Proven methodologies, implementation guides, and lessons learned from
-                real-world enterprise deployments.
-              </p>
-              <a href="/blog?category=best-practices" className="text-blue-600 hover:text-blue-800 font-medium">
-                Learn Best Practices →
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">Microsoft Intune</h3>
+              <p className="text-gray-600 text-sm mb-4">Mobile device management and modern endpoint protection</p>
+              <a href="/blog?category=intune" className="text-purple-600 hover:text-purple-800 font-medium text-sm">
+                Learn Intune →
+              </a>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg hover:border-indigo-200 transition-all group">
+              <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-indigo-200 transition-colors">
+                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold mb-2 text-gray-900">PowerShell</h3>
+              <p className="text-gray-600 text-sm mb-4">Automation scripts, DSC configurations, and advanced scripting</p>
+              <a href="/blog?category=powershell" className="text-indigo-600 hover:text-indigo-800 font-medium text-sm">
+                View Scripts →
               </a>
             </div>
           </div>
