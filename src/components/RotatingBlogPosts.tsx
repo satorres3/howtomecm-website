@@ -56,17 +56,35 @@ export default function RotatingBlogPosts({
     setCurrentIndex((prevIndex) => (prevIndex - 1 + posts.length) % posts.length)
   }
 
+  // Generate background image based on category
+  const getBackgroundImage = (category: string) => {
+    const categoryImages = {
+      'MECM': 'https://images.unsplash.com/photo-1551808525-51a94da548ce?w=1200&h=800&fit=crop&crop=center',
+      'Azure': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1200&h=800&fit=crop&crop=center',
+      'PowerShell': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=1200&h=800&fit=crop&crop=center',
+      'Intune': 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=1200&h=800&fit=crop&crop=center'
+    }
+    return categoryImages[category as keyof typeof categoryImages] ||
+           'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=1200&h=800&fit=crop&crop=center'
+  }
+
   return (
     <div
-      className={`relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 ${className}`}
+      className={`relative overflow-hidden rounded-3xl ${className}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute inset-0" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }}></div>
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <Image
+          src={currentPost.featured_image || getBackgroundImage(currentPost.category.name)}
+          alt={currentPost.title}
+          fill
+          className="object-cover transition-transform duration-700"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-purple-900/70 to-blue-800/80"></div>
       </div>
 
       {/* Main Content */}

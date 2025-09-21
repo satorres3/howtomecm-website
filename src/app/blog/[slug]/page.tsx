@@ -326,162 +326,258 @@ export default async function BlogPost({ params }: BlogPostProps) {
         </div>
       )}
 
-      {/* Main Content Area - Better Screen Usage */}
-      <div className="container mx-auto px-6 py-12">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 xl:grid-cols-5 gap-12">
+      {/* Two-Column Reading Layout */}
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-screen-2xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-0">
 
-            {/* Table of Contents - Sidebar */}
-            <aside className="xl:col-span-1 order-2 xl:order-1">
-              <div className="xl:sticky xl:top-8">
-                <TableOfContents content={postContent} />
-              </div>
-            </aside>
+            {/* Reader's Cockpit - Left Sidebar */}
+            <aside className="lg:col-span-1 bg-white dark:bg-gray-800 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto order-2 lg:order-1">
+              <div className="p-6 space-y-8">
 
-            {/* Main Content */}
-            <main className="xl:col-span-4 order-1 xl:order-2">
-              {/* Content Body */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden mb-12">
-                <div className="p-8 lg:p-12">
-                  {post.sections && post.sections.length > 0 ? (
-                    post.sections.map((section: any, index: number) => (
-                      <ContentRenderer
-                        key={section.id || index}
-                        title=""
-                        sections={[section]}
-                        seo={post.seo}
-                      />
-                    ))
-                  ) : (
-                    <div className="prose prose-xl max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white">
-                      {post.content ? (
-                        <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                      ) : (
-                        <p className="text-gray-600 dark:text-gray-400">No content available for this post.</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Tags Section */}
-              {post.tags && post.tags.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-                    <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                    </svg>
-                    Tags
-                  </h3>
-                  <div className="flex flex-wrap gap-3">
-                    {post.tags.map((tag, index: number) => {
-                      const tagName = typeof tag === 'string' ? tag : tag.name
-                      return (
-                        <a
-                          key={index}
-                          href={`/blog?tag=${encodeURIComponent(tagName)}`}
-                          className="bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
-                        >
-                          #{tagName}
-                        </a>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {/* Author Section */}
-              {post.author && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12">
-                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">About the Author</h3>
-                  <div className="flex items-center space-x-6">
-                    {post.author.avatar_url ? (
-                      <img
-                        src={post.author.avatar_url}
-                        alt={post.author.full_name}
-                        className="w-20 h-20 rounded-full"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-2xl">
-                        {post.author.full_name?.charAt(0) || 'A'}
-                      </div>
-                    )}
-                    <div>
-                      <h4 className="text-lg font-bold text-gray-900 dark:text-white">{post.author.full_name}</h4>
-                      <p className="text-gray-600 dark:text-gray-400">Content Author</p>
+                {/* Reading Progress */}
+                <div className="text-center">
+                  <div className="relative w-16 h-16 mx-auto mb-4">
+                    <div className="absolute inset-0 rounded-full border-4 border-gray-200 dark:border-gray-700"></div>
+                    <div className="absolute inset-0 rounded-full border-4 border-blue-600 border-t-transparent animate-pulse"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-semibold text-gray-600 dark:text-gray-300">85%</span>
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide">Reading Progress</p>
                 </div>
-              )}
 
-              {/* Comments Section */}
-              <div className="mb-12">
-                <CommentSystem
-                  postId={post.id}
-                  postTitle={post.title}
-                  moderationEnabled={true}
-                  allowReplies={true}
-                />
-              </div>
+                {/* Dynamic Table of Contents */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Contents</h3>
+                  <TableOfContents content={postContent} />
+                </div>
 
-              {/* Related Posts - Better Card Layout */}
-              {relatedPosts.length > 0 && (
-                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 mb-12">
-                  <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 flex items-center">
-                    <svg className="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    Related Posts
-                  </h3>
-                  <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-8">
-                    {relatedPosts.map((relatedPost) => (
-                      <article key={relatedPost.id} className="bg-gray-50 dark:bg-gray-700 rounded-lg overflow-hidden hover:shadow-xl transition-all duration-300 group">
-                        {relatedPost.featured_image && (
-                          <div className="h-48 overflow-hidden">
+                {/* YouTube Promotion Card */}
+                <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
+                  <div className="flex items-center space-x-3 mb-3">
+                    <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                      </svg>
+                    </div>
+                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Video Tutorials</h4>
+                  </div>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">Watch related content on our YouTube channel</p>
+                  <a
+                    href="https://youtube.com/@howtomecm"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-2 px-3 rounded-lg text-xs font-medium transition-colors"
+                  >
+                    Subscribe
+                  </a>
+                </div>
+
+                {/* Related Posts */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Related Posts</h3>
+                  <div className="space-y-4">
+                    {relatedPosts.slice(0, 3).map((relatedPost, index) => (
+                      <Link key={relatedPost.id} href={`/blog/${relatedPost.slug}`} className="block group">
+                        <article className="flex space-x-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                          <div className="w-16 h-12 bg-gray-200 dark:bg-gray-600 rounded-md flex-shrink-0 overflow-hidden">
                             <img
-                              src={relatedPost.featured_image}
+                              src={relatedPost.featured_image || 'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=200&h=150&fit=crop'}
                               alt={relatedPost.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             />
                           </div>
-                        )}
-                        <div className="p-6">
-                          <h4 className="text-lg font-bold mb-3 text-gray-900 dark:text-white line-clamp-2">
-                            <a href={`/blog/${relatedPost.slug}`} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                               {relatedPost.title}
-                            </a>
-                          </h4>
-                          <p className="text-gray-600 dark:text-gray-400 text-sm mb-3">
-                            {new Date(relatedPost.date || relatedPost.created_at).toLocaleDateString()}
-                          </p>
-                          {relatedPost.category?.name && (
-                            <span className="inline-block bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 text-sm px-3 py-1 rounded-full">
-                              {relatedPost.category.name}
-                            </span>
-                          )}
-                        </div>
-                      </article>
+                            </h4>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                              {new Date(relatedPost.date).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </article>
+                      </Link>
                     ))}
                   </div>
                 </div>
-              )}
 
-              {/* Navigation */}
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-                <div className="flex justify-between items-center">
-                  <a
-                    href="/blog"
-                    className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center group"
-                  >
-                    <svg className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    All Posts
-                  </a>
-                  <BackToTopButton />
+              </div>
+            </aside>
+
+            {/* Reading Pane - Main Content Area */}
+            <main className="lg:col-span-3 order-1 lg:order-2">
+              <div className="bg-white dark:bg-gray-800 min-h-screen">
+                <div className="max-w-4xl mx-auto px-8 py-12">
+
+                  {/* Content Header */}
+                  <div className="mb-12">
+                    <div className="flex items-center space-x-2 mb-6">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                        {post.category?.name || 'Article'}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {new Date(post.date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </span>
+                    </div>
+
+                    <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight mb-6">
+                      {post.title}
+                    </h1>
+
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-8">
+                      <div className="flex items-center space-x-2">
+                        <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+                        <span>By {post.author?.full_name || 'Anonymous'}</span>
+                      </div>
+                      <span>•</span>
+                      <span>8 min read</span>
+                      <span>•</span>
+                      <span>Last updated {new Date(post.updated_at || post.date).toLocaleDateString()}</span>
+                    </div>
+
+                    {post.excerpt && (
+                      <p className="text-xl leading-relaxed text-gray-700 dark:text-gray-300">
+                        {post.excerpt}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Article Content */}
+                  <article className="prose prose-xl max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-blockquote:border-l-blue-600 prose-img:rounded-xl prose-img:shadow-lg">
+                    {post.sections && post.sections.length > 0 ? (
+                      post.sections.map((section: any, index: number) => (
+                        <ContentRenderer
+                          key={section.id || index}
+                          title=""
+                          sections={[section]}
+                          seo={post.seo}
+                        />
+                      ))
+                    ) : (
+                      <div>
+                        {post.content ? (
+                          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                        ) : (
+                          <p className="text-gray-600 dark:text-gray-400">No content available for this post.</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Article Footer - Tags, Author, Share */}
+                    <footer className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
+
+                      {/* Tags */}
+                      {post.tags && post.tags.length > 0 && (
+                        <div className="mb-8">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Tags</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {post.tags.map((tag, index: number) => {
+                              const tagName = typeof tag === 'string' ? tag : tag.name
+                              return (
+                                <a
+                                  key={index}
+                                  href={`/blog?tag=${encodeURIComponent(tagName)}`}
+                                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                                >
+                                  #{tagName}
+                                </a>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Author Bio */}
+                      {post.author && (
+                        <div className="mb-8">
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">About the Author</h3>
+                          <div className="flex items-start space-x-4">
+                            {post.author.avatar_url ? (
+                              <img
+                                src={post.author.avatar_url}
+                                alt={post.author.full_name}
+                                className="w-16 h-16 rounded-full"
+                              />
+                            ) : (
+                              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                                {post.author.full_name?.charAt(0) || 'A'}
+                              </div>
+                            )}
+                            <div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white">{post.author.full_name}</h4>
+                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Microsoft technology expert with 15+ years of experience in enterprise environments.</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Share Section */}
+                      <div className="mb-8">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Share this article</h3>
+                        <div className="flex items-center space-x-4">
+                          <a
+                            href={`https://www.linkedin.com/feed/update/urn:li:share/?url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(post.title)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center space-x-2 bg-[#0077B5] hover:bg-[#005885] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                            </svg>
+                            <span>LinkedIn</span>
+                          </a>
+                          <button
+                            onClick={() => navigator.clipboard.writeText(postUrl)}
+                            className="flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 dark:bg-gray-500 dark:hover:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                            </svg>
+                            <span>Copy Link</span>
+                          </button>
+                        </div>
+                      </div>
+
+                    </footer>
+                  </article>
+
+                  {/* Comments Section */}
+                  <div className="mt-16 pt-8 border-t border-gray-200 dark:border-gray-700">
+                    <CommentSystem
+                      postId={post.id}
+                      postTitle={post.title}
+                      moderationEnabled={true}
+                      allowReplies={true}
+                    />
+                  </div>
+
                 </div>
               </div>
             </main>
+
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
+      <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+        <div className="max-w-screen-2xl mx-auto px-6 py-6">
+          <div className="flex justify-between items-center">
+            <a
+              href="/blog"
+              className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center group"
+            >
+              <svg className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              All Posts
+            </a>
+            <BackToTopButton />
           </div>
         </div>
       </div>
