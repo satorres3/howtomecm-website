@@ -8,23 +8,6 @@ export default function Header() {
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      {/* Top bar */}
-      <div className="bg-gray-900 text-white text-sm">
-        <div className="max-w-7xl mx-auto px-4 py-2">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <span>Professional Microsoft Technology Consulting</span>
-            </div>
-            <div className="flex items-center space-x-4">
-              <a href="#" className="hover:text-blue-300 transition-colors">Sign in</a>
-              <a href="#" className="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded transition-colors">
-                Get started
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main navigation */}
       <nav className="max-w-7xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
@@ -42,46 +25,16 @@ export default function Header() {
 
           {/* Desktop navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                <span>Solutions</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="py-2">
-                  <a href="/blog?category=mecm" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Configuration Manager</a>
-                  <a href="/blog?category=azure" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Azure Solutions</a>
-                  <a href="/blog?category=intune" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Microsoft Intune</a>
-                  <a href="/blog?category=powershell" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">PowerShell</a>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-600 font-medium transition-colors">
-                <span>Resources</span>
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                <div className="py-2">
-                  <a href="/blog" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Blog</a>
-                  <a href="/blog?category=tutorials" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Tutorials</a>
-                  <a href="/blog?category=best-practices" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Best Practices</a>
-                  <a href="/blog?category=case-studies" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">Case Studies</a>
-                </div>
-              </div>
-            </div>
-
             <Link href="/blog" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Blog
             </Link>
 
             <Link href="/contact" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
               Contact
+            </Link>
+
+            <Link href="/about" className="text-gray-700 hover:text-blue-600 font-medium transition-colors">
+              About
             </Link>
 
             {/* Search */}
@@ -121,14 +74,11 @@ export default function Header() {
               <Link href="/blog" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                 Blog
               </Link>
-              <Link href="/blog?category=mecm" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
-                Configuration Manager
-              </Link>
-              <Link href="/blog?category=azure" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
-                Azure Solutions
-              </Link>
               <Link href="/contact" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
                 Contact
+              </Link>
+              <Link href="/about" className="block px-4 py-2 text-gray-700 hover:bg-gray-50">
+                About
               </Link>
             </div>
             <div className="mt-4 px-4">

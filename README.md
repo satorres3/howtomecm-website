@@ -1,60 +1,47 @@
-# HowToMeCM Website
+# How to MeCM - Professional Microsoft Technology Blog
 
-Static website generator for staging.howtomecm.com (and production howtomecm.com).
-
-This Next.js application dynamically generates static websites from content stored in Supabase CMS.
+A modern, professional blog platform focused on Microsoft Configuration Manager (MECM), Azure cloud technologies, and enterprise IT solutions.
 
 ## Features
 
-- **Dynamic Content**: Pulls pages and posts from Supabase based on `website_domain`
-- **Static Generation**: Pre-renders pages at build time for optimal performance
-- **Multi-Domain Support**: Configurable for different domains (staging/production)
-- **SEO Optimized**: Generates metadata from CMS content
-- **Responsive Design**: Built with Tailwind CSS
-- **Content Types**: Supports various section types (hero, text, images, FAQ, etc.)
+- Azure blog-inspired design
+- Responsive layout with modern UI components
+- Content management system integration
+- Professional article templates with reading time
+- Search functionality
+- Category and tag filtering
+- SEO optimization
 
-## Environment Variables
+## Technology Stack
 
-Create a `.env.local` file with:
+- Next.js 15 with App Router
+- TypeScript
+- Tailwind CSS
+- Supabase (CMS backend)
 
-```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-WEBSITE_DOMAIN=staging.howtomecm.com
-```
-
-## Deployment
-
-This repository is configured to deploy to:
-- **Staging**: `staging.howtomecm.com`
-- **Production**: `howtomecm.com` (when replicated)
-
-### Vercel Deployment
-
-1. Connect this repository to Vercel project
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
-
-## Content Workflow
-
-1. User creates content in CMS admin (`cms.howtomecm.com`)
-2. Content is saved to Supabase with `website_domain` field
-3. This website queries Supabase for domain-specific content
-4. Static pages are generated and deployed
-
-## Development
+## Getting Started
 
 ```bash
 npm install
 npm run dev
 ```
 
-Visit `http://localhost:3000` to see the site.
+## Build
 
-## Architecture
-
+```bash
+npm run build
+npm run type-check
 ```
-CMS Admin → Supabase → This Website → Static Site
-```
 
-This solves the "staging creates nothing" issue by ensuring content actually gets deployed to the target domain.
+## Environment Variables
+
+Copy `.env.local.example` to `.env.local` and configure:
+
+- `WEBSITE_DOMAIN`: Your domain name
+- `SUPABASE_URL`: Supabase project URL
+- `SUPABASE_ANON_KEY`: Supabase anonymous key
+
+## Content Management
+
+This blog integrates with a Supabase-powered CMS for dynamic content management. Articles, categories, and metadata are managed through the CMS interface.
+

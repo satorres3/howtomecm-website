@@ -25,3 +25,10 @@ Thumbs.db
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# TypeScript
+*.tsbuildinfo
+
+# Documentation and pipeline files
+DEPLOYMENT-PIPELINE-COMPLETE.md
+STAGING-SETUP-COMPLETE.md
