@@ -47,30 +47,6 @@ export const metadata: Metadata = {
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
-// Helper function to convert page content to sections format
-function getPageSections(page: Page): Array<{id: string, type: string, content: any}> {
-  // Priority 1: Check if sections array exists
-  if (page.sections && Array.isArray(page.sections)) {
-    return page.sections
-  }
-
-  // Priority 2: Check if content is already an array of sections
-  if (page.content && Array.isArray(page.content)) {
-    return page.content
-  }
-
-  // Priority 3: Handle legacy string content
-  if (page.content && typeof page.content === 'string') {
-    return [{
-      id: 'legacy-content',
-      type: 'text',
-      content: { text: page.content }
-    }]
-  }
-
-  return []
-}
-
 export default async function HomePage() {
   // Try to get recent posts from CMS
   const recentPostsResult = await ContentLibrary.getRecentPosts(DOMAIN, 6)
@@ -78,8 +54,8 @@ export default async function HomePage() {
 
   // Use CMS posts if available, otherwise fall back to sample posts
   const allPosts = recentPosts.length > 0 ? recentPosts : samplePosts
-  const featuredPosts = allPosts.slice(0, 4)
-  const latestPosts = allPosts.slice(0, 6)
+  const featuredPosts = (allPosts.slice(0, 4) as any)
+  const latestPosts = (allPosts.slice(0, 6) as any)
 
   return (
     <main className="min-h-screen bg-white dark:bg-gray-900">
@@ -233,7 +209,7 @@ export default async function HomePage() {
 
               {/* Remaining posts in grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {latestPosts.slice(1).map((post, index) => (
+                {latestPosts.slice(1).map((post: any, index: number) => (
                   <div key={post.id} className="animate-fade-in" style={{animationDelay: `${(index + 1) * 100}ms`}}>
                     <ModernBlogCard
                       post={post}
@@ -286,196 +262,6 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
-    </main>
-  )
-                    <span>11 min read</span>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-2">
-                <div className="relative h-40 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=400&h=200&fit=crop&crop=center"
-                    alt="Patch Management"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                    Patch Management Strategies
-                  </h3>
-                  <div className="flex items-center text-xs text-gray-500 space-x-2">
-                    <span>November 25, 2024</span>
-                    <span>•</span>
-                    <span>8 min read</span>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-3">
-                <div className="relative h-40 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=200&fit=crop&crop=center"
-                    alt="Application Deployment"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold mb-3 text-gray-900 group-hover:text-blue-600 transition-colors duration-300">
-                    Application Deployment Automation
-                  </h3>
-                  <div className="flex items-center text-xs text-gray-500 space-x-2">
-                    <span>November 22, 2024</span>
-                    <span>•</span>
-                    <span>13 min read</span>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          {/* PowerShell and automation */}
-          <div className="mb-20">
-            <div className="flex items-center justify-between mb-12 animate-fade-in">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
-                  PowerShell and automation
-                </h2>
-                <p className="text-gray-600 text-lg">
-                  Powerful automation solutions and advanced scripting techniques
-                </p>
-              </div>
-              <a href="/blog?category=powershell" className="btn-ghost group">
-                See all PowerShell posts
-                <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </a>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              <article className="card-modern overflow-hidden group animate-slide-up">
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=500&h=300&fit=crop&crop=center"
-                    alt="PowerShell DSC"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-block bg-violet-500 text-white text-xs px-3 py-1 rounded-full font-medium">
-                      PowerShell
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-violet-600 transition-colors duration-300">
-                    DSC Configuration Templates
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                    Ready-to-use PowerShell DSC configurations for common enterprise scenarios.
-                  </p>
-                  <div className="flex items-center text-xs text-gray-500 space-x-2">
-                    <span>November 20, 2024</span>
-                    <span>•</span>
-                    <span>10 min read</span>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-1">
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=300&fit=crop&crop=center"
-                    alt="Azure Automation"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-block bg-rose-500 text-white text-xs px-3 py-1 rounded-full font-medium">
-                      Automation
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-rose-600 transition-colors duration-300">
-                    Azure Automation Runbooks
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                    Building robust automation workflows with Azure Automation and PowerShell.
-                  </p>
-                  <div className="flex items-center text-xs text-gray-500 space-x-2">
-                    <span>November 18, 2024</span>
-                    <span>•</span>
-                    <span>14 min read</span>
-                  </div>
-                </div>
-              </article>
-
-              <article className="card-modern overflow-hidden group animate-slide-up stagger-delay-2">
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src="https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=500&h=300&fit=crop&crop=center"
-                    alt="Advanced PowerShell"
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  <div className="absolute top-4 left-4">
-                    <span className="inline-block bg-amber-500 text-white text-xs px-3 py-1 rounded-full font-medium">
-                      Scripts
-                    </span>
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-3 text-gray-900 group-hover:text-amber-600 transition-colors duration-300">
-                    Advanced PowerShell Techniques
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-4 leading-relaxed">
-                    Professional scripting patterns and error handling for production environments.
-                  </p>
-                  <div className="flex items-center text-xs text-gray-500 space-x-2">
-                    <span>November 15, 2024</span>
-                    <span>•</span>
-                    <span>16 min read</span>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Modern Call to Action */}
-      <section className="relative section-padding bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white overflow-hidden">
-
-        <div className="container-modern text-center relative z-10">
-          <div className="max-w-4xl mx-auto animate-fade-in">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
-              Ready to accelerate your Microsoft technology journey?
-            </h2>
-            <p className="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
-              Get expert guidance on Configuration Manager, Azure, and modern device management.
-              Transform your IT infrastructure with proven strategies.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
-              <a href="/contact" className="btn-secondary bg-white text-blue-600 hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100">
-                Get Expert Consultation
-              </a>
-              <a href="/blog" className="inline-flex items-center justify-center px-8 py-3 border-2 border-white text-white rounded-xl font-medium hover:bg-white hover:text-blue-600 transition-all duration-300 hover:scale-105">
-                Explore Our Insights
-              </a>
-            </div>
-          </div>
-
-          {/* Floating Elements */}
-          <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
-        </div>
-      </section>
-
     </main>
   )
 }
