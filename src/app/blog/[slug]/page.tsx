@@ -13,6 +13,7 @@ import { notFound } from 'next/navigation'
 import type { Post } from '../../../../types/content'
 import { samplePosts } from '../../../data/samplePosts'
 import { calculateReadingTime, formatReadingTime } from '../../../utils/readingTime'
+import { processContentForTOC } from '../../../utils/contentProcessor'
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
@@ -236,44 +237,28 @@ export default async function BlogPost({ params }: BlogPostProps) {
   const postContent = post.content || ''
   const readingTime = calculateReadingTime(postContent)
 
+  // Process content to add IDs to headings and extract TOC items
+  const { processedContent, tocItems } = processContentForTOC(postContent)
+
   return (
     <article className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Navigation Header - Simplified */}
+      {/* Clean Navigation Header */}
       <header className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-screen-2xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <nav>
-              <a href="/blog" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium flex items-center">
+              <a href="/blog" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 font-medium flex items-center transition-colors">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
                 Back to Blog
               </a>
             </nav>
-            <div className="flex items-center space-x-4">
-              <EngagementMetrics
-                postId={post.id}
-                title={post.title}
-                url={postUrl}
-                className=""
-              />
-              <DarkModeToggle />
-            </div>
+            <DarkModeToggle />
           </div>
         </div>
       </header>
 
-      {/* Featured Image - Full Width */}
-      {post.featured_image && (
-        <div className="w-full h-96 md:h-[32rem] relative overflow-hidden">
-          <img
-            src={post.featured_image}
-            alt={post.title}
-            className="w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-        </div>
-      )}
 
       {/* Two-Column Reading Layout */}
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -288,27 +273,40 @@ export default async function BlogPost({ params }: BlogPostProps) {
                 {/* Dynamic Table of Contents */}
                 <div>
                   <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4 uppercase tracking-wide">Contents</h3>
-                  <TableOfContents content={postContent} />
+                  <TableOfContents tocItems={tocItems} />
                 </div>
 
                 {/* YouTube Promotion Card */}
                 <div className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20 rounded-xl p-4 border border-red-200 dark:border-red-800">
                   <div className="flex items-center space-x-3 mb-3">
-                    <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
-                      <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                      </svg>
+                    <div className="flex items-center -space-x-2">
+                      <img
+                        src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
+                        alt="How to MeCM"
+                        className="w-8 h-8 object-contain bg-white rounded-lg border-2 border-white shadow-sm z-10"
+                      />
+                      <div className="w-8 h-8 bg-red-600 rounded-lg flex items-center justify-center">
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                      </div>
                     </div>
-                    <h4 className="font-semibold text-gray-900 dark:text-white text-sm">Video Tutorials</h4>
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white text-sm">How to MeCM</h4>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">YouTube Channel</p>
+                    </div>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">Watch related content on our YouTube channel</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mb-3">Watch detailed video tutorials and implementation guides</p>
                   <a
                     href="https://youtube.com/channel/UCAceM2bfmSUfCwJ03TB2cjg"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full bg-red-600 hover:bg-red-700 text-white text-center py-2 px-3 rounded-lg text-xs font-medium transition-colors"
+                    className="flex items-center justify-center space-x-2 w-full bg-red-600 hover:bg-red-700 text-white py-2 px-3 rounded-lg text-xs font-medium transition-colors"
                   >
-                    Subscribe
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                    </svg>
+                    <span>Subscribe & Watch</span>
                   </a>
                 </div>
 
@@ -387,7 +385,7 @@ export default async function BlogPost({ params }: BlogPostProps) {
                       {post.title}
                     </h1>
 
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-8">
+                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400 mb-6">
                       <div className="flex items-center space-x-2">
                         {post.author?.avatar_url ? (
                           <img
@@ -406,6 +404,16 @@ export default async function BlogPost({ params }: BlogPostProps) {
                       <span>{formatReadingTime(readingTime)}</span>
                       <span>•</span>
                       <span>Last updated {new Date(post.updated_at || post.date).toLocaleDateString()}</span>
+                    </div>
+
+                    {/* Engagement Metrics */}
+                    <div className="mb-8">
+                      <EngagementMetrics
+                        postId={post.id}
+                        title={post.title}
+                        url={postUrl}
+                        className=""
+                      />
                     </div>
 
                     {post.excerpt && (
@@ -428,7 +436,18 @@ export default async function BlogPost({ params }: BlogPostProps) {
                   </div>
 
                   {/* Article Content */}
-                  <article className="prose prose-xl max-w-none dark:prose-invert prose-headings:text-gray-900 dark:prose-headings:text-white prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-strong:text-gray-900 dark:prose-strong:text-white prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-blockquote:border-l-blue-600 prose-img:rounded-xl prose-img:shadow-lg">
+                  <article className="prose prose-xl max-w-none dark:prose-invert
+                    prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight
+                    prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
+                    prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
+                    prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-semibold
+                    prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-700
+                    prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
+                    prose-blockquote:border-l-blue-600 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:p-4 prose-blockquote:rounded-r-lg
+                    prose-img:rounded-xl prose-img:shadow-lg prose-img:mb-6
+                    prose-ul:mb-6 prose-ol:mb-6 prose-li:mb-2
+                    prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-3
+                    [&>div]:mb-8 [&>div>*]:mb-4">
                     {post.sections && post.sections.length > 0 ? (
                       post.sections.map((section: any, index: number) => (
                         <ContentRenderer
@@ -440,8 +459,8 @@ export default async function BlogPost({ params }: BlogPostProps) {
                       ))
                     ) : (
                       <div>
-                        {post.content ? (
-                          <div dangerouslySetInnerHTML={{ __html: post.content }} />
+                        {processedContent ? (
+                          <div dangerouslySetInnerHTML={{ __html: processedContent }} />
                         ) : (
                           <p className="text-gray-600 dark:text-gray-400">No content available for this post.</p>
                         )}

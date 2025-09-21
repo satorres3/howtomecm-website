@@ -58,107 +58,106 @@ export default async function HomePage() {
   const latestPosts = (allPosts.slice(0, 6) as any)
 
   return (
-    <main className="min-h-screen bg-white dark:bg-gray-900">
-      {/* Clean Header with Social Links */}
-      <header className="bg-white dark:bg-gray-800 shadow-sm">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-8">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                How to MeCM
-              </h1>
-              <nav className="hidden md:flex items-center space-x-6">
-                <a href="/blog" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium">
-                  Blog
-                </a>
-                <a href="/about" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium">
-                  About
-                </a>
-                <a href="/contact" className="text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium">
-                  Contact
-                </a>
-              </nav>
-            </div>
-            <div className="flex items-center space-x-4">
-              {/* YouTube Link */}
-              <a
-                href="https://youtube.com/@howtomecm"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-                <span className="hidden sm:inline">YouTube</span>
-              </a>
+    <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
 
-              {/* LinkedIn Link */}
-              <a
-                href="https://linkedin.com/in/sauloalvestorres"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 bg-[#0077B5] hover:bg-[#005885] text-white px-4 py-2 rounded-lg font-medium transition-colors"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                </svg>
-                <span className="hidden sm:inline">LinkedIn</span>
-              </a>
-
-              <DarkModeToggle />
-            </div>
-          </div>
+      {/* Enhanced Hero Section */}
+      <section className="relative py-24 bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 dark:from-gray-800 dark:via-gray-900 dark:to-black overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute inset-0" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundSize: '60px 60px'
+          }} />
         </div>
-      </header>
 
-      {/* Hero Section - Blog Focus */}
-      <section className="py-20 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-900">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-7xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
-              Microsoft Technology
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"> Blog</span>
-            </h1>
-            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-              Expert insights on MECM, Azure, and enterprise solutions.
-              Practical guides and best practices for IT professionals.
+        <div className="relative container mx-auto px-6">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="flex items-center justify-center mb-8">
+              <img
+                src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
+                alt="How to MeCM Logo"
+                className="w-16 h-16 object-contain bg-white/10 backdrop-blur rounded-xl p-2 mr-4"
+              />
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white leading-tight">
+                How to MeCM
+                <span className="block text-blue-200 text-2xl md:text-3xl lg:text-4xl font-normal mt-2">
+                  Microsoft Technology Blog
+                </span>
+              </h1>
+            </div>
+
+            <p className="text-xl md:text-2xl text-blue-100 mb-12 leading-relaxed max-w-4xl mx-auto">
+              Expert insights on Microsoft Configuration Manager (MECM), Azure cloud technologies, and enterprise solutions.
+              <span className="block mt-2 text-lg text-blue-200">
+                Practical guides, tutorials, and best practices for IT professionals.
+              </span>
             </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-12">
               <a
                 href="/blog"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors"
+                className="group bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center"
               >
+                <svg className="w-5 h-5 mr-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
                 Explore Blog Posts
               </a>
               <a
                 href="https://youtube.com/@howtomecm"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-8 py-4 rounded-lg font-semibold text-lg transition-colors"
+                className="group bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center"
               >
-                Watch on YouTube
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
+                Watch Tutorials
               </a>
+            </div>
+
+            {/* Featured Topics */}
+            <div className="max-w-4xl mx-auto">
+              <p className="text-blue-200 text-sm uppercase tracking-wider mb-6">Popular Topics</p>
+              <div className="flex flex-wrap items-center justify-center gap-3">
+                {['Microsoft MECM', 'Azure Cloud', 'Configuration Manager', 'Intune', 'PowerShell', 'Enterprise Solutions'].map((topic) => (
+                  <span key={topic} className="bg-white/10 backdrop-blur text-white px-4 py-2 rounded-full text-sm font-medium hover:bg-white/20 transition-colors cursor-pointer">
+                    {topic}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Posts */}
-      <section className="py-20 bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-6">
+      <section className="py-24 bg-white dark:bg-gray-900 relative">
+        {/* Subtle background decoration */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-10">
+          <div className="absolute top-0 left-1/4 w-72 h-72 bg-blue-500 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                Featured Posts
+            <div className="text-center mb-20">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl mb-6">
+                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
+                Featured Content
               </h2>
-              <p className="text-xl text-gray-600 dark:text-gray-400">
-                Latest insights and tutorials from our tech blog
+              <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                Discover our most popular and comprehensive guides on Microsoft technologies,
+                handpicked for IT professionals and technology enthusiasts.
               </p>
             </div>
 
             {/* Rotating Featured Posts */}
-            <div className="mb-16">
+            <div className="mb-20">
               <RotatingBlogPosts
                 posts={featuredPosts}
                 autoRotate={true}
@@ -171,21 +170,22 @@ export default async function HomePage() {
       </section>
 
       {/* Latest Blog Posts Grid */}
-      <section className="py-20 bg-gray-50 dark:bg-gray-800">
+      <section className="py-24 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
         <div className="container mx-auto px-6">
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-12">
-              <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  Latest Posts
+            <div className="flex flex-col md:flex-row md:items-center justify-between mb-16">
+              <div className="mb-6 md:mb-0">
+                <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                  Latest Insights
                 </h2>
-                <p className="text-gray-600 dark:text-gray-400">
-                  Stay updated with our latest content
+                <p className="text-xl text-gray-600 dark:text-gray-400 max-w-2xl">
+                  Stay ahead with our freshest content on Microsoft technologies,
+                  cloud solutions, and IT best practices.
                 </p>
               </div>
               <a
                 href="/blog"
-                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-semibold flex items-center group"
+                className="group bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg flex items-center self-start md:self-center"
               >
                 View All Posts
                 <svg className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,10 +194,10 @@ export default async function HomePage() {
               </a>
             </div>
 
-            <div className="grid gap-8">
+            <div className="grid gap-10">
               {/* First post as featured */}
               {latestPosts[0] && (
-                <div className="animate-fade-in">
+                <div className="animate-fade-in transform hover:scale-[1.02] transition-transform duration-300">
                   <ModernBlogCard
                     post={latestPosts[0]}
                     variant="featured"
@@ -207,10 +207,14 @@ export default async function HomePage() {
                 </div>
               )}
 
-              {/* Remaining posts in grid */}
+              {/* Remaining posts in enhanced grid */}
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {latestPosts.slice(1).map((post: any, index: number) => (
-                  <div key={post.id} className="animate-fade-in" style={{animationDelay: `${(index + 1) * 100}ms`}}>
+                  <div
+                    key={post.id}
+                    className="animate-fade-in transform hover:scale-105 transition-all duration-300 hover:shadow-lg"
+                    style={{animationDelay: `${(index + 1) * 150}ms`}}
+                  >
                     <ModernBlogCard
                       post={post}
                       variant="default"
@@ -225,39 +229,64 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Newsletter/Contact CTA */}
-      <section className="py-20 bg-blue-600 dark:bg-blue-800">
-        <div className="container mx-auto px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Stay Connected
-            </h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Follow our journey for the latest Microsoft technology insights and tutorials
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+      {/* Enhanced CTA Section */}
+      <section className="py-24 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-800 dark:from-gray-800 dark:via-gray-900 dark:to-black relative overflow-hidden">
+        {/* Background Elements */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-2xl"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-300 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-300 rounded-full blur-3xl"></div>
+        </div>
+
+        <div className="relative container mx-auto px-6">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="mb-8">
+              <img
+                src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
+                alt="How to MeCM Logo"
+                className="w-20 h-20 object-contain bg-white/10 backdrop-blur rounded-2xl p-3 mx-auto mb-6"
+              />
+              <h2 className="text-4xl md:text-6xl font-bold text-white mb-6">
+                Join Our Community
+              </h2>
+              <p className="text-xl md:text-2xl text-blue-100 mb-4 leading-relaxed">
+                Connect with thousands of IT professionals and Microsoft technology enthusiasts.
+              </p>
+              <p className="text-lg text-blue-200 mb-12">
+                Get exclusive insights, tutorials, and industry updates delivered to your feed.
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto mb-12">
               <a
                 href="https://youtube.com/@howtomecm"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors flex items-center"
+                className="group bg-red-600 hover:bg-red-700 text-white p-6 rounded-2xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center"
               >
-                <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                <svg className="w-12 h-12 mb-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
-                Subscribe on YouTube
+                <span className="text-xl mb-2">YouTube Channel</span>
+                <span className="text-red-200 text-sm">Video tutorials & demos</span>
               </a>
+
               <a
                 href="https://linkedin.com/in/sauloalvestorres"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-lg font-semibold text-lg transition-colors flex items-center"
+                className="group bg-[#0077B5] hover:bg-[#005885] text-white p-6 rounded-2xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex flex-col items-center"
               >
-                <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-12 h-12 mb-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                 </svg>
-                Connect on LinkedIn
+                <span className="text-xl mb-2">LinkedIn Network</span>
+                <span className="text-blue-200 text-sm">Professional insights & updates</span>
               </a>
+            </div>
+
+            <div className="text-blue-200 text-sm">
+              <p>✨ Join 10,000+ IT professionals who trust our expertise</p>
             </div>
           </div>
         </div>

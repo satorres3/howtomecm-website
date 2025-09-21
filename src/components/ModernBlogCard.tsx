@@ -15,6 +15,32 @@ interface ModernBlogCardProps {
   className?: string
 }
 
+// Helper function to safely access post properties for both legacy and CMS posts
+const getPostProperty = (post: SamplePost | Post, property: string) => {
+  switch (property) {
+    case 'excerpt':
+      return 'excerpt' in post ? post.excerpt : ''
+    case 'authorName':
+      if ('author' in post && post.author) {
+        return typeof post.author === 'object' && 'full_name' in post.author
+          ? post.author.full_name
+          : 'Anonymous'
+      }
+      return 'Anonymous'
+    case 'categoryName':
+      if ('category' in post && post.category) {
+        return typeof post.category === 'object' && 'name' in post.category
+          ? post.category.name
+          : 'General'
+      }
+      return 'General'
+    case 'featuredImage':
+      return 'featured_image' in post ? post.featured_image : undefined
+    default:
+      return post[property as keyof typeof post]
+  }
+}
+
 export default function ModernBlogCard({
   post,
   variant = 'default',
@@ -36,7 +62,12 @@ export default function ModernBlogCard({
            'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=800&h=500&fit=crop&crop=center'
   }
 
-  const finalImageUrl = imageUrl || post.featured_image || getPlaceholderImage(post.category?.name || 'general')
+  const featuredImage = getPostProperty(post, 'featuredImage') as string | undefined
+  const categoryName = getPostProperty(post, 'categoryName') as string
+  const authorName = getPostProperty(post, 'authorName') as string
+  const excerpt = getPostProperty(post, 'excerpt') as string
+
+  const finalImageUrl = imageUrl || featuredImage || getPlaceholderImage(categoryName)
 
   // Calculate reading time
   const calculateReadingTime = (content: string) => {
@@ -75,8 +106,8 @@ export default function ModernBlogCard({
 
             {/* Category Badge */}
             <div className="absolute top-6 left-6">
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryStyles(post.category?.name || 'general')}`}>
-                {post.category?.name || 'General'}
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border backdrop-blur-sm ${getCategoryStyles(categoryName)}`}>
+                {categoryName}
               </span>
             </div>
           </div>
@@ -87,9 +118,9 @@ export default function ModernBlogCard({
               {post.title}
             </h2>
 
-            {showExcerpt && (
+            {showExcerpt && excerpt && (
               <p className="text-gray-200 mb-4 line-clamp-2 leading-relaxed">
-                {post.excerpt || 'No excerpt available'}
+                {excerpt}
               </p>
             )}
 
@@ -99,7 +130,7 @@ export default function ModernBlogCard({
                 {showAuthor && (
                   <>
                     <span>•</span>
-                    <span>{post.author?.full_name || 'Anonymous'}</span>
+                    <span>{authorName}</span>
                   </>
                 )}
                 <span>•</span>
@@ -138,8 +169,8 @@ export default function ModernBlogCard({
             {/* Content */}
             <div className="flex-1 p-4">
               <div className="mb-2">
-                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(post.category?.name || 'general')}`}>
-                  {post.category?.name || 'General'}
+                <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(categoryName)}`}>
+                  {categoryName}
                 </span>
               </div>
 
@@ -164,8 +195,8 @@ export default function ModernBlogCard({
       <Link href={`/blog/${post.slug}`} className={`block group ${className}`}>
         <article className="py-4 border-b border-gray-100 hover:border-gray-200 transition-colors duration-200">
           <div className="flex items-center justify-between mb-2">
-            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(post.category?.name || 'general')}`}>
-              {post.category?.name || 'General'}
+            <span className={`inline-flex items-center px-2 py-1 rounded-md text-xs font-medium ${getCategoryStyles(categoryName)}`}>
+              {categoryName}
             </span>
             <span className="text-xs text-gray-500">{calculateReadingTime(post.content || '')}</span>
           </div>
@@ -179,7 +210,7 @@ export default function ModernBlogCard({
             {showAuthor && (
               <>
                 <span>•</span>
-                <span>{post.author?.full_name || 'Anonymous'}</span>
+                <span>{authorName}</span>
               </>
             )}
           </div>
@@ -208,8 +239,8 @@ export default function ModernBlogCard({
         <div className="p-6">
           {/* Category */}
           <div className="mb-3">
-            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getCategoryStyles(post.category?.name || 'general')}`}>
-              {post.category?.name || 'General'}
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${getCategoryStyles(categoryName)}`}>
+              {categoryName}
             </span>
           </div>
 
@@ -219,9 +250,9 @@ export default function ModernBlogCard({
           </h3>
 
           {/* Excerpt */}
-          {showExcerpt && (
+          {showExcerpt && excerpt && (
             <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">
-              {post.excerpt}
+              {excerpt}
             </p>
           )}
 
@@ -232,7 +263,7 @@ export default function ModernBlogCard({
               {showAuthor && (
                 <>
                   <span>•</span>
-                  <span>{post.author?.full_name || 'Anonymous'}</span>
+                  <span>{authorName}</span>
                 </>
               )}
             </div>

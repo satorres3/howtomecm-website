@@ -246,24 +246,28 @@ Invoke-CMDeviceCollectionUpdate -Id $Collection.CollectionID</code></pre>
   </ul>
 </div>
 
-<h3>Video Tutorial: Implementing Co-Management</h3>
+<h3 id="video-tutorial-implementing-co-management">Video Tutorial: Implementing Co-Management</h3>
 <div class="my-8">
-  <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-6 text-center">
-    <div class="w-full h-64 bg-gradient-to-br from-red-500 to-red-600 rounded-lg flex items-center justify-center mb-4">
-      <div class="text-white">
-        <svg class="w-16 h-16 mx-auto mb-4" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-        </svg>
-        <p class="text-xl font-semibold">MECM Co-Management Deep Dive</p>
-        <p class="text-sm opacity-75">Complete implementation walkthrough</p>
-      </div>
+  <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-6">
+    <div class="aspect-w-16 aspect-h-9 mb-4">
+      <iframe
+        class="w-full h-full rounded-lg"
+        style="aspect-ratio: 16/9; min-height: 315px;"
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+        title="MECM Co-Management Implementation Tutorial"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
     </div>
-    <a href="https://youtube.com/channel/UCAceM2bfmSUfCwJ03TB2cjg" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
-      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-      </svg>
-      Watch on YouTube
-    </a>
+    <div class="text-center">
+      <h4 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">MECM Co-Management Deep Dive</h4>
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Complete step-by-step implementation walkthrough covering all phases from preparation to production deployment.</p>
+      <a href="https://youtube.com/channel/UCAceM2bfmSUfCwJ03TB2cjg" target="_blank" rel="noopener noreferrer" class="inline-flex items-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-colors">
+        <img src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif" alt="How to MeCM Logo" class="w-5 h-5 mr-2 rounded">
+        Subscribe to Channel
+      </a>
+    </div>
   </div>
 </div>
 

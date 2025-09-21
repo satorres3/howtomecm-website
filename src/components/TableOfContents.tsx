@@ -9,38 +9,18 @@ interface TOCItem {
 }
 
 interface TableOfContentsProps {
-  content: string
+  tocItems: TOCItem[]
   className?: string
 }
 
-export default function TableOfContents({ content, className = '' }: TableOfContentsProps) {
-  const [tocItems, setTocItems] = useState<TOCItem[]>([])
+export default function TableOfContents({ tocItems, className = '' }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('')
   const [readingProgress, setReadingProgress] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    // Extract headings from content
-    const tempDiv = document.createElement('div')
-    tempDiv.innerHTML = content
-    const headings = tempDiv.querySelectorAll('h1, h2, h3, h4, h5, h6')
-
-    const items: TOCItem[] = Array.from(headings).map((heading, index) => {
-      const level = parseInt(heading.tagName.charAt(1))
-      const title = heading.textContent || ''
-      const id = heading.id || `heading-${index}`
-
-      // Add ID to heading if it doesn't have one
-      if (!heading.id) {
-        heading.id = id
-      }
-
-      return { id, title, level }
-    })
-
-    setTocItems(items)
-    setIsVisible(items.length > 0)
-  }, [content])
+    setIsVisible(tocItems.length > 0)
+  }, [tocItems])
 
   useEffect(() => {
     const handleScroll = () => {

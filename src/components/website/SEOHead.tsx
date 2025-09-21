@@ -1,9 +1,17 @@
+import type { SEOData, Post, Page } from '../../../types/content'
+
 interface SEOHeadProps {
   title: string
   description: string
   keywords?: string[]
   ogImage?: string
   canonicalUrl?: string
+
+  // Support for CMS SEO data
+  seoData?: SEOData
+  content?: Post | Page
+
+  // Legacy support
   articleData?: {
     publishedTime?: string
     modifiedTime?: string
@@ -17,45 +25,102 @@ interface SEOHeadProps {
   }
 }
 
+// Helper function to extract SEO data from CMS content
+const extractSEOFromContent = (content: Post | Page | undefined, seoData: SEOData | undefined) => {
+  const defaultSEO = {
+    metaTitle: '',
+    metaDescription: '',
+    focusKeyword: '',
+    ogTitle: '',
+    ogDescription: '',
+    ogImage: '',
+    twitterTitle: '',
+    twitterDescription: '',
+    twitterImage: '',
+    twitterCard: 'summary_large_image' as const,
+    canonicalUrl: '',
+    noindex: false,
+    nofollow: false
+  }
+
+  // Priority: explicit seoData > content.seo > defaults
+  const extracted = {
+    ...defaultSEO,
+    ...(content?.seo || {}),
+    ...(seoData || {})
+  }
+
+  return extracted
+}
+
 export default function SEOHead({
   title,
   description,
   keywords,
   ogImage,
   canonicalUrl,
+  seoData,
+  content,
   articleData,
   siteData,
 }: SEOHeadProps) {
-  const fullTitle = siteData?.siteName ? `${title} | ${siteData.siteName}` : title
-  const imageUrl = ogImage || `${siteData?.siteUrl}/og-image.jpg`
-  const url = canonicalUrl || siteData?.siteUrl
+  // Extract SEO data from CMS content if available
+  const cmsSeO = extractSEOFromContent(content, seoData)
 
-  // Generate structured data for articles
+  // Use CMS SEO data with fallbacks to props
+  const finalTitle = cmsSeO.metaTitle || title
+  const finalDescription = cmsSeO.metaDescription || description
+  const finalOGImage = cmsSeO.ogImage || ogImage
+  const finalCanonicalUrl = cmsSeO.canonicalUrl || canonicalUrl
+
+  const fullTitle = siteData?.siteName ? `${finalTitle} | ${siteData.siteName}` : finalTitle
+  const imageUrl = finalOGImage || `${siteData?.siteUrl}/og-image.jpg`
+  const url = finalCanonicalUrl || siteData?.siteUrl
+
+  // Extract keywords from CMS content if available
+  const finalKeywords = keywords || (cmsSeO.focusKeyword ? [cmsSeO.focusKeyword] : [])
+
+  // Generate structured data for articles with CMS support
   const generateArticleSchema = () => {
-    if (!articleData || !siteData) return null
+    // Use CMS content data if available, fallback to legacy articleData
+    const hasContentData = content && 'date' in content // Check if it's a Post
+    const hasArticleData = articleData && siteData
+
+    if (!hasContentData && !hasArticleData) return null
+
+    // Extract article data from CMS or legacy source
+    const schemaData = hasContentData ? {
+      headline: finalTitle,
+      description: finalDescription,
+      image: imageUrl,
+      url: url,
+      datePublished: content.date,
+      dateModified: content.updated_at || content.date,
+      author: content.author?.full_name || 'Anonymous',
+      keywords: content.tags?.map(tag => tag.name).join(', ') || ''
+    } : {
+      headline: finalTitle,
+      description: finalDescription,
+      image: imageUrl,
+      url: url,
+      datePublished: articleData!.publishedTime,
+      dateModified: articleData!.modifiedTime || articleData!.publishedTime,
+      author: articleData!.author || 'Anonymous',
+      keywords: articleData!.tags?.join(', ') || ''
+    }
 
     return {
       '@context': 'https://schema.org',
       '@type': 'Article',
-      headline: title,
-      description,
-      image: imageUrl,
-      url: url,
-      datePublished: articleData.publishedTime,
-      dateModified: articleData.modifiedTime || articleData.publishedTime,
-      author: {
-        '@type': 'Person',
-        name: articleData.author || 'Anonymous',
-      },
+      ...schemaData,
       publisher: {
         '@type': 'Organization',
-        name: siteData.siteName,
+        name: siteData?.siteName || 'Website',
         logo: {
           '@type': 'ImageObject',
-          url: `${siteData.siteUrl}/logo.png`,
+          url: `${siteData?.siteUrl || ''}/logo.png`,
         },
       },
-      keywords: articleData.tags?.join(', '),
     }
   }
 
@@ -65,29 +130,46 @@ export default function SEOHead({
     <>
       {/* Basic meta tags */}
       <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      {keywords && keywords.length > 0 && (
-        <meta name="keywords" content={keywords.join(', ')} />
+      <meta name="description" content={finalDescription} />
+      {finalKeywords && finalKeywords.length > 0 && (
+        <meta name="keywords" content={finalKeywords.join(', ')} />
       )}
 
       {/* Canonical URL */}
-      {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+      {finalCanonicalUrl && <link rel="canonical" href={finalCanonicalUrl} />}
 
-      {/* Open Graph tags */}
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:type" content={articleData ? 'article' : 'website'} />
+      {/* Robots meta tags from CMS */}
+      {cmsSeO.noindex && <meta name="robots" content="noindex" />}
+      {cmsSeO.nofollow && <meta name="robots" content="nofollow" />}
+
+      {/* Open Graph tags with CMS support */}
+      <meta property="og:title" content={cmsSeO.ogTitle || fullTitle} />
+      <meta property="og:description" content={cmsSeO.ogDescription || finalDescription} />
+      <meta property="og:type" content={(content && 'date' in content) || articleData ? 'article' : 'website'} />
       <meta property="og:url" content={url} />
       <meta property="og:image" content={imageUrl} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content={title} />
+      <meta property="og:image:alt" content={finalTitle} />
       {siteData?.siteName && (
         <meta property="og:site_name" content={siteData.siteName} />
       )}
 
-      {/* Article-specific Open Graph tags */}
-      {articleData && (
+      {/* Article-specific Open Graph tags with CMS support */}
+      {(content && 'date' in content) && (
+        <>
+          <meta property="article:published_time" content={content.date} />
+          <meta property="article:modified_time" content={content.updated_at || content.date} />
+          {content.author?.full_name && (
+            <meta property="article:author" content={content.author.full_name} />
+          )}
+          {content.tags?.map((tag) => (
+            <meta key={tag.id} property="article:tag" content={tag.name} />
+          ))}
+        </>
+      )}
+      {/* Legacy article data support */}
+      {!content && articleData && (
         <>
           {articleData.publishedTime && (
             <meta property="article:published_time" content={articleData.publishedTime} />
@@ -104,11 +186,11 @@ export default function SEOHead({
         </>
       )}
 
-      {/* Twitter Card tags */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={imageUrl} />
+      {/* Twitter Card tags with CMS support */}
+      <meta name="twitter:card" content={cmsSeO.twitterCard || 'summary_large_image'} />
+      <meta name="twitter:title" content={cmsSeO.twitterTitle || fullTitle} />
+      <meta name="twitter:description" content={cmsSeO.twitterDescription || finalDescription} />
+      <meta name="twitter:image" content={cmsSeO.twitterImage || imageUrl} />
       {siteData?.twitterHandle && (
         <meta name="twitter:site" content={siteData.twitterHandle} />
       )}

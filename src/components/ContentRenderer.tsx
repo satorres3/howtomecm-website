@@ -16,11 +16,54 @@ interface ContentRendererProps {
     metaDescription?: string
     focusKeyword?: string
   }
+  className?: string
 }
 
-export default function ContentRenderer({ title, sections, seo }: ContentRendererProps) {
+// Helper function to safely render content with error boundaries
+const safeRender = (renderFunction: () => React.ReactNode, fallbackMessage: string) => {
+  try {
+    return renderFunction()
+  } catch (error) {
+    console.error('Error rendering section:', error)
+    return (
+      <div className="bg-red-50 border border-red-200 p-6 rounded-lg mb-8 shadow-sm">
+        <div className="flex items-center">
+          <span className="text-2xl mr-3">⚠️</span>
+          <div>
+            <p className="text-red-800 font-medium">Error rendering content</p>
+            <p className="text-red-700 text-sm mt-1">{fallbackMessage}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+export default function ContentRenderer({ title, sections, seo, className = '' }: ContentRendererProps) {
+  // Safely handle missing or invalid sections data
+  const safeSections = Array.isArray(sections) ? sections : []
+
   const renderSection = (section: Section) => {
-    switch (section.type) {
+    // Validate section structure
+    if (!section || !section.type) {
+      return safeRender(
+        () => (
+          <div className="bg-yellow-50 border border-yellow-200 p-6 rounded-lg mb-8 shadow-sm">
+            <div className="flex items-center">
+              <span className="text-2xl mr-3">⚠️</span>
+              <div>
+                <p className="text-yellow-800 font-medium">Invalid section data</p>
+                <p className="text-yellow-700 text-sm mt-1">Section is missing required properties</p>
+              </div>
+            </div>
+          </div>
+        ),
+        'Invalid section structure'
+      )
+    }
+
+    return safeRender(() => {
+      switch (section.type) {
       case 'text':
         return (
           <div key={section.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-8 mb-8">
@@ -361,11 +404,12 @@ export default function ContentRenderer({ title, sections, seo }: ContentRendere
             </div>
           </div>
         )
-    }
+      }
+    }, `Error rendering section of type: ${section.type}`)
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${className}`}>
       {/* Dynamic page title */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="container mx-auto px-6 py-12">
@@ -376,9 +420,9 @@ export default function ContentRenderer({ title, sections, seo }: ContentRendere
       {/* Content sections */}
       <main className="container mx-auto px-6 py-12">
         <div className="max-w-4xl mx-auto">
-          {sections.map(renderSection)}
+          {safeSections.map(renderSection)}
 
-          {sections.length === 0 && (
+          {safeSections.length === 0 && (
             <div className="text-center py-16">
               <div className="bg-white rounded-lg shadow-sm p-12">
                 <p className="text-gray-600 text-lg">No content sections available.</p>
