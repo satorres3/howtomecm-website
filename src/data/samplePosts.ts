@@ -30,6 +30,7 @@ export const samplePosts: SamplePost[] = [
 </div>
 
 <h2>Overview</h2>
+
 <p>Managing Microsoft Edge browser settings across your organization is crucial for maintaining consistency and productivity. In this comprehensive guide, I'll walk you through configuring the Microsoft Edge Start and Home page for Windows 10/11 devices managed by Microsoft Intune using the Settings Catalog approach.</p>
 
 <div class="bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-6 my-8 border border-green-200 dark:border-green-800">
@@ -48,7 +49,9 @@ export const samplePosts: SamplePost[] = [
 </div>
 
 <h2>Prerequisites</h2>
+
 <p>Before you begin, ensure you have:</p>
+
 <ul class="list-disc list-inside space-y-2 mb-6">
   <li>Microsoft Intune administrator access</li>
   <li>Windows 10/11 devices enrolled in Intune</li>
@@ -57,7 +60,9 @@ export const samplePosts: SamplePost[] = [
 </ul>
 
 <h2>Step 1: Access Intune Administration Center</h2>
+
 <p>First, navigate to the Microsoft Intune admin center:</p>
+
 <ol class="list-decimal list-inside space-y-2 mb-6">
   <li>Go to <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">https://intune.microsoft.com</code></li>
   <li>Navigate to <strong>Devices > Windows > Configuration</strong></li>
@@ -65,7 +70,9 @@ export const samplePosts: SamplePost[] = [
 </ol>
 
 <h2>Step 2: Set Up the Configuration Profile</h2>
+
 <p>Configure the basic profile settings:</p>
+
 <ol class="list-decimal list-inside space-y-2 mb-6">
   <li>Select <strong>Platform</strong> as <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Windows 10 and later</code></li>
   <li>Choose <strong>Profile type</strong> as <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Settings catalog</code></li>
@@ -88,7 +95,9 @@ export const samplePosts: SamplePost[] = [
 </div>
 
 <h2>Step 3: Add Microsoft Edge Configuration Settings</h2>
+
 <p>Now we'll add the specific Edge browser settings:</p>
+
 <ol class="list-decimal list-inside space-y-2 mb-6">
   <li>Click <strong>Add settings</strong></li>
   <li>In the search box, type <code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">Microsoft Edge</code></li>
@@ -97,7 +106,8 @@ export const samplePosts: SamplePost[] = [
 </ol>
 
 <h2>Step 4: Configure Startup Page Settings</h2>
-<p>Configure the browser startup behavior:</p>
+
+<p>Configure the browser startup behavior by enabling the following settings:</p>
 
 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 my-6">
   <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Required Settings Configuration:</h4>
@@ -115,7 +125,7 @@ export const samplePosts: SamplePost[] = [
       <code class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-sm">Value: Open a list of URLs</code>
     </div>
 
-    <div class="border-b border-gray-200 dark:border-gray-700 pb-3">
+    <div>
       <h5 class="font-medium text-gray-900 dark:text-white">Sites to open when the browser starts</h5>
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Define startup URLs</p>
       <code class="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-sm">Status: Enabled</code>
@@ -125,7 +135,8 @@ export const samplePosts: SamplePost[] = [
 </div>
 
 <h2>Step 5: Configure Home Page Settings</h2>
-<p>Set up the home page configuration:</p>
+
+<p>Set up the home page configuration by enabling these settings:</p>
 
 <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-6 my-6">
   <h4 class="font-semibold text-gray-900 dark:text-white mb-4">Home Page Configuration:</h4>
@@ -160,14 +171,18 @@ export const samplePosts: SamplePost[] = [
 <p>Once all settings are configured, click <strong>Next</strong> to proceed.</p>
 
 <h2>Step 6: Set Scope Tags (Optional)</h2>
+
 <p>If your organization uses scope tags for role-based access control:</p>
+
 <ol class="list-decimal list-inside space-y-2 mb-6">
   <li>Add appropriate scope tags if needed</li>
   <li>Click <strong>Next</strong> to continue</li>
 </ol>
 
 <h2>Step 7: Assign the Configuration Profile</h2>
+
 <p>Target the policy to specific groups:</p>
+
 <ol class="list-decimal list-inside space-y-2 mb-6">
   <li>Click <strong>Add groups</strong> under Assignments</li>
   <li>Select the target <strong>device groups</strong> or <strong>user groups</strong></li>
@@ -188,7 +203,9 @@ export const samplePosts: SamplePost[] = [
 </div>
 
 <h2>Step 8: Review and Create</h2>
+
 <p>Finalize the configuration:</p>
+
 <ol class="list-decimal list-inside space-y-2 mb-6">
   <li>Review all configuration settings in the summary</li>
   <li>Verify the assigned groups are correct</li>
@@ -196,9 +213,11 @@ export const samplePosts: SamplePost[] = [
 </ol>
 
 <h2>Verification and Troubleshooting</h2>
+
 <p>After deploying the policy, verify it's working correctly:</p>
 
 <h3>Policy Status Check</h3>
+
 <ul class="list-disc list-inside space-y-2 mb-6">
   <li>Navigate to <strong>Devices > Monitor > Device configuration</strong></li>
   <li>Find your Edge configuration policy</li>
@@ -206,6 +225,7 @@ export const samplePosts: SamplePost[] = [
 </ul>
 
 <h3>End-User Verification</h3>
+
 <ul class="list-disc list-inside space-y-2 mb-6">
   <li>On a target device, open Microsoft Edge</li>
   <li>Verify the configured URLs open on startup</li>
@@ -237,9 +257,11 @@ export const samplePosts: SamplePost[] = [
 </div>
 
 <h2>Conclusion</h2>
+
 <p>Configuring Microsoft Edge start and home pages through Intune provides centralized control over browser behavior across your organization. Using the Settings Catalog approach with device-level configurations ensures consistent user experience while preventing unauthorized modifications.</p>
 
 <p>This configuration is particularly valuable for:</p>
+
 <ul class="list-disc list-inside space-y-2 mb-6">
   <li><strong>Corporate branding:</strong> Direct users to company portals and resources</li>
   <li><strong>Productivity:</strong> Provide quick access to frequently used applications</li>
