@@ -106,6 +106,7 @@ export default function Header() {
               </button>
             </div>
           </div>
+        </div>
 
         {/* Mobile menu */}
         {isMobileMenuOpen && (
