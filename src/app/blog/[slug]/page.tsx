@@ -436,17 +436,9 @@ export default async function BlogPost({ params }: BlogPostProps) {
                   </div>
 
                   {/* Article Content */}
-                  <article className="prose prose-xl max-w-none dark:prose-invert
-                    prose-headings:text-gray-900 dark:prose-headings:text-white prose-headings:font-bold prose-headings:tracking-tight
-                    prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
+                  <article className="prose prose-xl prose-enhanced max-w-none dark:prose-invert
                     prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-a:no-underline hover:prose-a:underline
                     prose-strong:text-gray-900 dark:prose-strong:text-white prose-strong:font-semibold
-                    prose-pre:bg-gray-100 dark:prose-pre:bg-gray-800 prose-pre:border prose-pre:border-gray-200 dark:prose-pre:border-gray-700
-                    prose-code:text-blue-600 dark:prose-code:text-blue-400 prose-code:bg-gray-100 dark:prose-code:bg-gray-800 prose-code:px-1 prose-code:py-0.5 prose-code:rounded
-                    prose-blockquote:border-l-blue-600 prose-blockquote:bg-blue-50 dark:prose-blockquote:bg-blue-900/20 prose-blockquote:p-4 prose-blockquote:rounded-r-lg
-                    prose-img:rounded-xl prose-img:shadow-lg prose-img:mb-6
-                    prose-ul:mb-6 prose-ol:mb-6 prose-li:mb-2
-                    prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-3
                     [&>div]:mb-8 [&>div>*]:mb-4">
                     {post.sections && post.sections.length > 0 ? (
                       post.sections.map((section: any, index: number) => (

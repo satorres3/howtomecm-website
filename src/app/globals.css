@@ -212,6 +212,85 @@
   background: var(--color-gray-400);
 }
 
+/* Enhanced Blog Post Prose Styling */
+@layer components {
+  .prose-enhanced {
+    @apply max-w-none;
+  }
+
+  /* Improved heading spacing */
+  .prose-enhanced h1 {
+    @apply text-4xl font-bold text-gray-900 dark:text-white mt-12 mb-8 first:mt-0;
+  }
+
+  .prose-enhanced h2 {
+    @apply text-3xl font-bold text-gray-900 dark:text-white mt-12 mb-6 first:mt-0;
+  }
+
+  .prose-enhanced h3 {
+    @apply text-2xl font-semibold text-gray-900 dark:text-white mt-10 mb-5;
+  }
+
+  .prose-enhanced h4 {
+    @apply text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4;
+  }
+
+  .prose-enhanced h5 {
+    @apply text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3;
+  }
+
+  /* Enhanced paragraph spacing */
+  .prose-enhanced p {
+    @apply text-gray-700 dark:text-gray-300 leading-relaxed mb-6 text-lg;
+  }
+
+  /* Better list spacing */
+  .prose-enhanced ul, .prose-enhanced ol {
+    @apply mb-8 space-y-3;
+  }
+
+  .prose-enhanced li {
+    @apply text-gray-700 dark:text-gray-300 leading-relaxed text-lg;
+  }
+
+  /* Enhanced code styling */
+  .prose-enhanced code {
+    @apply text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md text-sm font-mono;
+  }
+
+  .prose-enhanced pre {
+    @apply bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-8 overflow-x-auto;
+  }
+
+  /* Enhanced blockquote styling */
+  .prose-enhanced blockquote {
+    @apply border-l-4 border-blue-600 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-r-lg mb-8 not-italic;
+  }
+
+  /* Better image spacing */
+  .prose-enhanced img {
+    @apply rounded-xl shadow-lg mb-8 w-full;
+  }
+
+  /* Enhanced table styling */
+  .prose-enhanced table {
+    @apply w-full border-collapse border border-gray-200 dark:border-gray-700 mb-8;
+  }
+
+  .prose-enhanced th, .prose-enhanced td {
+    @apply border border-gray-200 dark:border-gray-700 px-4 py-2 text-left;
+  }
+
+  .prose-enhanced th {
+    @apply bg-gray-50 dark:bg-gray-800 font-semibold;
+  }
+
+  /* Section dividers */
+  .prose-enhanced hr {
+    @apply border-gray-200 dark:border-gray-700 my-12;
+  }
+}
+
 /* Print Styles */
 @media print {
   .no-print {

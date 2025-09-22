@@ -24,11 +24,34 @@ export default function TableOfContents({ tocItems, className = '' }: TableOfCon
 
   useEffect(() => {
     const handleScroll = () => {
-      // Calculate reading progress
-      const winScroll = document.body.scrollTop || document.documentElement.scrollTop
-      const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
-      const scrolled = (winScroll / height) * 100
-      setReadingProgress(scrolled)
+      // Calculate reading progress based on main article content only
+      const articleElement = document.querySelector('article.prose')
+      if (articleElement) {
+        const articleRect = articleElement.getBoundingClientRect()
+        const articleTop = articleElement.offsetTop
+        const articleHeight = articleElement.offsetHeight
+        const viewportHeight = window.innerHeight
+        const currentScroll = window.pageYOffset
+
+        // Calculate progress through the article
+        const articleStart = articleTop
+        const articleEnd = articleTop + articleHeight - viewportHeight
+
+        if (currentScroll < articleStart) {
+          setReadingProgress(0)
+        } else if (currentScroll > articleEnd) {
+          setReadingProgress(100)
+        } else {
+          const progress = ((currentScroll - articleStart) / (articleEnd - articleStart)) * 100
+          setReadingProgress(Math.min(100, Math.max(0, progress)))
+        }
+      } else {
+        // Fallback to document-based calculation if article not found
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight
+        const scrolled = (winScroll / height) * 100
+        setReadingProgress(scrolled)
+      }
 
       // Find active heading
       const headingElements = tocItems.map(item => document.getElementById(item.id)).filter(Boolean)

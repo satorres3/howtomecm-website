@@ -10,6 +10,7 @@ export interface TOCItem {
 
 /**
  * Processes HTML content to add IDs to headings and extract TOC items
+ * Also enhances formatting for better readability
  */
 export function processContentForTOC(htmlContent: string): {
   processedContent: string
@@ -21,8 +22,22 @@ export function processContentForTOC(htmlContent: string): {
 
   const tocItems: TOCItem[] = []
 
-  // Add IDs to headings and extract TOC items
-  const processedContent = htmlContent.replace(
+  // First pass: Enhance formatting by adding line breaks and spacing
+  let enhancedContent = htmlContent
+    // Add line breaks after headings
+    .replace(/(<\/h[1-6]>)\s*(?!<)/gi, '$1\n\n')
+    // Add line breaks after paragraphs
+    .replace(/(<\/p>)\s*(?=<p>)/gi, '$1\n\n')
+    // Add line breaks after lists
+    .replace(/(<\/ul>|<\/ol>)\s*(?=<)/gi, '$1\n\n')
+    // Add line breaks before headings (except h1)
+    .replace(/(?<!^|\n\n)(<h[2-6][^>]*>)/gi, '\n\n$1')
+    // Ensure proper spacing around divs
+    .replace(/(<div[^>]*>)\s*/gi, '$1\n')
+    .replace(/\s*(<\/div>)/gi, '\n$1\n\n')
+
+  // Second pass: Add IDs to headings and extract TOC items
+  const processedContent = enhancedContent.replace(
     /<(h[1-6])([^>]*)>(.*?)<\/h[1-6]>/gi,
     (match, tag, attributes, content) => {
       const level = parseInt(tag.charAt(1))
