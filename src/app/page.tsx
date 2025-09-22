@@ -61,13 +61,29 @@ export default async function HomePage() {
   // Transform posts to compatible format for DynamicHero component
   const heroCompatiblePosts = allPosts
     .filter(post => post.excerpt) // Only posts with excerpts
-    .map(post => ({
-      ...post,
-      excerpt: post.excerpt || '', // Ensure excerpt is always string
-      author: post.author || { full_name: 'Portal Blog Team', email: 'admin@howtomecm.com' },
-      category: post.category || { name: 'Technology', slug: 'technology' },
-      tags: post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name) || ['Microsoft', 'Technology']
-    }))
+    .map(post => {
+      // Explicitly construct SamplePost objects with all required fields
+      const samplePost = {
+        id: post.id,
+        title: post.title,
+        slug: post.slug,
+        excerpt: post.excerpt || '',
+        content: post.content || '',
+        date: post.date,
+        created_at: post.created_at,
+        category: post.category || { name: 'Technology', slug: 'technology' },
+        tags: post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name) || ['Microsoft', 'Technology'],
+        featured_image: post.featured_image,
+        author: post.author ? {
+          full_name: post.author.full_name || 'Portal Blog Team',
+          email: post.author.email || 'admin@howtomecm.com'
+        } : {
+          full_name: 'Portal Blog Team',
+          email: 'admin@howtomecm.com'
+        }
+      }
+      return samplePost
+    })
 
   const featuredPosts = (allPosts.slice(0, 4) as any)
   const latestPosts = (allPosts.slice(0, 6) as any)
