@@ -1,6 +1,10 @@
 import { supabase } from './supabase'
 import type { Page, Post, ContentSection, SEOData, MediaFile } from '../types/content'
 
+// CMS API Configuration
+const CMS_API_URL = process.env.CMS_API_URL || process.env.NEXT_PUBLIC_CMS_URL
+const ENABLE_CMS_INTEGRATION = process.env.ENABLE_CMS_INTEGRATION === 'true' || process.env.NEXT_PUBLIC_ENABLE_CMS_INTEGRATION === 'true'
+
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 const contentCache = new Map<string, { data: any; timestamp: number }>()
@@ -40,8 +44,257 @@ function createErrorResult<T>(error: string): ContentResult<T> {
 
 /**
  * Enhanced content fetching library with caching and error handling
+ * Supports both direct Supabase access and CMS API integration
  */
 export class ContentLibrary {
+  /**
+   * Get media files from CMS
+   */
+  static async getMediaFiles(domain: string): Promise<ContentResult<MediaFile[]>> {
+    const cacheKey = getCacheKey('media', { domain })
+    const cached = getFromCache<MediaFile[]>(cacheKey)
+
+    if (cached) {
+      return createSuccessResult(cached)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('media_files')
+        .select('*')
+        .eq('domain', domain)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        return createErrorResult(`Failed to fetch media files: ${error.message}`)
+      }
+
+      const mediaFiles = data || []
+      setCache(cacheKey, mediaFiles)
+
+      return createSuccessResult(mediaFiles)
+    } catch (error) {
+      return createErrorResult(`Unexpected error fetching media files: ${error}`)
+    }
+  }
+
+  /**
+   * Get categories for a domain
+   */
+  static async getCategories(domain: string): Promise<ContentResult<any[]>> {
+    const cacheKey = getCacheKey('categories', { domain })
+    const cached = getFromCache<any[]>(cacheKey)
+
+    if (cached) {
+      return createSuccessResult(cached)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('*')
+        .eq('website_domain', domain)
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true })
+
+      if (error) {
+        return createErrorResult(`Failed to fetch categories: ${error.message}`)
+      }
+
+      const categories = data || []
+      setCache(cacheKey, categories)
+
+      return createSuccessResult(categories)
+    } catch (error) {
+      return createErrorResult(`Unexpected error fetching categories: ${error}`)
+    }
+  }
+
+  /**
+   * Get tags for a domain
+   */
+  static async getTags(domain: string): Promise<ContentResult<any[]>> {
+    const cacheKey = getCacheKey('tags', { domain })
+    const cached = getFromCache<any[]>(cacheKey)
+
+    if (cached) {
+      return createSuccessResult(cached)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('tags')
+        .select('*')
+        .order('name', { ascending: true })
+
+      if (error) {
+        return createErrorResult(`Failed to fetch tags: ${error.message}`)
+      }
+
+      const tags = data || []
+      setCache(cacheKey, tags)
+
+      return createSuccessResult(tags)
+    } catch (error) {
+      return createErrorResult(`Unexpected error fetching tags: ${error}`)
+    }
+  }
+
+  /**
+   * Get comments for a post
+   */
+  static async getComments(postId: string): Promise<ContentResult<any[]>> {
+    const cacheKey = getCacheKey('comments', { postId })
+    const cached = getFromCache<any[]>(cacheKey)
+
+    if (cached) {
+      return createSuccessResult(cached)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('comments')
+        .select('*')
+        .eq('post_id', postId)
+        .eq('status', 'approved')
+        .order('created_at', { ascending: true })
+
+      if (error) {
+        return createErrorResult(`Failed to fetch comments: ${error.message}`)
+      }
+
+      const comments = data || []
+      setCache(cacheKey, comments)
+
+      return createSuccessResult(comments)
+    } catch (error) {
+      return createErrorResult(`Unexpected error fetching comments: ${error}`)
+    }
+  }
+
+  /**
+   * Get forms for a domain
+   */
+  static async getForms(domain: string): Promise<ContentResult<any[]>> {
+    const cacheKey = getCacheKey('forms', { domain })
+    const cached = getFromCache<any[]>(cacheKey)
+
+    if (cached) {
+      return createSuccessResult(cached)
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('forms')
+        .select('*')
+        .eq('domain', domain)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        return createErrorResult(`Failed to fetch forms: ${error.message}`)
+      }
+
+      const forms = data || []
+      setCache(cacheKey, forms)
+
+      return createSuccessResult(forms)
+    } catch (error) {
+      return createErrorResult(`Unexpected error fetching forms: ${error}`)
+    }
+  }
+
+  /**
+   * Create a new form submission
+   */
+  static async submitForm(formId: string, formData: Record<string, any>): Promise<ContentResult<any>> {
+    try {
+      const { data, error } = await supabase
+        .from('form_submissions')
+        .insert({
+          form_id: formId,
+          data: formData,
+          submitted_at: new Date().toISOString(),
+          ip_address: '', // Will be filled by edge function
+          user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : ''
+        })
+        .select()
+        .single()
+
+      if (error) {
+        return createErrorResult(`Failed to submit form: ${error.message}`)
+      }
+
+      return createSuccessResult(data)
+    } catch (error) {
+      return createErrorResult(`Unexpected error submitting form: ${error}`)
+    }
+  }
+
+  /**
+   * CMS API Integration Methods
+   */
+  static async createContentViaCMS(type: 'post' | 'page', data: any): Promise<ContentResult<any>> {
+    if (!ENABLE_CMS_INTEGRATION || !CMS_API_URL) {
+      return createErrorResult('CMS integration not enabled')
+    }
+
+    try {
+      const response = await fetch(`${CMS_API_URL}/${type}s`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) {
+        return createErrorResult(`Failed to create ${type}: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      // Clear cache to ensure fresh data
+      ContentLibrary.clearCache(data.website_domain)
+
+      return createSuccessResult(result)
+    } catch (error) {
+      return createErrorResult(`Unexpected error creating ${type}: ${error}`)
+    }
+  }
+
+  /**
+   * Upload media via CMS
+   */
+  static async uploadMediaViaCMS(file: File, domain: string): Promise<ContentResult<any>> {
+    if (!ENABLE_CMS_INTEGRATION || !CMS_API_URL) {
+      return createErrorResult('CMS integration not enabled')
+    }
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('domain', domain)
+
+      const response = await fetch(`${CMS_API_URL}/media`, {
+        method: 'POST',
+        body: formData
+      })
+
+      if (!response.ok) {
+        return createErrorResult(`Failed to upload media: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      // Clear media cache
+      const cacheKey = getCacheKey('media', { domain })
+      contentCache.delete(cacheKey)
+
+      return createSuccessResult(result)
+    } catch (error) {
+      return createErrorResult(`Unexpected error uploading media: ${error}`)
+    }
+  }
   /**
    * Get all pages for a domain with caching
    */
@@ -442,8 +695,33 @@ export class ContentLibrary {
   }
 }
 
-// Legacy support - re-export old functions for backward compatibility
+// Enhanced exports - Full CMS functionality
 export const getAllPages = ContentLibrary.getAllPages
 export const getAllPosts = ContentLibrary.getAllPosts
 export const getPageBySlug = ContentLibrary.getPageBySlug
 export const getPostBySlug = ContentLibrary.getPostBySlug
+export const getRecentPosts = ContentLibrary.getRecentPosts
+export const getPostsByCategory = ContentLibrary.getPostsByCategory
+export const getPostsByTag = ContentLibrary.getPostsByTag
+export const getSiteSettings = ContentLibrary.getSiteSettings
+export const searchContent = ContentLibrary.searchContent
+
+// Media and Assets
+export const getMediaFiles = ContentLibrary.getMediaFiles
+export const uploadMediaViaCMS = ContentLibrary.uploadMediaViaCMS
+
+// Taxonomy
+export const getCategories = ContentLibrary.getCategories
+export const getTags = ContentLibrary.getTags
+
+// Interactive Features
+export const getComments = ContentLibrary.getComments
+export const getForms = ContentLibrary.getForms
+export const submitForm = ContentLibrary.submitForm
+
+// Content Creation (CMS Integration)
+export const createContentViaCMS = ContentLibrary.createContentViaCMS
+
+// Cache Management
+export const clearContentCache = ContentLibrary.clearCache
+export const getContentCacheStats = ContentLibrary.getCacheStats
