@@ -57,6 +57,18 @@ export default async function HomePage() {
 
   // Use CMS posts if available, otherwise fall back to sample posts
   const allPosts = recentPosts.length > 0 ? recentPosts : samplePosts
+
+  // Transform posts to compatible format for DynamicHero component
+  const heroCompatiblePosts = allPosts
+    .filter(post => post.excerpt) // Only posts with excerpts
+    .map(post => ({
+      ...post,
+      excerpt: post.excerpt || '', // Ensure excerpt is always string
+      author: post.author || { full_name: 'Portal Blog Team', email: 'admin@howtomecm.com' },
+      category: post.category || { name: 'Technology', slug: 'technology' },
+      tags: post.tags?.map(tag => typeof tag === 'string' ? tag : tag.name) || ['Microsoft', 'Technology']
+    }))
+
   const featuredPosts = (allPosts.slice(0, 4) as any)
   const latestPosts = (allPosts.slice(0, 6) as any)
 
@@ -87,7 +99,7 @@ export default async function HomePage() {
       </section>
 
       {/* Dynamic Hero Section */}
-      <DynamicHero posts={allPosts} className="relative" />
+      <DynamicHero posts={heroCompatiblePosts} className="relative" />
 
       {/* Premium Promotional Cards */}
       <section className="py-16 relative">
