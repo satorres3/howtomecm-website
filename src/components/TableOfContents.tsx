@@ -25,7 +25,7 @@ export default function TableOfContents({ tocItems, className = '' }: TableOfCon
   useEffect(() => {
     const handleScroll = () => {
       // Calculate reading progress based on main article content only
-      const articleElement = document.querySelector('article.prose')
+      const articleElement = document.querySelector('article.prose') as HTMLElement | null
       if (articleElement) {
         const articleRect = articleElement.getBoundingClientRect()
         const articleTop = articleElement.offsetTop
