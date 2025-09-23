@@ -1,5 +1,6 @@
 import { supabase } from './supabase'
 import type { Page, Post, ContentSection, SEOData, MediaFile } from '../types/content'
+import type { CompleteHomepageContent } from '../types/homepage'
 
 // CMS API Configuration
 const CMS_API_URL = process.env.CMS_API_URL || process.env.NEXT_PUBLIC_CMS_URL
@@ -693,6 +694,438 @@ export class ContentLibrary {
       keys: Array.from(contentCache.keys())
     }
   }
+
+  // ========================================
+  // CMS HOMEPAGE CONTENT INTEGRATION
+  // ========================================
+
+  /**
+   * Get published homepage content for a domain from CMS
+   */
+  static async getHomepageContent(domain: string, isPreview: boolean = false): Promise<ContentResult<CompleteHomepageContent>> {
+    const cacheKey = getCacheKey('homepage-content', { domain, isPreview })
+    const cached = getFromCache<CompleteHomepageContent>(cacheKey)
+
+    if (cached && !isPreview) {
+      return createSuccessResult(cached)
+    }
+
+    try {
+      // Call the database function to get published content by domain
+      const { data, error } = await supabase
+        .rpc('get_published_content_by_domain', {
+          domain_name: domain
+        })
+
+      if (error) {
+        return createErrorResult(`Failed to fetch homepage content: ${error.message}`)
+      }
+
+      if (!data || data.length === 0) {
+        return createErrorResult('No published homepage content found for this domain')
+      }
+
+      // Get the first (latest) result
+      const contentRow = data[0]
+      const homepageContent = contentRow.content as CompleteHomepageContent
+
+      // Validate the content structure
+      if (!homepageContent || typeof homepageContent !== 'object') {
+        return createErrorResult('Invalid homepage content format')
+      }
+
+      // Cache the result (skip caching for preview requests)
+      if (!isPreview) {
+        setCache(cacheKey, homepageContent)
+      }
+
+      return createSuccessResult(homepageContent)
+    } catch (error) {
+      return createErrorResult(`Unexpected error fetching homepage content: ${error}`)
+    }
+  }
+
+  /**
+   * Get homepage content with preview token support
+   */
+  static async getHomepageContentWithPreview(
+    domain: string,
+    previewToken?: string
+  ): Promise<ContentResult<CompleteHomepageContent>> {
+    // If preview token is provided, always fetch fresh data
+    if (previewToken) {
+      try {
+        // For preview mode, we get the latest content regardless of published status
+        const { data, error } = await supabase
+          .from('homepage_content')
+          .select('content, version_number, modified_at')
+          .eq('environment_id', domain) // Assuming environment maps to domain
+          .order('modified_at', { ascending: false })
+          .limit(1)
+
+        if (error) {
+          return createErrorResult(`Failed to fetch preview content: ${error.message}`)
+        }
+
+        if (!data || data.length === 0) {
+          // Fallback to published content if no preview content
+          return ContentLibrary.getHomepageContent(domain, false)
+        }
+
+        const contentRow = data[0]
+        const homepageContent = contentRow.content as CompleteHomepageContent
+
+        if (!homepageContent || typeof homepageContent !== 'object') {
+          return createErrorResult('Invalid preview content format')
+        }
+
+        return createSuccessResult(homepageContent)
+      } catch (error) {
+        return createErrorResult(`Unexpected error fetching preview content: ${error}`)
+      }
+    }
+
+    // Regular published content request
+    return ContentLibrary.getHomepageContent(domain, false)
+  }
+
+  /**
+   * Get fallback homepage content structure when CMS content is unavailable
+   */
+  static getStaticHomepageContent(domain: string): CompleteHomepageContent {
+    const baseUrl = `https://${domain}`
+
+    return {
+      id: 'static-fallback',
+      environmentId: domain,
+      header: {
+        id: 'static-header',
+        environmentId: domain,
+        logo: {
+          url: '/logo.png',
+          alt: 'How to MeCM Logo',
+          width: 120,
+          height: 40
+        },
+        brand: {
+          name: 'How to MeCM',
+          tagline: 'Professional Microsoft Technology Consulting',
+          primaryColor: '#2563eb',
+          secondaryColor: '#7c3aed'
+        },
+        navigation: {
+          items: [
+            { id: '1', label: 'Home', url: '/', target: '_self', order: 1, isActive: true },
+            { id: '2', label: 'Blog', url: '/blog', target: '_self', order: 2, isActive: true },
+            { id: '3', label: 'About', url: '/about', target: '_self', order: 3, isActive: true },
+            { id: '4', label: 'Contact', url: '/contact', target: '_self', order: 4, isActive: true }
+          ],
+          searchPlaceholder: 'Search articles...'
+        },
+        socialLinks: {
+          youtube: {
+            url: 'https://youtube.com/@howtomecm',
+            title: 'YouTube Channel',
+            backgroundColor: '#dc2626'
+          },
+          linkedin: {
+            url: 'https://linkedin.com/in/sauloalvestorres',
+            title: 'LinkedIn Profile',
+            backgroundColor: '#0077B5'
+          }
+        },
+        lastModified: new Date().toISOString()
+      },
+      welcome: {
+        id: 'static-welcome',
+        mainHeading: 'The Official Portal Blog',
+        subtitle: 'Your gateway to expert insights, comprehensive tutorials, and professional consulting on Microsoft technologies.',
+        gradientColors: {
+          from: '#2563eb',
+          via: '#7c3aed',
+          to: '#1e40af',
+          darkFrom: '#3b82f6',
+          darkVia: '#8b5cf6',
+          darkTo: '#2563eb'
+        },
+        isActive: true
+      },
+      dynamicHero: {
+        isActive: true,
+        postsToShow: 4,
+        showSidebar: false
+      },
+      promotionalCards: [
+        {
+          id: 'youtube-card',
+          type: 'youtube',
+          title: 'YouTube Channel',
+          subtitle: 'Video tutorials & demos',
+          description: 'Watch comprehensive video tutorials, live demonstrations, and step-by-step implementation guides for Microsoft technologies.',
+          url: 'https://youtube.com/@howtomecm',
+          target: '_blank',
+          gradientColors: {
+            from: '#dc2626',
+            via: '#ef4444',
+            to: '#b91c1c'
+          },
+          icon: null,
+          order: 1,
+          isActive: true
+        },
+        {
+          id: 'linkedin-card',
+          type: 'linkedin',
+          title: 'LinkedIn Network',
+          subtitle: 'Professional insights',
+          description: 'Connect with industry professionals, get exclusive insights, and stay updated with the latest Microsoft technology trends.',
+          url: 'https://linkedin.com/in/sauloalvestorres',
+          target: '_blank',
+          gradientColors: {
+            from: '#0077B5',
+            via: '#005885',
+            to: '#004e70'
+          },
+          icon: null,
+          order: 2,
+          isActive: true
+        }
+      ],
+      featuredVideo: {
+        id: 'static-video',
+        title: 'Featured Video',
+        description: 'Watch our latest tutorial on Microsoft Configuration Manager',
+        video: {
+          title: 'Microsoft MECM Tutorial',
+          description: 'Complete deployment guide',
+          platform: null,
+          autoplay: false,
+          lazyLoad: true
+        },
+        styling: {
+          aspectRatio: '16:9',
+          backgroundColor: '#f3f4f6',
+          gradientColors: {
+            from: '#3b82f6',
+            to: '#8b5cf6'
+          },
+          playButtonColor: '#ffffff',
+          borderRadius: 12
+        },
+        isActive: true
+      },
+      articles: {
+        id: 'static-articles',
+        title: 'More Articles',
+        description: 'Explore our comprehensive library of Microsoft technology guides',
+        displaySettings: {
+          postsPerPage: 6,
+          showPagination: true,
+          gridColumns: 3,
+          showExcerpts: true,
+          showAuthor: true,
+          showDate: true,
+          showCategory: true,
+          showTags: false,
+          showFeaturedImages: true,
+          excerptMaxLines: 3,
+          titleMaxLines: 2
+        },
+        layoutSettings: {
+          cardBorderRadius: 12,
+          shadowIntensity: 'light',
+          hoverEffect: 'scale',
+          imageAspectRatio: '16:9'
+        },
+        sortingSettings: {
+          defaultSort: 'date-newest',
+          enableCategoryFilter: false,
+          enableSearch: false,
+          loadMoreStyle: 'pagination'
+        },
+        paginationText: {
+          next: 'Next',
+          previous: 'Previous',
+          page: 'Page',
+          loadMore: 'Load More'
+        },
+        isActive: true
+      },
+      footer: {
+        id: 'static-footer',
+        environmentId: domain,
+        copyrightText: '© 2024 How to MeCM. All rights reserved. | Expert Microsoft Technology Consulting & Insights',
+        showSocialLinks: true,
+        socialLinks: [
+          {
+            id: 'youtube-footer',
+            platform: 'YouTube',
+            url: 'https://youtube.com/@howtomecm',
+            isActive: true
+          },
+          {
+            id: 'linkedin-footer',
+            platform: 'LinkedIn',
+            url: 'https://linkedin.com/in/sauloalvestorres',
+            isActive: true
+          }
+        ],
+        footerColumns: [],
+        backgroundColor: '#ffffff',
+        textColor: '#6b7280',
+        lastModified: new Date().toISOString()
+      },
+      seo: {
+        id: 'static-seo',
+        environmentId: domain,
+        pageTitle: 'How to MeCM - Professional Microsoft Technology Consulting',
+        metaDescription: 'Expert insights on Microsoft Configuration Manager (MECM/SCCM), Azure cloud technologies, and enterprise solutions. Professional consulting and best practices for IT professionals.',
+        keywords: ['Microsoft Configuration Manager', 'MECM', 'SCCM', 'Azure', 'Microsoft 365', 'IT consulting', 'enterprise solutions', 'cloud technologies'],
+        openGraph: {
+          title: 'How to MeCM - Professional Microsoft Technology Consulting',
+          description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
+          image: '/og-image.jpg',
+          url: baseUrl,
+          siteName: 'How to MeCM',
+          type: 'website',
+          locale: 'en_US'
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: 'How to MeCM - Professional Microsoft Technology Consulting',
+          description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
+          image: '/og-image.jpg'
+        },
+        structuredData: {
+          organization: {
+            name: 'How to MeCM',
+            description: 'Professional Microsoft Technology Consulting & Insights',
+            url: baseUrl,
+            logo: `${baseUrl}/logo.png`,
+            sameAs: [
+              'https://youtube.com/@howtomecm',
+              'https://linkedin.com/in/sauloalvestorres'
+            ]
+          },
+          contactPoint: {
+            contactType: 'customer service',
+            availableLanguage: 'English'
+          }
+        },
+        robots: {
+          index: true,
+          follow: true,
+          maxImagePreview: 'large',
+          maxVideoPreview: -1,
+          maxSnippet: -1
+        },
+        canonicalUrl: baseUrl,
+        lastModified: new Date().toISOString()
+      },
+      background: {
+        id: 'static-background',
+        environmentId: domain,
+        ambientGradient: {
+          isActive: true,
+          baseColors: {
+            light: {
+              primary: '#dbeafe',
+              secondary: '#ede9fe',
+              tertiary: '#fce7f3'
+            },
+            dark: {
+              primary: '#1e3a8a',
+              secondary: '#581c87',
+              tertiary: '#831843'
+            }
+          },
+          animatedBlobs: {
+            isActive: true,
+            blobs: [
+              {
+                id: 'blob-1',
+                size: 384,
+                position: { x: '25%', y: '0%' },
+                colors: { from: '#60a5fa', to: '#8b5cf6' },
+                animationDelay: '0s',
+                blur: 48
+              },
+              {
+                id: 'blob-2',
+                size: 320,
+                position: { x: '66%', y: '75%' },
+                colors: { from: '#8b5cf6', to: '#ec4899' },
+                animationDelay: '2s',
+                blur: 32
+              },
+              {
+                id: 'blob-3',
+                size: 256,
+                position: { x: '75%', y: '33%' },
+                colors: { from: '#ec4899', to: '#3b82f6' },
+                animationDelay: '4s',
+                blur: 32
+              }
+            ]
+          }
+        },
+        lastModified: new Date().toISOString()
+      },
+      lastModified: new Date().toISOString(),
+      modifiedBy: 'system'
+    }
+  }
+
+  /**
+   * Get homepage content with intelligent fallback
+   * This method provides a robust content fetching strategy
+   */
+  static async getHomepageContentWithFallback(
+    domain: string,
+    previewToken?: string
+  ): Promise<ContentResult<CompleteHomepageContent>> {
+    try {
+      // First, try to get CMS content
+      const cmsResult = await ContentLibrary.getHomepageContentWithPreview(domain, previewToken)
+
+      if (cmsResult.success && cmsResult.data) {
+        return cmsResult
+      }
+
+      // If CMS content fails, provide static fallback
+      const staticContent = ContentLibrary.getStaticHomepageContent(domain)
+
+      return createSuccessResult(staticContent)
+    } catch (error) {
+      // Final fallback - return static content even on unexpected errors
+      const staticContent = ContentLibrary.getStaticHomepageContent(domain)
+      return createSuccessResult(staticContent)
+    }
+  }
+
+  /**
+   * Clear homepage content cache
+   */
+  static clearHomepageCache(domain?: string): void {
+    if (domain) {
+      const keysToDelete: string[] = []
+      contentCache.forEach((_, key) => {
+        if (key.includes('homepage-content') && key.includes(domain)) {
+          keysToDelete.push(key)
+        }
+      })
+      keysToDelete.forEach(key => contentCache.delete(key))
+    } else {
+      // Clear all homepage cache
+      const keysToDelete: string[] = []
+      contentCache.forEach((_, key) => {
+        if (key.includes('homepage-content')) {
+          keysToDelete.push(key)
+        }
+      })
+      keysToDelete.forEach(key => contentCache.delete(key))
+    }
+  }
 }
 
 // Enhanced exports - Full CMS functionality
@@ -725,3 +1158,10 @@ export const createContentViaCMS = ContentLibrary.createContentViaCMS
 // Cache Management
 export const clearContentCache = ContentLibrary.clearCache
 export const getContentCacheStats = ContentLibrary.getCacheStats
+
+// Homepage Content API (CMS Integration)
+export const getHomepageContent = ContentLibrary.getHomepageContent
+export const getHomepageContentWithPreview = ContentLibrary.getHomepageContentWithPreview
+export const getHomepageContentWithFallback = ContentLibrary.getHomepageContentWithFallback
+export const getStaticHomepageContent = ContentLibrary.getStaticHomepageContent
+export const clearHomepageCache = ContentLibrary.clearHomepageCache
