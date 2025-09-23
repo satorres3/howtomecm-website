@@ -1,7 +1,7 @@
 {
   "id": "1bc4cf49-43d6-4564-af4e-6d40b0ef4d6a",
   "environmentId": "best",
-  "lastModified": "2025-09-23T10:29:43.164Z",
+  "lastModified": "2025-09-23T14:24:13.057Z",
   "header": {
     "logo": {
       "url": "https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif",
@@ -50,7 +50,7 @@
     }
   },
   "hero": {
-    "mainHeading": "The Official Portal Blog",
+    "mainHeading": "The Official Portal",
     "subtitle": "Your gateway to expert insights, comprehensive tutorials, and professional consulting on Microsoft technologies.",
     "gradientColors": {
       "from": "#3B82F6",
