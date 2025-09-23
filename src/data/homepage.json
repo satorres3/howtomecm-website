@@ -1,0 +1,100 @@
+{
+  "id": "1bc4cf49-43d6-4564-af4e-6d40b0ef4d6a",
+  "environmentId": "best",
+  "lastModified": "2025-09-23T10:29:43.164Z",
+  "header": {
+    "logo": {
+      "url": "https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif",
+      "alt": "How to MeCM Logo",
+      "width": 40,
+      "height": 40
+    },
+    "brand": {
+      "name": "Test",
+      "tagline": "The Official Portal Blog",
+      "primaryColor": "#3B82F6",
+      "secondaryColor": "#8B5CF6"
+    },
+    "navigation": {
+      "items": [
+        {
+          "id": "22cf16f9-1f49-4f26-8ca9-1b41d18a8f8d",
+          "label": "Blog",
+          "url": "/blog",
+          "target": "_self",
+          "order": 1,
+          "isActive": true
+        },
+        {
+          "id": "4b797667-833c-4815-ae01-12730bcfec6e",
+          "label": "About",
+          "url": "/about",
+          "target": "_self",
+          "order": 2,
+          "isActive": true
+        }
+      ],
+      "searchPlaceholder": "Search articles..."
+    },
+    "socialLinks": {
+      "youtube": {
+        "url": "https://youtube.com/@howtomecm",
+        "title": "Watch on YouTube",
+        "backgroundColor": "#DC2626"
+      },
+      "linkedin": {
+        "url": "https://linkedin.com/in/sauloalvestorres",
+        "title": "Connect on LinkedIn",
+        "backgroundColor": "#0077B5"
+      }
+    }
+  },
+  "hero": {
+    "mainHeading": "The Official Portal Blog",
+    "subtitle": "Your gateway to expert insights, comprehensive tutorials, and professional consulting on Microsoft technologies.",
+    "gradientColors": {
+      "from": "#3B82F6",
+      "via": "#8B5CF6",
+      "to": "#1E40AF",
+      "darkFrom": "#60A5FA",
+      "darkVia": "#A78BFA",
+      "darkTo": "#3B82F6"
+    }
+  },
+  "articles": {
+    "title": "Latest Articles",
+    "description": "Stay updated with our latest insights and tutorials",
+    "displaySettings": {
+      "postsPerPage": 6,
+      "showPagination": true,
+      "gridColumns": 3,
+      "showExcerpts": true,
+      "showAuthor": true,
+      "showDate": true,
+      "showCategory": true,
+      "showTags": true,
+      "showFeaturedImages": true,
+      "excerptMaxLines": 3,
+      "titleMaxLines": 2
+    }
+  },
+  "seo": {
+    "pageTitle": "Portal Blog - Professional Content Management",
+    "metaDescription": "Your gateway to expert insights, comprehensive tutorials, and professional consulting on Microsoft technologies.",
+    "keywords": [
+      "content management",
+      "blog",
+      "tutorials",
+      "insights"
+    ],
+    "openGraph": {
+      "title": "Portal Blog",
+      "description": "Professional Content Management Platform",
+      "image": "",
+      "url": "",
+      "siteName": "Portal Blog",
+      "type": "website",
+      "locale": "en_US"
+    }
+  }
+}
