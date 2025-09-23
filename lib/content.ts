@@ -552,29 +552,61 @@ export class ContentLibrary {
     }
 
     try {
-      const { data, error } = await supabase
-        .from('posts')
-        .select(`
-          *,
-          categories(*),
-          post_tags(tags(*))
-        `)
-        .eq('website_domain', domain)
-        .eq('status', 'published')
-        .eq('is_published_to_domain', true)
-        .order('created_at', { ascending: false })
-        .limit(limit)
-
-      if (error) {
-        return createErrorResult(`Failed to fetch recent posts: ${error.message}`)
+      // Try to fetch from CMS API if available
+      if (CMS_API_URL && ENABLE_CMS_INTEGRATION) {
+        const response = await fetch(`${CMS_API_URL}/api/posts?limit=${limit}`)
+        if (response.ok) {
+          const posts = await response.json()
+          setCache(cacheKey, posts)
+          return createSuccessResult(posts)
+        }
       }
 
-      const posts = data || []
-      setCache(cacheKey, posts)
+      // Fallback: Try to get from homepage content in database
+      const { data: homepageData, error: homepageError } = await supabase
+        .from('homepage_content')
+        .select('content')
+        .eq('is_published', true)
+        .order('modified_at', { ascending: false })
+        .limit(1)
+        .single()
 
-      return createSuccessResult(posts)
+      if (homepageData && !homepageError) {
+        const content = JSON.parse(homepageData.content)
+
+        // Extract posts from CMS content structure if available
+        if (content?.articles?.posts && Array.isArray(content.articles.posts)) {
+          const posts = content.articles.posts
+            .filter((post: any) => post.status === 'Published')
+            .slice(0, limit)
+            .map((post: any) => ({
+              id: post.id,
+              title: post.title,
+              slug: post.slug,
+              excerpt: post.translations?.en?.excerpt || 'Professional Microsoft technology insights.',
+              content: post.translations?.en?.content || '',
+              date: post.date || post.publicationDate,
+              created_at: post.date || post.publicationDate,
+              category: { name: post.category || 'Technology', slug: 'technology' },
+              tags: Array.isArray(post.tags) ? post.tags : [],
+              featured_image: post.featuredImage,
+              author: {
+                full_name: post.author || 'Portal Blog Team',
+                email: 'admin@howtomecm.com'
+              }
+            }))
+
+          setCache(cacheKey, posts)
+          return createSuccessResult(posts)
+        }
+      }
+
+      // Final fallback: Return empty array (will trigger use of sample posts in homepage)
+      console.log('No CMS posts found, website will use sample posts fallback')
+      return createSuccessResult([])
     } catch (error) {
-      return createErrorResult(`Unexpected error fetching recent posts: ${error}`)
+      console.warn('CMS content fetch failed, falling back to sample data:', error)
+      return createSuccessResult([])
     }
   }
 
