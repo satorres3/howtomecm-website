@@ -1,11 +1,11 @@
 {
-  "id": "36a07389-5c75-4d11-b20f-87fb4e8d0801",
-  "environmentId": "tests",
-  "lastModified": "2025-09-23T20:18:36.571Z",
+  "id": "4e0a9b83-12db-4804-8a87-53877f6538c0",
+  "environmentId": "production",
+  "lastModified": "2025-09-23T20:26:30.587Z",
   "header": {
     "logo": {
-      "url": "https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif",
-      "alt": "How",
+      "url": "https://test-autosave-1758659170714.png",
+      "alt": "Test publish integration 1758659190563",
       "width": 40,
       "height": 40
     },
@@ -18,7 +18,7 @@
     "navigation": {
       "items": [
         {
-          "id": "0804bc5d-b77e-4bdc-a7cc-3a9152ca2443",
+          "id": "3aad2539-d54d-4982-b4df-198b1e4a0f5a",
           "label": "Blog",
           "url": "/blog",
           "target": "_self",
@@ -26,7 +26,7 @@
           "isActive": true
         },
         {
-          "id": "08aa024c-618f-450d-9333-5cc4f1f57125",
+          "id": "4c7d41b2-1c64-4b6d-9c5b-b4ba12fedd44",
           "label": "About",
           "url": "/about",
           "target": "_self",
