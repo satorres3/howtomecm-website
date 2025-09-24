@@ -19,6 +19,16 @@
       "created": "2025-09-24T10:09:17.703Z",
       "status": "active",
       "lastCommit": "e7e421676bae07929fc692a7245fece23a64e57b"
+    },
+    "demo2": {
+      "id": "demo2",
+      "name": "demo2",
+      "domain": "demo2.howtomecm.com",
+      "branch": "env/demo2",
+      "template": "corporate",
+      "created": "2025-09-24T10:18:51.956Z",
+      "status": "active",
+      "lastCommit": "89eb04fc39f94a446571586f5e6025341d367b24"
     }
   },
   "templates": [
@@ -27,5 +37,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T10:09:17.703Z"
+  "lastUpdated": "2025-09-24T10:18:51.957Z"
 }
