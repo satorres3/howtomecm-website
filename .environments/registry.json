@@ -81,17 +81,6 @@
       "repositoryUrl": "https://github.com/satorres3/saulo2",
       "vercelDomain": "saulo2.vercel.app",
       "deploymentUrl": "https://saulo2-b1yultmph-satorres3s-projects.vercel.app"
-    },
-    "saulo3": {
-      "id": "saulo3",
-      "name": "saulo3",
-      "repository": "satorres3/saulo3",
-      "template": "azure-corporate",
-      "created": "2025-09-24T13:40:01.229Z",
-      "status": "active",
-      "repositoryUrl": "https://github.com/satorres3/saulo3",
-      "vercelDomain": "saulo3.vercel.app",
-      "deploymentUrl": "https://saulo3-7js5vfqe4-satorres3s-projects.vercel.app"
     }
   },
   "templates": [
@@ -100,5 +89,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T14:04:14.374Z"
+  "lastUpdated": "2025-09-24T14:10:11.157Z"
 }
