@@ -56,7 +56,7 @@
       "repository": "satorres3/saulo10",
       "template": "azure-corporate",
       "created": "2025-09-24T14:28:51.511Z",
-      "status": "active",
+      "status": "failed",
       "repositoryUrl": "https://github.com/satorres3/saulo10",
       "vercelDomain": "saulo10.vercel.app"
     }
@@ -67,5 +67,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T14:28:51.511Z"
+  "lastUpdated": "2025-09-24T14:30:30.382Z"
 }
