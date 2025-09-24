@@ -49,6 +49,16 @@
       "status": "active",
       "repositoryUrl": "https://github.com/satorres3/test2",
       "vercelDomain": "test2.vercel.app"
+    },
+    "saulo10": {
+      "id": "saulo10",
+      "name": "saulo10",
+      "repository": "satorres3/saulo10",
+      "template": "azure-corporate",
+      "created": "2025-09-24T14:28:51.511Z",
+      "status": "active",
+      "repositoryUrl": "https://github.com/satorres3/saulo10",
+      "vercelDomain": "saulo10.vercel.app"
     }
   },
   "templates": [
@@ -57,5 +67,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T14:27:58.215Z"
+  "lastUpdated": "2025-09-24T14:28:51.511Z"
 }
