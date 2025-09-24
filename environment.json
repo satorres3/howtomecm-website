@@ -1,0 +1,18 @@
+{
+  "id": "demo",
+  "name": "demo",
+  "domain": "demo.howtomecm.com",
+  "template": "azure-corporate",
+  "created": "2025-09-24T10:08:29.580Z",
+  "config": {
+    "title": "demo",
+    "description": "demo environment",
+    "theme": "azure-corporate",
+    "features": {
+      "blog": false,
+      "forms": true,
+      "media": true,
+      "comments": false
+    }
+  }
+}
