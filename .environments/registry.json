@@ -59,6 +59,16 @@
       "status": "active",
       "repositoryUrl": "https://github.com/satorres3/demo5",
       "vercelDomain": "demo5.vercel.app"
+    },
+    "test2": {
+      "id": "test2",
+      "name": "test2",
+      "repository": "satorres3/test2",
+      "template": "corporate",
+      "created": "2025-09-24T11:22:52.404Z",
+      "status": "active",
+      "repositoryUrl": "https://github.com/satorres3/test2",
+      "vercelDomain": "test2.vercel.app"
     }
   },
   "templates": [
@@ -67,5 +77,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T11:02:54.542Z"
+  "lastUpdated": "2025-09-24T11:22:52.405Z"
 }
