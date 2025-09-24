@@ -90,7 +90,8 @@
       "created": "2025-09-24T13:40:01.229Z",
       "status": "active",
       "repositoryUrl": "https://github.com/satorres3/saulo3",
-      "vercelDomain": "saulo3.vercel.app"
+      "vercelDomain": "saulo3.vercel.app",
+      "deploymentUrl": "https://saulo3-7js5vfqe4-satorres3s-projects.vercel.app"
     }
   },
   "templates": [
@@ -99,5 +100,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T13:40:01.230Z"
+  "lastUpdated": "2025-09-24T13:41:27.699Z"
 }
