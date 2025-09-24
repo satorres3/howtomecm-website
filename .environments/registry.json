@@ -9,6 +9,16 @@
       "created": "2025-09-24T10:08:30.195Z",
       "status": "active",
       "lastCommit": "9de80607222a7bc12789cf05c1672be58eddeeca"
+    },
+    "demo1": {
+      "id": "demo1",
+      "name": "demo1",
+      "domain": "demo1.howtomecm.com",
+      "branch": "env/demo1",
+      "template": "azure-corporate",
+      "created": "2025-09-24T10:09:17.703Z",
+      "status": "active",
+      "lastCommit": "e7e421676bae07929fc692a7245fece23a64e57b"
     }
   },
   "templates": [
@@ -17,5 +27,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T10:08:30.195Z"
+  "lastUpdated": "2025-09-24T10:09:17.703Z"
 }
