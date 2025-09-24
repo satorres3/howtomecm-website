@@ -1,0 +1,18 @@
+{
+  "id": "demo2",
+  "name": "demo2",
+  "domain": "demo2.howtomecm.com",
+  "template": "corporate",
+  "created": "2025-09-24T10:18:51.337Z",
+  "config": {
+    "title": "demo2",
+    "description": "demo2 environment",
+    "theme": "corporate",
+    "features": {
+      "blog": true,
+      "forms": true,
+      "media": true,
+      "comments": false
+    }
+  }
+}
