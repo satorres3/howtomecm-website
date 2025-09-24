@@ -79,17 +79,6 @@
       "status": "active",
       "repositoryUrl": "https://github.com/satorres3/test3",
       "vercelDomain": "test3.vercel.app"
-    },
-    "test7": {
-      "id": "test7",
-      "name": "test7",
-      "repository": "satorres3/test7",
-      "template": "corporate",
-      "created": "2025-09-24T11:36:40.009Z",
-      "status": "active",
-      "repositoryUrl": "https://github.com/satorres3/test7",
-      "vercelDomain": "test7.vercel.app",
-      "deploymentUrl": "https://test7-4bzxygm98-satorres3s-projects.vercel.app"
     }
   },
   "templates": [
@@ -98,5 +87,5 @@
     "portfolio",
     "ecommerce"
   ],
-  "lastUpdated": "2025-09-24T11:38:05.664Z"
+  "lastUpdated": "2025-09-24T11:50:21.901Z"
 }
