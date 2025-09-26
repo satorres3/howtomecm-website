@@ -4,22 +4,16 @@
 
 import { ContentLibrary } from '../../src/lib/content'
 
-// Mock Supabase
-jest.mock('../../src/lib/supabase', () => ({
-  supabase: {
-    from: jest.fn(() => ({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      order: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      single: jest.fn(),
-      insert: jest.fn().mockReturnThis()
-    })),
-    rpc: jest.fn()
-  }
+// Mock database functions
+jest.mock('../../src/lib/database', () => ({
+  getPostsFromDatabase: jest.fn(),
+  getPostBySlugFromDatabase: jest.fn(),
+  getSiteSettingsFromDatabase: jest.fn(),
+  checkDatabaseConnection: jest.fn().mockResolvedValue(true),
+  withDatabaseErrorHandling: jest.fn((fn) => fn())
 }))
 
-// Mock fetch for CMS API calls
+// Mock fetch for fallback content
 global.fetch = jest.fn()
 
 describe('ContentLibrary', () => {
@@ -28,7 +22,7 @@ describe('ContentLibrary', () => {
   })
 
   describe('getAllPosts', () => {
-    it('should return posts successfully', async () => {
+    it('should return posts successfully from database', async () => {
       const mockPosts = [
         {
           id: '1',
@@ -40,8 +34,8 @@ describe('ContentLibrary', () => {
         }
       ]
 
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().order().mockResolvedValue({
+      const { getPostsFromDatabase } = require('../../src/lib/database')
+      getPostsFromDatabase.mockResolvedValue({
         data: mockPosts,
         error: null
       })
@@ -54,10 +48,10 @@ describe('ContentLibrary', () => {
     })
 
     it('should handle database errors gracefully', async () => {
-      const mockError = { message: 'Database connection failed' }
+      const mockError = 'Database connection failed'
 
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().order().mockResolvedValue({
+      const { getPostsFromDatabase } = require('../../src/lib/database')
+      getPostsFromDatabase.mockResolvedValue({
         data: null,
         error: mockError
       })
@@ -67,6 +61,20 @@ describe('ContentLibrary', () => {
       expect(result.success).toBe(false)
       expect(result.data).toBeNull()
       expect(result.error).toContain('Failed to fetch posts')
+    })
+
+    it('should fallback to demo content when database fails', async () => {
+      const { getPostsFromDatabase } = require('../../src/lib/database')
+      getPostsFromDatabase.mockResolvedValue({
+        data: null,
+        error: 'Connection failed'
+      })
+
+      const result = await ContentLibrary.getAllPosts('test.com')
+
+      // Should still return data (demo content) even when database fails
+      expect(result.data).toBeDefined()
+      expect(Array.isArray(result.data)).toBe(true)
     })
   })
 
@@ -81,8 +89,8 @@ describe('ContentLibrary', () => {
         status: 'published'
       }
 
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().single.mockResolvedValue({
+      const { getPostBySlugFromDatabase } = require('../../src/lib/database')
+      getPostBySlugFromDatabase.mockResolvedValue({
         data: mockPost,
         error: null
       })
@@ -95,12 +103,10 @@ describe('ContentLibrary', () => {
     })
 
     it('should handle post not found', async () => {
-      const mockError = { code: 'PGRST116' }
-
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().single.mockResolvedValue({
+      const { getPostBySlugFromDatabase } = require('../../src/lib/database')
+      getPostBySlugFromDatabase.mockResolvedValue({
         data: null,
-        error: mockError
+        error: 'Post not found'
       })
 
       const result = await ContentLibrary.getPostBySlug('test.com', 'nonexistent')
@@ -112,15 +118,15 @@ describe('ContentLibrary', () => {
   })
 
   describe('getSiteSettings', () => {
-    it('should return site settings', async () => {
+    it('should return site settings from database', async () => {
       const mockSettings = {
         domain: 'test.com',
         site_name: 'Test Site',
         tagline: 'Test Tagline'
       }
 
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().single.mockResolvedValue({
+      const { getSiteSettingsFromDatabase } = require('../../src/lib/database')
+      getSiteSettingsFromDatabase.mockResolvedValue({
         data: mockSettings,
         error: null
       })
@@ -131,13 +137,11 @@ describe('ContentLibrary', () => {
       expect(result.data).toEqual(mockSettings)
     })
 
-    it('should return default settings when none exist', async () => {
-      const mockError = { code: 'PGRST116' }
-
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().single.mockResolvedValue({
+    it('should return default settings when database fails', async () => {
+      const { getSiteSettingsFromDatabase } = require('../../src/lib/database')
+      getSiteSettingsFromDatabase.mockResolvedValue({
         data: null,
-        error: mockError
+        error: 'Settings not found'
       })
 
       const result = await ContentLibrary.getSiteSettings('test.com')
@@ -152,8 +156,8 @@ describe('ContentLibrary', () => {
     it('should cache results', async () => {
       const mockPosts = [{ id: '1', title: 'Test' }]
 
-      const { supabase } = require('../../lib/supabase')
-      supabase.from().select().eq().order().mockResolvedValue({
+      const { getPostsFromDatabase } = require('../../src/lib/database')
+      getPostsFromDatabase.mockResolvedValue({
         data: mockPosts,
         error: null
       })
@@ -166,6 +170,9 @@ describe('ContentLibrary', () => {
       expect(result1.success).toBe(true)
       expect(result2.success).toBe(true)
       expect(result1.data).toEqual(result2.data)
+
+      // Database should only be called once due to caching
+      expect(getPostsFromDatabase).toHaveBeenCalledTimes(1)
     })
 
     it('should clear cache correctly', () => {

@@ -12,13 +12,10 @@ const customJestConfig = {
   testMatch: [
     '<rootDir>/__tests__/**/*.(test|spec).(js|jsx|ts|tsx)',
     '<rootDir>/src/**/__tests__/**/*.(test|spec).(js|jsx|ts|tsx)',
-    '<rootDir>/src/**/*.(test|spec).(js|jsx|ts|tsx)',
-    '<rootDir>/lib/**/__tests__/**/*.(test|spec).(js|jsx|ts|tsx)',
-    '<rootDir>/lib/**/*.(test|spec).(js|jsx|ts|tsx)'
+    '<rootDir>/src/**/*.(test|spec).(js|jsx|ts|tsx)'
   ],
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',
-    'lib/**/*.{js,jsx,ts,tsx}',
     '!src/**/*.d.ts',
     '!src/app/layout.tsx',
     '!src/app/globals.css'
@@ -27,7 +24,7 @@ const customJestConfig = {
   coverageDirectory: 'coverage',
   moduleNameMapping: {
     '^@/(.*)$': '<rootDir>/src/$1',
-    '^@lib/(.*)$': '<rootDir>/lib/$1'
+    '^@lib/(.*)$': '<rootDir>/src/lib/$1'
   },
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
   transformIgnorePatterns: [

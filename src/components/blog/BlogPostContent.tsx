@@ -1477,32 +1477,6 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           className="space-y-10 rounded-3xl border border-gray-200 bg-white/75 p-8 shadow-lg backdrop-blur transition-shadow duration-200 dark:border-gray-800 dark:bg-gray-900/80 lg:hidden"
           aria-label="Article navigation"
         >
-          <section className="rounded-2xl border border-gray-200 bg-white/70 p-5 shadow-sm transition-colors duration-200 dark:border-gray-700 dark:bg-gray-900/70">
-            <div className="flex items-center gap-4">
-              <div className="relative h-12 w-12">
-                <Image
-                  src={authorAvatar}
-                  alt={authorName}
-                  fill
-                  sizes="48px"
-                  className="rounded-full object-cover"
-                  unoptimized
-                />
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Author</p>
-                <p className="text-sm font-semibold text-gray-900 dark:text-white">{authorName}</p>
-                {authorRole && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400">{authorRole}</p>
-                )}
-              </div>
-            </div>
-            {authorBio && (
-              <p className="mt-3 text-xs text-gray-500 dark:text-gray-400">
-                {authorBio}
-              </p>
-            )}
-          </section>
 
           <section data-testid="table-of-contents">
             <div className="flex flex-col items-center gap-1 text-center">

@@ -59,7 +59,7 @@ export default function Custom500() {
 
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            We're working to resolve this issue. For urgent matters, please{' '}
+            We&apos;re working to resolve this issue. For urgent matters, please{' '}
             <Link href="/contact" className="text-blue-600 dark:text-blue-400 hover:underline">
               contact us directly
             </Link>
