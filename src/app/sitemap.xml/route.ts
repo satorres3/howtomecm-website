@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ContentLibrary } from '../../../lib/content'
+import { ContentLibrary } from '../../lib/content'
 import type { SitemapEntry } from '../../../types/content'
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()

@@ -1,0 +1,116 @@
+<svg width="1200" height="675" viewBox="0 0 1200 675" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title>Security Copilot Agent Updates</title>
+  <desc>Microsoft Security Copilot vulnerability remediation agent with RBAC and identity controls visualization.</desc>
+  <defs>
+    <linearGradient id="securityGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="30%" stop-color="#1e3a8a" />
+      <stop offset="70%" stop-color="#7c2d12" />
+      <stop offset="100%" stop-color="#dc2626" />
+    </linearGradient>
+    <linearGradient id="agentGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#6366f1" />
+    </linearGradient>
+    <linearGradient id="rbacGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#059669" />
+      <stop offset="100%" stop-color="#0d9488" />
+    </linearGradient>
+    <linearGradient id="identityGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#dc2626" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="675" fill="url(#securityGradient)" />
+
+  <!-- Grid pattern for tech feel -->
+  <g fill="none" stroke="#3b82f6" stroke-opacity="0.15" stroke-width="2">
+    <defs>
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" />
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#grid)" />
+  </g>
+
+  <!-- Central Security Copilot Icon -->
+  <g transform="translate(500, 200)">
+    <!-- Shield base -->
+    <path d="M100 50 L180 80 L180 160 Q180 200 100 220 Q20 200 20 160 L20 80 Z" fill="url(#agentGradient)" stroke="#1e40af" stroke-width="3"/>
+    <!-- AI Brain pattern -->
+    <circle cx="100" cy="130" r="35" fill="none" stroke="#fff" stroke-width="2" stroke-opacity="0.8"/>
+    <circle cx="85" cy="120" r="8" fill="#fff" opacity="0.9"/>
+    <circle cx="115" cy="120" r="8" fill="#fff" opacity="0.9"/>
+    <circle cx="100" cy="145" r="12" fill="#fff" opacity="0.7"/>
+    <!-- Connection lines -->
+    <g stroke="#fff" stroke-width="2" stroke-opacity="0.6">
+      <line x1="85" y1="120" x2="100" y2="145" />
+      <line x1="115" y1="120" x2="100" y2="145" />
+      <line x1="85" y1="120" x2="115" y2="120" />
+    </g>
+  </g>
+
+  <!-- RBAC Component -->
+  <g transform="translate(200, 350)">
+    <rect x="0" y="0" width="180" height="100" rx="20" fill="url(#rbacGradient)" stroke="#047857" stroke-width="2"/>
+    <text x="90" y="35" font-family="'Segoe UI', system-ui" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Enhanced RBAC</text>
+    <text x="90" y="55" font-family="'Segoe UI', system-ui" font-size="14" fill="#d1fae5" text-anchor="middle">Role Controls</text>
+    <text x="90" y="75" font-family="'Segoe UI', system-ui" font-size="14" fill="#d1fae5" text-anchor="middle">Permissions</text>
+    <!-- Lock icon -->
+    <g transform="translate(20, 20)">
+      <rect x="0" y="15" width="25" height="20" rx="3" fill="#fff" opacity="0.9"/>
+      <path d="M5 15 V10 Q5 5 12.5 5 Q20 5 20 10 V15" fill="none" stroke="#fff" stroke-width="2" opacity="0.9"/>
+    </g>
+  </g>
+
+  <!-- Identity Management Component -->
+  <g transform="translate(820, 350)">
+    <rect x="0" y="0" width="180" height="100" rx="20" fill="url(#identityGradient)" stroke="#dc2626" stroke-width="2"/>
+    <text x="90" y="35" font-family="'Segoe UI', system-ui" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Identity Controls</text>
+    <text x="90" y="55" font-family="'Segoe UI', system-ui" font-size="14" fill="#fecaca" text-anchor="middle">Manual Agent</text>
+    <text x="90" y="75" font-family="'Segoe UI', system-ui" font-size="14" fill="#fecaca" text-anchor="middle">Management</text>
+    <!-- User icon -->
+    <g transform="translate(20, 20)">
+      <circle cx="12.5" cy="8" r="6" fill="#fff" opacity="0.9"/>
+      <path d="M3 25 Q3 18 12.5 18 Q22 18 22 25" fill="#fff" opacity="0.9"/>
+    </g>
+  </g>
+
+  <!-- Vulnerability Agent -->
+  <g transform="translate(510, 450)">
+    <rect x="0" y="0" width="180" height="80" rx="15" fill="rgba(59,130,246,0.8)" stroke="#1e40af" stroke-width="2"/>
+    <text x="90" y="30" font-family="'Segoe UI', system-ui" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Vulnerability</text>
+    <text x="90" y="50" font-family="'Segoe UI', system-ui" font-size="16" font-weight="600" fill="#fff" text-anchor="middle">Remediation Agent</text>
+    <!-- Bot icon -->
+    <g transform="translate(20, 15)">
+      <rect x="0" y="0" width="20" height="15" rx="3" fill="#fff" opacity="0.9"/>
+      <circle cx="6" cy="6" r="2" fill="#3b82f6"/>
+      <circle cx="14" cy="6" r="2" fill="#3b82f6"/>
+      <rect x="8" y="10" width="4" height="2" fill="#3b82f6"/>
+    </g>
+  </g>
+
+  <!-- Connection lines -->
+  <g stroke="#60a5fa" stroke-width="3" stroke-opacity="0.7" fill="none">
+    <!-- From Security Copilot to RBAC -->
+    <path d="M550 300 Q400 325 290 350" stroke-dasharray="8 4"/>
+    <!-- From Security Copilot to Identity -->
+    <path d="M650 300 Q800 325 910 350" stroke-dasharray="8 4"/>
+    <!-- From Security Copilot to Vulnerability Agent -->
+    <path d="M600 320 L600 450" stroke-dasharray="8 4"/>
+  </g>
+
+  <!-- Decorative elements -->
+  <g fill="#3b82f6" fill-opacity="0.3">
+    <circle cx="150" cy="150" r="4"/>
+    <circle cx="1050" cy="200" r="6"/>
+    <circle cx="100" cy="500" r="5"/>
+    <circle cx="1100" cy="550" r="4"/>
+  </g>
+
+  <!-- Title at bottom -->
+  <text x="600" y="620" font-family="'Segoe UI', system-ui" font-size="24" font-weight="700" fill="#e2e8f0" text-anchor="middle">Security Copilot Agent Updates</text>
+  <text x="600" y="650" font-family="'Segoe UI', system-ui" font-size="16" fill="#94a3b8" text-anchor="middle">Enhanced RBAC Controls &amp; Identity Management</text>
+</svg>

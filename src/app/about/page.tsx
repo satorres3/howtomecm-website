@@ -194,6 +194,7 @@ export default function AboutPage() {
                 href="https://linkedin.com/in/sauloalvestorres"
                 target="_blank"
                 rel="noopener noreferrer"
+                rel="noopener noreferrer"
                 className="group bg-[#0077B5] hover:bg-[#005885] text-white p-8 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
               >
                 <svg className="w-12 h-12 mx-auto mb-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
@@ -206,6 +207,7 @@ export default function AboutPage() {
               <a
                 href="https://youtube.com/@howtomecm"
                 target="_blank"
+                rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="group bg-red-600 hover:bg-red-700 text-white p-8 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
               >

@@ -1,40 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useTheme } from '../contexts/SiteContext'
 
 export default function DarkModeToggle({ className = '' }: { className?: string }) {
-  const [isDark, setIsDark] = useState(false)
-
-  useEffect(() => {
-    // Check for saved theme preference or default to light mode
-    const savedTheme = localStorage.getItem('theme')
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-
-    if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
-      setIsDark(true)
-      document.documentElement.classList.add('dark')
-    } else {
-      setIsDark(false)
-      document.documentElement.classList.remove('dark')
-    }
-  }, [])
-
-  const toggleDarkMode = () => {
-    const newIsDark = !isDark
-    setIsDark(newIsDark)
-
-    if (newIsDark) {
-      document.documentElement.classList.add('dark')
-      localStorage.setItem('theme', 'dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
-    }
-  }
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === 'dark'
 
   return (
     <button
-      onClick={toggleDarkMode}
+      onClick={toggleTheme}
       className={`
         relative inline-flex items-center justify-center
         w-12 h-6 rounded-full transition-all duration-300 ease-in-out
@@ -46,7 +20,7 @@ export default function DarkModeToggle({ className = '' }: { className?: string 
         dark:focus:ring-offset-gray-800
         ${className}
       `}
-      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      aria-label={isDark ? 'Switch to light mode - dark mode currently active' : 'Switch to dark mode - light mode currently active'}
     >
       <span
         className={`

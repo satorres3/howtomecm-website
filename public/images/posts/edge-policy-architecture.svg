@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" role="img" aria-labelledby="title desc">
+  <title id="title">Edge policy architecture diagram</title>
+  <desc id="desc">Blueprint showing how Microsoft Intune delivers Edge homepage settings to user devices.</desc>
+  <defs>
+    <linearGradient id="panel" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#7c3aed" stop-opacity="0.25" />
+    </linearGradient>
+    <linearGradient id="device" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d4ed8" stop-opacity="0.18" />
+      <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0.25" />
+    </linearGradient>
+    <filter id="softShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow stdDeviation="8" dx="0" dy="10" flood-color="#000" flood-opacity="0.08" />
+    </filter>
+  </defs>
+  <rect x="32" y="32" width="896" height="476" rx="32" fill="#0f172a" opacity="0.12" />
+
+  <g filter="url(#softShadow)">
+    <rect x="96" y="88" width="240" height="144" rx="18" fill="url(#panel)" />
+    <rect x="96" y="88" width="240" height="144" rx="18" fill="#0f172a" opacity="0.04" />
+  </g>
+  <text x="216" y="130" text-anchor="middle" fill="#0f172a" font-family="'Inter', sans-serif" font-size="20" font-weight="600">Microsoft Intune</text>
+  <g fill="#1e3a8a" font-family="'Inter', sans-serif" font-size="15">
+    <text x="120" y="168">• Settings Catalog</text>
+    <text x="120" y="196">• Edge ADMX templates</text>
+    <text x="120" y="224">• Targeted security groups</text>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="360" y="208" width="240" height="160" rx="18" fill="url(#panel)" />
+    <rect x="360" y="208" width="240" height="160" rx="18" fill="#0f172a" opacity="0.04" />
+  </g>
+  <text x="480" y="250" text-anchor="middle" fill="#0f172a" font-family="'Inter', sans-serif" font-size="20" font-weight="600">Configuration profile</text>
+  <g fill="#1e3a8a" font-family="'Inter', sans-serif" font-size="15">
+    <text x="384" y="288">• Homepage URLs</text>
+    <text x="384" y="316">• Start page experience</text>
+    <text x="384" y="344">• Compliance baseline</text>
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="640" y="120" width="224" height="128" rx="18" fill="url(#device)" />
+    <rect x="640" y="120" width="224" height="128" rx="18" fill="#0f172a" opacity="0.05" />
+  </g>
+  <text x="752" y="160" text-anchor="middle" fill="#0f172a" font-family="'Inter', sans-serif" font-size="20" font-weight="600">Windows client</text>
+  <g fill="#0f172a" font-family="'Inter', sans-serif" font-size="15">
+    <text x="664" y="196">• Enrolled via Intune</text>
+    <text x="664" y="224">• Edge 120+</text>
+    <text x="664" y="252">• Hybrid joined</text>
+  </g>
+
+  <g stroke="#1d4ed8" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M336 160 H352 C376 160 376 208 360 208" />
+    <path d="M600 288 H624 C656 288 656 184 640 184" />
+  </g>
+  <g fill="#1d4ed8">
+    <path d="M340 160 l12 -6 v12 z" />
+    <path d="M608 288 l12 -6 v12 z" />
+  </g>
+
+  <g filter="url(#softShadow)">
+    <rect x="640" y="296" width="224" height="148" rx="18" fill="url(#device)" />
+    <rect x="640" y="296" width="224" height="148" rx="18" fill="#0f172a" opacity="0.05" />
+  </g>
+  <text x="752" y="332" text-anchor="middle" fill="#0f172a" font-family="'Inter', sans-serif" font-size="20" font-weight="600">Edge experience</text>
+  <g fill="#0f172a" font-family="'Inter', sans-serif" font-size="15">
+    <text x="664" y="368">• Start page preset</text>
+    <text x="664" y="396">• Tab layout policy</text>
+    <text x="664" y="424">• Corporate links</text>
+  </g>
+
+  <g stroke="#1d4ed8" stroke-width="3" stroke-linecap="round" fill="none">
+    <path d="M600 288 H624 C648 288 648 296 640 296" />
+  </g>
+  <path d="M608 288 l12 -6 v12 z" fill="#1d4ed8" />
+
+  <g fill="#475569" font-family="'Inter', sans-serif" font-size="16">
+    <text x="96" y="360">Policy sync cadence: every 8 hours or when device restarts</text>
+  </g>
+</svg>

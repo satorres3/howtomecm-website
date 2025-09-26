@@ -2,42 +2,78 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
-import { Analytics } from '@vercel/analytics/react'
+import SkipToContentLink from '@/components/SkipToContentLink'
+import PageTransition from '@/components/PageTransition'
+import DevOverlayFocusGuard from '@/components/DevOverlayFocusGuard'
+import { AppProviders } from '@/providers/AppProviders'
+import { ContentLibrary } from '../lib/content'
+import Footer from '@/components/Footer'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'How to MeCM - Professional Microsoft Technology Consulting',
-  description: 'Expert insights on Microsoft Configuration Manager (MECM/SCCM), Azure cloud technologies, and enterprise solutions.',
-  keywords: 'Microsoft Configuration Manager, MECM, SCCM, Azure, Microsoft 365, IT consulting',
-  authors: [{ name: 'How to MeCM Team' }],
-  openGraph: {
-    type: 'website',
-    locale: 'en_US',
-    url: 'https://howtomecm.com',
-    siteName: 'How to MeCM',
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+// Dynamic metadata generation based on CMS settings
+export async function generateMetadata(): Promise<Metadata> {
+  const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.example.com').trim()
+
+  const settingsResult = await ContentLibrary.getSiteSettings(DOMAIN)
+  const siteSettings = settingsResult.success ? settingsResult.data : null
+
+  const siteName = siteSettings?.site_name || 'Website'
+  const description = siteSettings?.description || 'A modern website built with Next.js and CMS'
+  const tagline = siteSettings?.tagline || ''
+
+  return {
+    title: {
+      template: `%s | ${siteName}`,
+      default: tagline ? `${siteName} - ${tagline}` : siteName
+    },
+    description,
+    keywords: siteSettings?.keywords || undefined,
+    authors: siteSettings?.author ? [{ name: siteSettings.author }] : undefined,
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: `https://${DOMAIN}`,
+      siteName,
+      title: siteName,
+      description
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: siteName,
+      description
+    },
+    robots: {
+      index: true,
+      follow: true,
+    },
+  }
 }
 
-export default function RootLayout({
+const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  // Fetch site settings for context
+  const settingsResult = await ContentLibrary.getSiteSettings(DOMAIN)
+  const siteSettings = settingsResult.success ? settingsResult.data : {
+    domain: DOMAIN,
+    site_name: 'Website',
+    tagline: 'A modern CMS-driven website',
+    description: 'Built with Next.js and modern web technologies'
+  }
+
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "How to MeCM",
-    "description": "Professional Microsoft Technology Consulting",
-    "url": "https://howtomecm.com",
-    "logo": "https://howtomecm.com/logo.png",
-    "sameAs": [
-      "https://linkedin.com/company/howtomecm"
-    ],
+    "name": siteSettings.site_name,
+    "description": siteSettings.description,
+    "url": `https://${DOMAIN}`,
+    "logo": siteSettings.logo_url || `https://${DOMAIN}/images/branding/portal-logo.svg`,
+    "sameAs": siteSettings.social_links?.filter((link: any) => link.enabled).map((link: any) => link.url) || [],
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",
@@ -46,7 +82,7 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" className="light" data-scroll-behavior="smooth">
       <head>
         <script
           type="application/ld+json"
@@ -54,13 +90,16 @@ export default function RootLayout({
             __html: JSON.stringify(structuredData),
           }}
         />
-        <link rel="canonical" href="https://howtomecm.com" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href={`https://${DOMAIN}`} />
       </head>
       <body className={inter.className}>
-        <Header />
-        {children}
-        <Analytics />
+        <AppProviders siteSettings={siteSettings}>
+          <DevOverlayFocusGuard />
+          <SkipToContentLink />
+          <Header />
+          <PageTransition>{children}</PageTransition>
+          <Footer siteSettings={siteSettings} />
+        </AppProviders>
       </body>
     </html>
   )

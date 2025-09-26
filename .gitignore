@@ -32,3 +32,26 @@ yarn-error.log*
 # Documentation and pipeline files
 DEPLOYMENT-PIPELINE-COMPLETE.md
 STAGING-SETUP-COMPLETE.md
+
+# Database setup files with credentials
+test-app.js
+add-sample-data.js
+NEON_SETUP_INSTRUCTIONS.md
+NEON_MIGRATION_SCHEMA.sql
+
+# Playwright test artifacts and reports
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Comprehensive test files (prevent committing detailed tests)
+e2e/core-functionality.spec.ts
+e2e/database.spec.ts
+e2e/performance.spec.ts
+e2e/accessibility.spec.ts
+e2e/cross-browser.spec.ts
+e2e/api.spec.ts
+e2e/blog-enhanced.spec.ts
+e2e/comment-system.spec.ts
+e2e/blog-accessibility.spec.ts
+e2e/utils/test-helpers.ts

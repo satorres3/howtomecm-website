@@ -1,353 +1,242 @@
 import { Metadata } from 'next'
-import { ContentLibrary } from '../../../lib/content'
+import Link from 'next/link'
+import { ContentLibrary } from '../../lib/content'
 import type { Post } from '../../../types/content'
-import { calculateReadingTime, formatReadingTime } from '../../utils/readingTime'
-import { samplePosts } from '../../data/samplePosts'
-import ModernBlogCard from '../../components/ModernBlogCard'
+import BlogCard from '@/components/blog/BlogCard'
+import { getDemoPosts, getDemoCategories } from '../../lib/demoContent'
 
-const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
-
-interface BlogPageProps {
-  searchParams: Promise<{
-    page?: string
-    category?: string
-    tag?: string
-  }>
+export const metadata: Metadata = {
+  title: 'Blog - How to MeCM',
+  description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
 }
 
-// Generate metadata with dynamic content
-export async function generateMetadata({ searchParams }: BlogPageProps): Promise<Metadata> {
-  const resolvedParams = await searchParams
-  const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
-  const posts = postsResult.success ? postsResult.data || [] : []
+interface BlogPageProps {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>
+}
 
-  let title = 'Blog - How to MeCM'
-  let description = 'Latest articles and insights about content management'
-
-  if (resolvedParams.category) {
-    title = `${resolvedParams.category} Articles - How to MeCM`
-    description = `Latest articles in the ${resolvedParams.category} category`
-  } else if (resolvedParams.tag) {
-    title = `${resolvedParams.tag} Posts - How to MeCM`
-    description = `Posts tagged with ${resolvedParams.tag}`
-  } else if (resolvedParams.page) {
-    title = `Blog - Page ${resolvedParams.page} - How to MeCM`
-  }
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-      url: `${DOMAIN}/blog`,
-    },
-    robots: {
-      index: true,
-      follow: true,
-    },
-  }
+function resolveTestState(params: Record<string, string | string[] | undefined> | undefined, key: string) {
+  const raw = params?.[key]
+  if (!raw) return undefined
+  return Array.isArray(raw) ? raw[0] : raw
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const resolvedParams = await searchParams
-  const page = parseInt(resolvedParams.page || '1', 10)
-  const postsPerPage = 6
-  const category = resolvedParams.category
-  const tag = resolvedParams.tag
+  const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
-  const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
-  let posts = postsResult.success ? postsResult.data || [] : []
+  try {
+    const resolvedSearchParams = searchParams ? await searchParams : undefined
+    const forcedState = resolveTestState(resolvedSearchParams, 'testState')
+    const activeCategorySlug = resolveTestState(resolvedSearchParams, 'category')
+    const activeTagSlug = resolveTestState(resolvedSearchParams, 'tag')
 
-  // If no CMS posts available, use sample posts
-  if (posts.length === 0) {
-    posts = samplePosts.map(post => ({
-      ...post,
-      status: 'published' as const,
-      website_domain: DOMAIN,
-      is_published_to_domain: true,
-      updated_at: post.date,
-      author: {
-        ...post.author,
-        id: `author-${post.author.email.split('@')[0]}`
-      },
-      tags: post.tags.map(tag => ({
-        id: `tag-${tag.toLowerCase().replace(/\s+/g, '-')}`,
-        name: tag,
-        slug: tag.toLowerCase().replace(/\s+/g, '-'),
-        website_domain: DOMAIN,
-        created_at: post.date
-      })),
-      category: post.category ? {
-        id: `cat-${post.category.slug}`,
-        name: post.category.name,
-        slug: post.category.slug,
-        website_domain: DOMAIN,
-        created_at: post.date
-      } : undefined
-    }))
-  }
+    const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
+    const fetchedPosts: Post[] = postsResult.success ? (postsResult.data || []) : []
+    const demoPosts = getDemoPosts()
 
-  // Filter by category if specified
-  if (category) {
-    posts = posts.filter(post =>
-      post.category?.name?.toLowerCase() === category.toLowerCase()
-    )
-  }
+    // Log any database errors for debugging (only in development)
+    if (!postsResult.success && process.env.NODE_ENV === 'development') {
+      console.debug('CMS posts not available, using demo content:', postsResult.error)
+    }
 
-  // Filter by tag if specified
-  if (tag) {
-    posts = posts.filter(post =>
-      post.tags?.some(postTag => {
-        const tagName = typeof postTag === 'string' ? postTag : postTag.name
-        return tagName.toLowerCase() === tag.toLowerCase()
+    // Use demo posts by default to ensure consistency with homepage
+    // Only show empty state if explicitly forced via testState parameter
+    let posts: Post[] = forcedState === 'empty' ? [] : demoPosts
+
+    const categoriesResult = await ContentLibrary.getCategories(DOMAIN)
+    const cmsCategories = categoriesResult.success ? (categoriesResult.data || []) : []
+    const demoCategories = getDemoCategories()
+    const categoryMap = new Map(demoCategories.map(category => [category.slug, category]))
+
+    const categoryList = (cmsCategories.length ? cmsCategories : demoCategories).map((category: any) => {
+      const enhancement = categoryMap.get(category.slug)
+      return {
+        ...category,
+        icon: enhancement?.icon || '📘',
+        description: category.description || enhancement?.description || ''
+      }
+    })
+
+    if (activeCategorySlug) {
+      posts = posts.filter(post => {
+        const slug = (post as any).category_slug || post.category?.slug
+        return slug === activeCategorySlug
       })
+    }
+
+    if (activeTagSlug) {
+      posts = posts.filter(post => {
+        if (!post.tags || !Array.isArray(post.tags)) return false
+        return post.tags.some((tag: any) => tag.slug === activeTagSlug)
+      })
+    }
+
+    const siteSettingsResult = await ContentLibrary.getSiteSettings(DOMAIN)
+    const siteSettings = siteSettingsResult.success ? siteSettingsResult.data : null
+
+    const heroTitle = resolveTestState(resolvedSearchParams, 'heroTitle') || 'Latest insights from the How to MeCM team'
+    const heroSubtitle = resolveTestState(resolvedSearchParams, 'heroSubtitle') ||
+      'Deep dives, configuration walkthroughs, and battle-tested guidance for Microsoft Endpoint Configuration Manager, Intune, Azure, and the modern workplace.'
+
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+        <main id="main-content" className="space-y-24">
+          <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 py-24 text-white">
+            <div className="absolute inset-0 opacity-40">
+              <div className="absolute top-12 left-16 h-28 w-28 rounded-full bg-white/15 blur-2xl" />
+              <div className="absolute bottom-12 right-12 h-44 w-44 rounded-full bg-purple-300/25 blur-3xl" />
+            </div>
+
+            <div className="relative container-modern">
+              <div className="mx-auto max-w-4xl text-center">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">
+                  How to MeCM Blog
+                </span>
+                <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+                  {heroTitle}
+                </h1>
+                <p className="mt-6 text-lg text-blue-100 md:text-xl">
+                  {heroSubtitle}
+                </p>
+
+                <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+                  <Link
+                    href="/"
+                    className="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:bg-blue-50"
+                  >
+                    Back to homepage
+                  </Link>
+                  <a
+                    href="#latest"
+                    className="inline-flex items-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-1 hover:bg-white/10"
+                  >
+                    Jump to latest insights
+                  </a>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="container-modern space-y-16">
+            {categoryList.length > 0 && (
+              <nav aria-label="Filter posts by category" className="flex flex-wrap items-center gap-3">
+                <Link
+                  href="/blog"
+                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition-colors duration-200 sm:text-sm ${
+                    !activeCategorySlug
+                      ? 'border-blue-500 bg-blue-50 text-blue-600 dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-200'
+                      : 'border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'
+                  }`}
+                >
+                  All field notes
+                </Link>
+                {categoryList.map(category => (
+                  <Link
+                    key={category.slug ?? category.id}
+                    href={`/blog?category=${category.slug}`}
+                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition-colors duration-200 sm:text-sm ${
+                      activeCategorySlug === category.slug
+                        ? 'border-blue-500 bg-blue-50 text-blue-600 dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-200'
+                        : 'border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'
+                    }`}
+                  >
+                    <span aria-hidden="true">{category.icon ?? '📘'}</span>
+                    {category.name}
+                  </Link>
+                ))}
+              </nav>
+            )}
+
+            <section id="latest" data-testid="blog-posts" className="space-y-10">
+              <header className="text-center">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
+                  Featured articles
+                </h2>
+                <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600 dark:text-gray-300 sm:text-base">
+                  Curated guidance, migration notes, and operational checklists for enterprise endpoint teams.
+                </p>
+              </header>
+
+              {posts.length > 0 ? (
+                <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-3 xl:gap-12">
+                  {posts.map((post, index) => (
+                    <BlogCard key={post.id} post={post} index={index} />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-3xl border border-gray-200 bg-white p-12 text-center text-gray-600 shadow-lg dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
+                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">No posts published yet</h3>
+                  <p className="mt-4 text-base">
+                    We're curating fresh field notes right now. Subscribe to the newsletter or check back soon for the next deep dive.
+                  </p>
+                  <Link
+                    href="/contact"
+                    className="mt-6 inline-flex items-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-1 dark:bg-white dark:text-gray-900"
+                  >
+                    Get notified when we publish
+                  </Link>
+                </div>
+              )}
+            </section>
+
+            <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white px-8 py-12 shadow-xl transition-transform duration-200 hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-900">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-500/10 to-transparent" aria-hidden="true" />
+              <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-blue-600 dark:text-blue-300">
+                    Stay in the loop
+                  </p>
+                  <h2 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
+                    Subscribe for fresh endpoint strategies
+                  </h2>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-base">
+                    Join the {siteSettings?.site_name || 'How to MeCM'} community for Intune, MECM, and automation updates. No spam—just battle-tested insights.
+                  </p>
+                </div>
+
+                <form className="grid w-full gap-4 sm:grid-cols-[minmax(0,1fr)_auto]" data-testid="blog-subscribe-form">
+                  <label className="sr-only" htmlFor="newsletter-email">
+                    Work email
+                  </label>
+                  <input
+                    id="newsletter-email"
+                    type="email"
+                    inputMode="email"
+                    placeholder="you@company.com"
+                    className="input-modern"
+                  />
+                  <button
+                    type="submit"
+                    className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5 dark:bg-white dark:text-gray-900"
+                  >
+                    Subscribe
+                  </button>
+                </form>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  We respect your inbox. Unsubscribe anytime.
+                </p>
+              </div>
+            </section>
+          </section>
+        </main>
+      </div>
+    )
+  } catch (error) {
+    console.error('Blog page error:', error)
+
+    // Fallback content when fetch fails
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-950">
+        <div className="max-w-lg rounded-3xl border border-white/10 bg-white/5 p-12 text-center text-white backdrop-blur">
+          <h1 className="text-3xl font-semibold">Blog</h1>
+          <p className="mt-4 text-blue-100">Unable to load blog posts at this time.</p>
+          <Link
+            href="/"
+            className="mt-8 inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow transition-transform duration-200 hover:-translate-y-1"
+          >
+            ← Back to Home
+          </Link>
+        </div>
+      </div>
     )
   }
-
-  // Pagination
-  const totalPosts = posts.length
-  const totalPages = Math.ceil(totalPosts / postsPerPage)
-  const startIndex = (page - 1) * postsPerPage
-  const endIndex = startIndex + postsPerPage
-  const currentPosts = posts.slice(startIndex, endIndex)
-
-  // Get only categories for filters (simplified)
-  const categorySet = new Set(posts.map(post => post.category?.name).filter((name): name is string => Boolean(name)))
-  const allCategories = Array.from(categorySet)
-
-  return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      {/* Modern Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 text-white section-padding">
-
-        <div className="container-modern relative z-10">
-          <div className="max-w-4xl mx-auto text-center animate-fade-in">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              {category ? `${category} Articles` : tag ? `Posts tagged "${tag}"` : 'Professional Tech Blog'}
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              {category
-                ? `Expert insights and best practices in ${category}`
-                : tag
-                ? `All content related to ${tag}`
-                : 'Discover the latest in Microsoft technologies, configuration management, and enterprise solutions'
-              }
-            </p>
-
-            {/* Floating Elements */}
-            <div className="absolute top-10 left-10 w-20 h-20 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute bottom-10 right-10 w-32 h-32 bg-purple-300/20 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
-          </div>
-        </div>
-      </section>
-
-      <div className="container-modern section-padding">
-        {/* Modern Breadcrumb */}
-        <nav className="mb-8 animate-slide-up">
-          <ol className="flex items-center space-x-2 text-sm text-gray-500">
-            <li><a href="/" className="hover:text-blue-600 transition-colors duration-200">Home</a></li>
-            <li>
-              <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-              </svg>
-            </li>
-            <li><a href="/blog" className="hover:text-blue-600 transition-colors duration-200">Blog</a></li>
-            {category && (
-              <>
-                <li>
-                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </li>
-                <li className="text-gray-900 font-medium">{category}</li>
-              </>
-            )}
-            {tag && (
-              <>
-                <li>
-                  <svg className="w-4 h-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                  </svg>
-                </li>
-                <li className="text-gray-900 font-medium">#{tag}</li>
-              </>
-            )}
-          </ol>
-        </nav>
-
-        {/* Modern Filters */}
-        {allCategories.length > 0 && (
-          <div className="mb-12 card-modern p-8 animate-slide-up stagger-delay-1">
-            <div className="flex flex-wrap gap-6">
-              {/* Category filters */}
-              {allCategories.length > 0 && (
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-4 text-lg">Categories</h3>
-                  <div className="flex flex-wrap gap-3">
-                    <a
-                      href="/blog"
-                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                        !category && !tag
-                          ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-                          : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-105'
-                      }`}
-                    >
-                      All Posts
-                    </a>
-                    {allCategories.map((cat) => (
-                      <a
-                        key={cat}
-                        href={`/blog?category=${encodeURIComponent(cat)}`}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                          category === cat
-                            ? 'bg-blue-600 text-white shadow-lg transform scale-105'
-                            : 'bg-gray-100 text-gray-700 hover:bg-blue-50 hover:text-blue-600 hover:scale-105'
-                        }`}
-                      >
-                        {cat}
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            </div>
-          </div>
-        )}
-
-        {/* Modern Results Summary */}
-        <div className="mb-8 flex items-center justify-between animate-slide-up stagger-delay-2">
-          <div className="text-sm text-gray-600">
-            Showing <span className="font-semibold text-gray-900">{currentPosts.length}</span> of <span className="font-semibold text-gray-900">{totalPosts}</span> posts
-            {totalPages > 1 && (
-              <span className="text-gray-400"> • Page {page} of {totalPages}</span>
-            )}
-          </div>
-
-          {/* View Toggle (for future enhancement) */}
-          <div className="hidden sm:flex items-center space-x-2">
-            <span className="text-xs text-gray-500 uppercase tracking-wide">View</span>
-            <div className="flex bg-gray-100 rounded-lg p-1">
-              <button className="p-1 rounded bg-white shadow-sm">
-                <svg className="w-4 h-4 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </button>
-            </div>
-          </div>
-        </div>
-
-        {currentPosts.length === 0 ? (
-          <div className="text-center py-20 animate-fade-in">
-            <div className="max-w-md mx-auto">
-              <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {category || tag ? 'No posts found' : 'No posts available'}
-              </h3>
-              <p className="text-gray-600 mb-6">
-                {category || tag ? 'No posts found matching your filter criteria.' : 'No blog posts available yet. Check back soon!'}
-              </p>
-              {(category || tag) && (
-                <a href="/blog" className="btn-primary">
-                  ← View all posts
-                </a>
-              )}
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Featured Post */}
-            {currentPosts.length > 0 && (
-              <div className="mb-16 animate-fade-in">
-                <ModernBlogCard
-                  post={currentPosts[0]}
-                  variant="featured"
-                  className="stagger-delay-1"
-                />
-              </div>
-            )}
-
-            {/* Regular Posts Grid */}
-            {currentPosts.length > 1 && (
-              <div className="grid-auto-fit mb-16">
-                {currentPosts.slice(1).map((post, index) => (
-                  <div key={post.id} className="animate-slide-up" style={{animationDelay: `${(index + 2) * 100}ms`}}>
-                    <ModernBlogCard
-                      post={post}
-                      variant="default"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Modern Pagination */}
-            {totalPages > 1 && (
-              <div className="flex justify-center items-center space-x-3 animate-fade-in">
-                {page > 1 && (
-                  <a
-                    href={`/blog?page=${page - 1}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
-                    className="inline-flex items-center px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all duration-200 hover:scale-105"
-                  >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                    </svg>
-                    Previous
-                  </a>
-                )}
-
-                {/* Page Numbers */}
-                <div className="flex items-center space-x-2">
-                  {Array.from({ length: Math.min(totalPages, 7) }, (_, i) => {
-                    let pageNum;
-                    if (totalPages <= 7) {
-                      pageNum = i + 1;
-                    } else if (page <= 4) {
-                      pageNum = i + 1;
-                    } else if (page >= totalPages - 3) {
-                      pageNum = totalPages - 6 + i;
-                    } else {
-                      pageNum = page - 3 + i;
-                    }
-
-                    return (
-                      <a
-                        key={pageNum}
-                        href={`/blog?page=${pageNum}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
-                        className={`w-12 h-12 flex items-center justify-center rounded-xl font-medium transition-all duration-200 ${
-                          pageNum === page
-                            ? 'bg-blue-600 text-white shadow-lg transform scale-110'
-                            : 'bg-white text-gray-700 border-2 border-gray-200 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 hover:scale-105'
-                        }`}
-                      >
-                        {pageNum}
-                      </a>
-                    );
-                  })}
-                </div>
-
-                {page < totalPages && (
-                  <a
-                    href={`/blog?page=${page + 1}${category ? `&category=${encodeURIComponent(category)}` : ''}${tag ? `&tag=${encodeURIComponent(tag)}` : ''}`}
-                    className="inline-flex items-center px-6 py-3 bg-white border-2 border-gray-200 rounded-xl font-medium text-gray-700 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600 transition-all duration-200 hover:scale-105"
-                  >
-                    Next
-                    <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </a>
-                )}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    </main>
-  )
 }

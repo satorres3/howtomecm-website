@@ -22,6 +22,8 @@ export interface UserProfile {
   full_name?: string
   avatar_url?: string
   email?: string
+  role?: string
+  bio?: string
 }
 
 // SEO metadata interface
@@ -260,10 +262,13 @@ export interface Post extends BaseContent {
   date: string
   category_id?: string
   category?: Category
+  category_slug?: string
   tags?: Tag[]
   comments_enabled?: boolean
   is_featured?: boolean
   view_count?: number
+  share_count?: number
+  like_count?: number
   reading_time?: number
 }
 
