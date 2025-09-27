@@ -89,7 +89,7 @@ export async function getPostWithSerializedContent(
   if (!post) return null
 
   try {
-    const serializedContent = await serialize(post.content, {
+    const serializedContent = await serialize(post.content || '', {
       mdxOptions: {
         development: process.env.NODE_ENV === 'development',
       },

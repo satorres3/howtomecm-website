@@ -121,7 +121,6 @@ export const demoPosts: Post[] = [
     category: demoCategories[0],
     tags: [demoTags[0], demoTags[1], demoTags[2]],
     reading_time: 8,
-    view_count: 156,
   },
   {
     id: 'demo-post-edge-config',
@@ -156,7 +155,6 @@ export const demoPosts: Post[] = [
     category: demoCategories[0],
     tags: [demoTags[0]],
     reading_time: 9,
-    view_count: 243,
   },
   {
     id: 'demo-post-security-copilot',
@@ -188,7 +186,6 @@ export const demoPosts: Post[] = [
     category: demoCategories[0],
     tags: [demoTags[1], demoTags[2]],
     reading_time: 7,
-    view_count: 89,
   },
   {
     id: 'demo-post-office365-macos',
