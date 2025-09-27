@@ -6,7 +6,7 @@ import { SkipNavigation } from '@/components/accessibility/SkipLink'
 import PageTransition from '@/components/PageTransition'
 import DevOverlayFocusGuard from '@/components/DevOverlayFocusGuard'
 import { AppProviders } from '@/providers/AppProviders'
-import { ContentLibrary } from '../lib/content'
+import { getSiteSettings } from '../lib/content'
 import Footer from '@/components/Footer'
 import { WebVitals } from '@/components/WebVitals'
 
@@ -16,7 +16,7 @@ const inter = Inter({ subsets: ['latin'] })
 export async function generateMetadata(): Promise<Metadata> {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.example.com').trim()
 
-  const settingsResult = await ContentLibrary.getSiteSettings(DOMAIN)
+  const settingsResult = await getSiteSettings(DOMAIN)
   const siteSettings = settingsResult.success ? settingsResult.data : null
 
   const siteName = siteSettings?.site_name || 'Website'
@@ -60,7 +60,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }) {
   // Fetch site settings for context
-  const settingsResult = await ContentLibrary.getSiteSettings(DOMAIN)
+  const settingsResult = await getSiteSettings(DOMAIN)
   const siteSettings = settingsResult.success ? settingsResult.data : {
     domain: DOMAIN,
     site_name: 'Website',
