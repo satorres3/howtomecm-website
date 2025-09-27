@@ -1,10 +1,18 @@
 import { query, queryOne, select, selectOne, insert, withDatabaseErrorHandling } from './database'
 import type { Page, Post, ContentSection, SEOData, MediaFile } from '../../types/content'
 import type { CompleteHomepageContent } from '../../types/homepage'
+// MDX content support
+import {
+  getAllPosts as getMDXPosts,
+  getPostBySlug as getMDXPostBySlug,
+  getRecentPosts as getMDXRecentPosts,
+} from './mdx'
 
 // CMS API Configuration
 const CMS_API_URL = process.env.CMS_API_URL || process.env.NEXT_PUBLIC_CMS_URL
-const ENABLE_CMS_INTEGRATION = process.env.ENABLE_CMS_INTEGRATION === 'true' || process.env.NEXT_PUBLIC_ENABLE_CMS_INTEGRATION === 'true'
+const ENABLE_CMS_INTEGRATION =
+  process.env.ENABLE_CMS_INTEGRATION === 'true' ||
+  process.env.NEXT_PUBLIC_ENABLE_CMS_INTEGRATION === 'true'
 
 // Cache configuration
 const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
@@ -183,14 +191,17 @@ export class ContentLibrary {
   /**
    * Create a new form submission
    */
-  static async submitForm(formId: string, formData: Record<string, any>): Promise<ContentResult<any>> {
+  static async submitForm(
+    formId: string,
+    formData: Record<string, any>
+  ): Promise<ContentResult<any>> {
     return withDatabaseErrorHandling(async () => {
       const result = await insert('form_submissions', {
         form_id: formId,
         data: formData,
         submitted_at: new Date().toISOString(),
         ip_address: '', // Will be filled by edge function
-        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : ''
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
       })
 
       if (!result.success) {
@@ -215,7 +226,7 @@ export class ContentLibrary {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       })
 
       if (!response.ok) {
@@ -248,7 +259,7 @@ export class ContentLibrary {
 
       const response = await fetch(`${CMS_API_URL}/media`, {
         method: 'POST',
-        body: formData
+        body: formData,
       })
 
       if (!response.ok) {
@@ -284,7 +295,7 @@ export class ContentLibrary {
         {
           website_domain: domain,
           status: 'published',
-          is_published_to_domain: true
+          is_published_to_domain: true,
         },
         'created_at DESC'
       )
@@ -300,7 +311,7 @@ export class ContentLibrary {
   }
 
   /**
-   * Get all posts for a domain with caching
+   * Get all posts for a domain with caching and MDX fallback
    */
   static async getAllPosts(domain: string): Promise<ContentResult<Post[]>> {
     const cacheKey = getCacheKey('posts', { domain })
@@ -312,7 +323,8 @@ export class ContentLibrary {
 
     return withDatabaseErrorHandling(async () => {
       // Complex query with joins - using raw SQL for better control
-      const result = await query<Post>(`
+      const result = await query<Post>(
+        `
         SELECT
           p.*,
           c.name as category_name,
@@ -340,13 +352,36 @@ export class ContentLibrary {
         AND p.is_published_to_domain = true
         GROUP BY p.id, c.id, pm.view_count, pm.share_count, pm.like_count
         ORDER BY p.created_at DESC
-      `, [domain])
+      `,
+        [domain]
+      )
 
       if (!result.success) {
-        return createErrorResult(`Failed to fetch posts: ${result.error}`)
+        // Fallback to MDX posts if database fails
+        try {
+          const mdxPosts = getMDXPosts()
+          setCache(cacheKey, mdxPosts)
+          return createSuccessResult(mdxPosts)
+        } catch (mdxError) {
+          return createErrorResult(`Failed to fetch posts: ${result.error}`)
+        }
       }
 
       const posts = result.data || []
+
+      // If no database posts, try MDX as fallback
+      if (posts.length === 0) {
+        try {
+          const mdxPosts = getMDXPosts()
+          if (mdxPosts.length > 0) {
+            setCache(cacheKey, mdxPosts)
+            return createSuccessResult(mdxPosts)
+          }
+        } catch (mdxError) {
+          // Continue with empty database result
+        }
+      }
+
       setCache(cacheKey, posts)
       return createSuccessResult(posts)
     })
@@ -372,7 +407,7 @@ export class ContentLibrary {
           website_domain: domain,
           is_homepage: true,
           status: 'published',
-          is_published_to_domain: true
+          is_published_to_domain: true,
         })
 
         if (!result.success) {
@@ -384,7 +419,7 @@ export class ContentLibrary {
           website_domain: domain,
           slug: slug,
           status: 'published',
-          is_published_to_domain: true
+          is_published_to_domain: true,
         })
 
         if (!result.success) {
@@ -398,7 +433,7 @@ export class ContentLibrary {
   }
 
   /**
-   * Get a post by slug with caching
+   * Get a post by slug with caching and MDX fallback
    */
   static async getPostBySlug(domain: string, slug: string): Promise<ContentResult<Post>> {
     const cacheKey = getCacheKey('post', { domain, slug })
@@ -409,7 +444,8 @@ export class ContentLibrary {
     }
 
     return withDatabaseErrorHandling(async () => {
-      const result = await query<Post>(`
+      const result = await query<Post>(
+        `
         SELECT
           p.*,
           c.name as category_name,
@@ -438,9 +474,21 @@ export class ContentLibrary {
         AND p.is_published_to_domain = true
         GROUP BY p.id, c.id, pm.view_count, pm.share_count, pm.like_count
         LIMIT 1
-      `, [domain, slug])
+      `,
+        [domain, slug]
+      )
 
       if (!result.success || !result.data || result.data.length === 0) {
+        // Fallback to MDX posts if database query fails or no results
+        try {
+          const mdxPost = getMDXPostBySlug(slug)
+          if (mdxPost) {
+            setCache(cacheKey, mdxPost)
+            return createSuccessResult(mdxPost)
+          }
+        } catch (mdxError) {
+          // Continue with database error
+        }
         return createErrorResult('Post not found')
       }
 
@@ -453,7 +501,10 @@ export class ContentLibrary {
   /**
    * Get posts by category
    */
-  static async getPostsByCategory(domain: string, categorySlug: string): Promise<ContentResult<Post[]>> {
+  static async getPostsByCategory(
+    domain: string,
+    categorySlug: string
+  ): Promise<ContentResult<Post[]>> {
     const cacheKey = getCacheKey('posts-category', { domain, categorySlug })
     const cached = getFromCache<Post[]>(cacheKey)
 
@@ -462,7 +513,8 @@ export class ContentLibrary {
     }
 
     return withDatabaseErrorHandling(async () => {
-      const result = await query<Post>(`
+      const result = await query<Post>(
+        `
         SELECT
           p.*,
           c.name as category_name,
@@ -494,7 +546,9 @@ export class ContentLibrary {
         AND c.slug = $2
         GROUP BY p.id, c.id, up.id, pm.view_count, pm.share_count, pm.like_count
         ORDER BY p.created_at DESC
-      `, [domain, categorySlug])
+      `,
+        [domain, categorySlug]
+      )
 
       if (!result.success) {
         return createErrorResult(`Failed to fetch posts by category: ${result.error}`)
@@ -518,7 +572,8 @@ export class ContentLibrary {
     }
 
     return withDatabaseErrorHandling(async () => {
-      const result = await query<Post>(`
+      const result = await query<Post>(
+        `
         SELECT
           p.*,
           c.name as category_name,
@@ -547,7 +602,9 @@ export class ContentLibrary {
         AND t.slug = $2
         GROUP BY p.id, c.id, pm.view_count, pm.share_count, pm.like_count
         ORDER BY p.created_at DESC
-      `, [domain, tagSlug])
+      `,
+        [domain, tagSlug]
+      )
 
       if (!result.success) {
         return createErrorResult(`Failed to fetch posts by tag: ${result.error}`)
@@ -560,7 +617,7 @@ export class ContentLibrary {
   }
 
   /**
-   * Get recent posts (limited number)
+   * Get recent posts (limited number) with MDX fallback
    */
   static async getRecentPosts(domain: string, limit: number = 5): Promise<ContentResult<Post[]>> {
     const cacheKey = getCacheKey('recent-posts', { domain, limit })
@@ -582,7 +639,8 @@ export class ContentLibrary {
       }
 
       // Get from posts table directly
-      const result = await query<Post>(`
+      const result = await query<Post>(
+        `
         SELECT
           p.*,
           c.name as category_name,
@@ -611,13 +669,36 @@ export class ContentLibrary {
         GROUP BY p.id, c.id, pm.view_count, pm.share_count, pm.like_count
         ORDER BY p.created_at DESC
         LIMIT $2
-      `, [domain, limit])
+      `,
+        [domain, limit]
+      )
 
       if (!result.success) {
-        return createErrorResult(`Failed to fetch recent posts: ${result.error}`)
+        // Fallback to MDX posts if database fails
+        try {
+          const mdxPosts = getMDXRecentPosts(limit)
+          setCache(cacheKey, mdxPosts)
+          return createSuccessResult(mdxPosts)
+        } catch (mdxError) {
+          return createErrorResult(`Failed to fetch recent posts: ${result.error}`)
+        }
       }
 
       const posts = result.data || []
+
+      // If no database posts, try MDX as fallback
+      if (posts.length === 0) {
+        try {
+          const mdxPosts = getMDXRecentPosts(limit)
+          if (mdxPosts.length > 0) {
+            setCache(cacheKey, mdxPosts)
+            return createSuccessResult(mdxPosts)
+          }
+        } catch (mdxError) {
+          // Continue with empty database result
+        }
+      }
+
       setCache(cacheKey, posts)
       return createSuccessResult(posts)
     })
@@ -643,7 +724,7 @@ export class ContentLibrary {
           domain,
           site_name: domain === 'staging.howtomecm.com' ? 'How to MeCM (Staging)' : 'How to MeCM',
           tagline: 'Microsoft endpoint knowledge hub',
-          description: 'Hands-on guides, automation playbooks, and deployment retrospectives.'
+          description: 'Hands-on guides, automation playbooks, and deployment retrospectives.',
         }
         setCache(cacheKey, defaultSettings)
         return createSuccessResult(defaultSettings)
@@ -657,14 +738,18 @@ export class ContentLibrary {
   /**
    * Search content across posts and pages
    */
-  static async searchContent(domain: string, searchQuery: string): Promise<ContentResult<(Post | Page)[]>> {
+  static async searchContent(
+    domain: string,
+    searchQuery: string
+  ): Promise<ContentResult<(Post | Page)[]>> {
     if (!searchQuery.trim()) {
       return createSuccessResult([])
     }
 
     return withDatabaseErrorHandling(async () => {
       // Search posts with category and tag information
-      const postsQuery = await query<Post>(`
+      const postsQuery = await query<Post>(
+        `
         SELECT
           p.*,
           'post' as content_type,
@@ -694,10 +779,13 @@ export class ContentLibrary {
         AND p.title ILIKE $2
         GROUP BY p.id, c.id, pm.view_count, pm.share_count, pm.like_count
         ORDER BY p.created_at DESC
-      `, [domain, `%${searchQuery}%`])
+      `,
+        [domain, `%${searchQuery}%`]
+      )
 
       // Search pages
-      const pagesQuery = await query<Page>(`
+      const pagesQuery = await query<Page>(
+        `
         SELECT
           *,
           'page' as content_type
@@ -707,7 +795,9 @@ export class ContentLibrary {
         AND is_published_to_domain = true
         AND title ILIKE $2
         ORDER BY created_at DESC
-      `, [domain, `%${searchQuery}%`])
+      `,
+        [domain, `%${searchQuery}%`]
+      )
 
       const postsResult = postsQuery
       const pagesResult = pagesQuery
@@ -716,10 +806,9 @@ export class ContentLibrary {
         return createErrorResult(`Search failed: ${postsResult.error || pagesResult.error}`)
       }
 
-      const results = [
-        ...(postsResult.data || []),
-        ...(pagesResult.data || [])
-      ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      const results = [...(postsResult.data || []), ...(pagesResult.data || [])].sort(
+        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
 
       return createSuccessResult(results)
     })
@@ -750,7 +839,7 @@ export class ContentLibrary {
   static getCacheStats(): { size: number; keys: string[] } {
     return {
       size: contentCache.size,
-      keys: Array.from(contentCache.keys())
+      keys: Array.from(contentCache.keys()),
     }
   }
 
@@ -761,7 +850,10 @@ export class ContentLibrary {
   /**
    * Get published homepage content for a domain from CMS
    */
-  static async getHomepageContent(domain: string, isPreview: boolean = false): Promise<ContentResult<CompleteHomepageContent>> {
+  static async getHomepageContent(
+    domain: string,
+    isPreview: boolean = false
+  ): Promise<ContentResult<CompleteHomepageContent>> {
     const cacheKey = getCacheKey('homepage-content', { domain, isPreview })
     const cached = getFromCache<CompleteHomepageContent>(cacheKey)
 
@@ -866,55 +958,63 @@ export class ContentLibrary {
           url: '/images/branding/portal-logo.svg',
           alt: 'How to MeCM Logo',
           width: 120,
-          height: 40
+          height: 40,
         },
         brand: {
           name: 'How to MeCM',
           tagline: 'Microsoft endpoint learning hub',
           primaryColor: '#2563eb',
-          secondaryColor: '#7c3aed'
+          secondaryColor: '#7c3aed',
         },
         navigation: {
           items: [
             { id: '1', label: 'Home', url: '/', target: '_self', order: 1, isActive: true },
             { id: '2', label: 'Blog', url: '/blog', target: '_self', order: 2, isActive: true },
             { id: '3', label: 'About', url: '/about', target: '_self', order: 3, isActive: true },
-            { id: '4', label: 'Contact', url: '/contact', target: '_self', order: 4, isActive: true }
+            {
+              id: '4',
+              label: 'Contact',
+              url: '/contact',
+              target: '_self',
+              order: 4,
+              isActive: true,
+            },
           ],
-          searchPlaceholder: 'Search articles...'
+          searchPlaceholder: 'Search articles...',
         },
         socialLinks: {
           youtube: {
             url: 'https://youtube.com/@howtomecm',
             title: 'YouTube Channel',
-            backgroundColor: '#dc2626'
+            backgroundColor: '#dc2626',
           },
           linkedin: {
             url: 'https://linkedin.com/in/sauloalvestorres',
             title: 'LinkedIn Profile',
-            backgroundColor: '#0077B5'
-          }
+            backgroundColor: '#0077B5',
+          },
         },
-        lastModified: new Date().toISOString()
+        lastModified: new Date().toISOString(),
       },
       welcome: {
         id: 'static-welcome',
         mainHeading: 'The Official Portal Blog',
-        subtitle: 'Your gateway to hands-on guides, lab notes, and deployment experiments for Microsoft endpoint ecosystems.',
+        subtitle:
+          'Your gateway to hands-on guides, lab notes, and deployment experiments for Microsoft endpoint ecosystems.',
         gradientColors: {
           from: '#2563eb',
           via: '#7c3aed',
           to: '#1e40af',
           darkFrom: '#3b82f6',
           darkVia: '#8b5cf6',
-          darkTo: '#2563eb'
+          darkTo: '#2563eb',
         },
-        isActive: true
+        isActive: true,
       },
       dynamicHero: {
         isActive: true,
         postsToShow: 4,
-        showSidebar: false
+        showSidebar: false,
       },
       promotionalCards: [
         {
@@ -922,35 +1022,37 @@ export class ContentLibrary {
           type: 'youtube',
           title: 'YouTube Channel',
           subtitle: 'Video tutorials & demos',
-          description: 'Watch deep-dive tutorials, live demonstrations, and step-by-step implementation guides for Microsoft technologies.',
+          description:
+            'Watch deep-dive tutorials, live demonstrations, and step-by-step implementation guides for Microsoft technologies.',
           url: 'https://youtube.com/@howtomecm',
           target: '_blank',
           gradientColors: {
             from: '#dc2626',
             via: '#ef4444',
-            to: '#b91c1c'
+            to: '#b91c1c',
           },
           icon: null,
           order: 1,
-          isActive: true
+          isActive: true,
         },
         {
           id: 'linkedin-card',
           type: 'linkedin',
           title: 'LinkedIn Network',
           subtitle: 'Community updates',
-          description: 'Follow release breakdowns, roadmap reactions, and open discussions with the endpoint community.',
+          description:
+            'Follow release breakdowns, roadmap reactions, and open discussions with the endpoint community.',
           url: 'https://linkedin.com/in/sauloalvestorres',
           target: '_blank',
           gradientColors: {
             from: '#0077B5',
             via: '#005885',
-            to: '#004e70'
+            to: '#004e70',
           },
           icon: null,
           order: 2,
-          isActive: true
-        }
+          isActive: true,
+        },
       ],
       featuredVideo: {
         id: 'static-video',
@@ -961,19 +1063,19 @@ export class ContentLibrary {
           description: 'Complete deployment guide',
           platform: null,
           autoplay: false,
-          lazyLoad: true
+          lazyLoad: true,
         },
         styling: {
           aspectRatio: '16:9',
           backgroundColor: '#f3f4f6',
           gradientColors: {
             from: '#3b82f6',
-            to: '#8b5cf6'
+            to: '#8b5cf6',
           },
           playButtonColor: '#ffffff',
-          borderRadius: 12
+          borderRadius: 12,
         },
-        isActive: true
+        isActive: true,
       },
       articles: {
         id: 'static-articles',
@@ -990,72 +1092,85 @@ export class ContentLibrary {
           showTags: false,
           showFeaturedImages: true,
           excerptMaxLines: 3,
-          titleMaxLines: 2
+          titleMaxLines: 2,
         },
         layoutSettings: {
           cardBorderRadius: 12,
           shadowIntensity: 'light',
           hoverEffect: 'scale',
-          imageAspectRatio: '16:9'
+          imageAspectRatio: '16:9',
         },
         sortingSettings: {
           defaultSort: 'date-newest',
           enableCategoryFilter: false,
           enableSearch: false,
-          loadMoreStyle: 'pagination'
+          loadMoreStyle: 'pagination',
         },
         paginationText: {
           next: 'Next',
           previous: 'Previous',
           page: 'Page',
-          loadMore: 'Load More'
+          loadMore: 'Load More',
         },
-        isActive: true
+        isActive: true,
       },
       footer: {
         id: 'static-footer',
         environmentId: domain,
-        copyrightText: '© 2024 How to MeCM. All rights reserved. | Microsoft endpoint knowledge & community.',
+        copyrightText:
+          '© 2024 How to MeCM. All rights reserved. | Microsoft endpoint knowledge & community.',
         showSocialLinks: true,
         socialLinks: [
           {
             id: 'youtube-footer',
             platform: 'YouTube',
             url: 'https://youtube.com/@howtomecm',
-            isActive: true
+            isActive: true,
           },
           {
             id: 'linkedin-footer',
             platform: 'LinkedIn',
             url: 'https://linkedin.com/in/sauloalvestorres',
-            isActive: true
-          }
+            isActive: true,
+          },
         ],
         footerColumns: [],
         backgroundColor: '#ffffff',
         textColor: '#6b7280',
-        lastModified: new Date().toISOString()
+        lastModified: new Date().toISOString(),
       },
       seo: {
         id: 'static-seo',
         environmentId: domain,
         pageTitle: 'How to MeCM – Microsoft endpoint knowledge hub',
-        metaDescription: 'Deep technical guides, lab walkthroughs, and community automation for Microsoft Configuration Manager, Intune, and modern endpoint management teams.',
-        keywords: ['Microsoft Configuration Manager', 'MECM', 'SCCM', 'Intune', 'Endpoint management', 'Automation', 'PowerShell', 'Windows Autopilot'],
+        metaDescription:
+          'Deep technical guides, lab walkthroughs, and community automation for Microsoft Configuration Manager, Intune, and modern endpoint management teams.',
+        keywords: [
+          'Microsoft Configuration Manager',
+          'MECM',
+          'SCCM',
+          'Intune',
+          'Endpoint management',
+          'Automation',
+          'PowerShell',
+          'Windows Autopilot',
+        ],
         openGraph: {
           title: 'How to MeCM – Microsoft endpoint knowledge hub',
-          description: 'Hands-on guides, videos, and automation blueprints for Microsoft endpoint teams.',
+          description:
+            'Hands-on guides, videos, and automation blueprints for Microsoft endpoint teams.',
           image: '/og-image.jpg',
           url: baseUrl,
           siteName: 'How to MeCM',
           type: 'website',
-          locale: 'en_US'
+          locale: 'en_US',
         },
         twitter: {
           card: 'summary_large_image',
           title: 'How to MeCM – Microsoft endpoint knowledge hub',
-          description: 'Hands-on guides, videos, and automation blueprints for Microsoft endpoint teams.',
-          image: '/og-image.jpg'
+          description:
+            'Hands-on guides, videos, and automation blueprints for Microsoft endpoint teams.',
+          image: '/og-image.jpg',
         },
         structuredData: {
           organization: {
@@ -1063,25 +1178,22 @@ export class ContentLibrary {
             description: 'Microsoft endpoint learning community and technical resource library.',
             url: baseUrl,
             logo: `${baseUrl}/images/branding/portal-logo.svg`,
-            sameAs: [
-              'https://youtube.com/@howtomecm',
-              'https://linkedin.com/in/sauloalvestorres'
-            ]
+            sameAs: ['https://youtube.com/@howtomecm', 'https://linkedin.com/in/sauloalvestorres'],
           },
           contactPoint: {
             contactType: 'customer service',
-            availableLanguage: 'English'
-          }
+            availableLanguage: 'English',
+          },
         },
         robots: {
           index: true,
           follow: true,
           maxImagePreview: 'large',
           maxVideoPreview: -1,
-          maxSnippet: -1
+          maxSnippet: -1,
         },
         canonicalUrl: baseUrl,
-        lastModified: new Date().toISOString()
+        lastModified: new Date().toISOString(),
       },
       background: {
         id: 'static-background',
@@ -1092,13 +1204,13 @@ export class ContentLibrary {
             light: {
               primary: '#dbeafe',
               secondary: '#ede9fe',
-              tertiary: '#fce7f3'
+              tertiary: '#fce7f3',
             },
             dark: {
               primary: '#1e3a8a',
               secondary: '#581c87',
-              tertiary: '#831843'
-            }
+              tertiary: '#831843',
+            },
           },
           animatedBlobs: {
             isActive: true,
@@ -1109,7 +1221,7 @@ export class ContentLibrary {
                 position: { x: '25%', y: '0%' },
                 colors: { from: '#60a5fa', to: '#8b5cf6' },
                 animationDelay: '0s',
-                blur: 48
+                blur: 48,
               },
               {
                 id: 'blob-2',
@@ -1117,7 +1229,7 @@ export class ContentLibrary {
                 position: { x: '66%', y: '75%' },
                 colors: { from: '#8b5cf6', to: '#ec4899' },
                 animationDelay: '2s',
-                blur: 32
+                blur: 32,
               },
               {
                 id: 'blob-3',
@@ -1125,15 +1237,15 @@ export class ContentLibrary {
                 position: { x: '75%', y: '33%' },
                 colors: { from: '#ec4899', to: '#3b82f6' },
                 animationDelay: '4s',
-                blur: 32
-              }
-            ]
-          }
+                blur: 32,
+              },
+            ],
+          },
         },
-        lastModified: new Date().toISOString()
+        lastModified: new Date().toISOString(),
       },
       lastModified: new Date().toISOString(),
-      modifiedBy: 'system'
+      modifiedBy: 'system',
     }
   }
 

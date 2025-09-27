@@ -1,3 +1,5 @@
+import createMDX from '@next/mdx'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Security configurations
@@ -5,6 +7,9 @@ const nextConfig = {
 
   // Performance configurations
   compress: true, // Performance: Compress responses
+
+  // MDX support
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
 
   // Bundle optimization
   experimental: {
@@ -110,4 +115,8 @@ const nextConfig = {
 
 }
 
-export default nextConfig
+const withMDX = createMDX({
+  // Add markdown plugins here, as desired
+})
+
+export default withMDX(nextConfig)

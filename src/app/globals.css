@@ -996,6 +996,12 @@
     border-bottom: 2px solid rgba(148, 163, 184, 0.15);
   }
 
+  /* Adjust layout when no number is present */
+  .topic-section__header:not(:has(.topic-section__number)) {
+    display: block;
+    gap: 0;
+  }
+
   .dark .topic-section__header {
     border-bottom-color: rgba(71, 85, 105, 0.3);
   }
@@ -1023,6 +1029,22 @@
 
   .dark .topic-section__title {
     color: #f1f5f9;
+  }
+
+  /* Remove native numbering from ordered lists inside TopicSection */
+  .topic-section ol {
+    list-style: none !important;
+    padding-left: 0 !important;
+  }
+
+  .topic-section ol li {
+    list-style: none !important;
+  }
+
+  /* If the content needs indentation, add it without numbers */
+  .topic-section ol li {
+    padding-left: 1.5rem;
+    position: relative;
   }
 
   /* Step-by-step Enhancement */
@@ -1116,21 +1138,27 @@
     margin-bottom: 0;
   }
 
-  /* Drop caps for first paragraph after headings */
+  /* Only apply lead styling to the excerpt paragraph, not all first paragraphs */
+  .prose-enhanced > p:first-of-type {
+    @apply text-xl leading-relaxed text-gray-600 dark:text-gray-300 mb-8;
+  }
+
+  /* Remove drop caps - they were causing typography issues in MDX */
   .prose-enhanced h2 + p::first-letter,
   .prose-enhanced h3 + p::first-letter {
-    float: left;
-    font-size: 3.5rem;
-    line-height: 3rem;
-    padding-right: 0.5rem;
-    margin-top: 0.25rem;
-    font-weight: 700;
-    color: #3b82f6;
+    /* Drop caps removed for better readability */
+    float: none;
+    font-size: inherit;
+    line-height: inherit;
+    padding-right: 0;
+    margin-top: 0;
+    font-weight: inherit;
+    color: inherit;
   }
 
   .dark .prose-enhanced h2 + p::first-letter,
   .dark .prose-enhanced h3 + p::first-letter {
-    color: #60a5fa;
+    color: inherit;
   }
 
   /* Enhanced blockquotes */
