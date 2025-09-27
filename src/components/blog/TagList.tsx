@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import type { ReactElement } from 'react'
 import type { Tag } from '../../../types/content'
 
 interface TagListProps {
@@ -7,7 +8,7 @@ interface TagListProps {
   showIcons?: boolean
 }
 
-function getTagIcon(tagName: string): JSX.Element | null {
+function getTagIcon(tagName: string): ReactElement | null {
   const lowerName = tagName.toLowerCase()
 
   // Only show icons for non-obvious or technical terms

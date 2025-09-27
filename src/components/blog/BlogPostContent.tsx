@@ -856,28 +856,418 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
     })
   }, [isClient, post.content, processedHTML])
 
-  return (
-    <div className="relative">
-
-      <div className={containerClasses}>
-        <aside
-          id="desktop-post-navigation"
-          aria-label="Article navigation and reading progress"
-          aria-hidden={isSidebarCollapsed}
-          role="complementary"
-          className={`hidden space-y-8 rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-md backdrop-blur transition-all duration-500 ease-in-out dark:border-gray-800 dark:bg-gray-900/90 lg:sticky lg:top-28 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:sidebar-scroll ${
-            isSidebarCollapsed
-              ? 'lg:hidden lg:w-0 lg:min-w-0 lg:opacity-0 lg:scale-95 lg:translate-x-8'
-              : 'lg:block lg:w-[320px] lg:min-w-[320px] lg:opacity-100 lg:scale-100 lg:translate-x-0'
-          }`}
-        >
-          <section data-testid="reading-progress" className="relative">
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
-                Reading Progress
-              </h2>
+  const desktopSidebar = () => (
+    <aside
+      id="desktop-post-navigation"
+      aria-label="Article navigation and reading progress"
+      aria-hidden={isSidebarCollapsed}
+      className={`hidden space-y-8 rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-md backdrop-blur transition-all duration-500 ease-in-out dark:border-gray-800 dark:bg-gray-900/90 lg:sticky lg:top-28 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:sidebar-scroll ${
+        isSidebarCollapsed
+          ? 'lg:hidden lg:w-0 lg:min-w-0 lg:opacity-0 lg:scale-95 lg:translate-x-8'
+          : 'lg:block lg:w-[320px] lg:min-w-[320px] lg:opacity-100 lg:scale-100 lg:translate-x-0'
+      }`}
+    >
+      <section data-testid="reading-progress" className="relative">
+        <div className="flex flex-col items-center gap-1 text-center">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+            Reading Progress
+          </h2>
+        </div>
+        <div className="mt-4 flex flex-col items-center gap-4">
+          <div className="toc-progress mx-auto">
+            <svg viewBox="0 0 120 120" className="toc-progress__svg" aria-hidden="true">
+              <circle className="toc-progress__track" cx="60" cy="60" r="52" />
+              <circle
+                className="toc-progress__indicator"
+                cx="60"
+                cy="60"
+                r="52"
+                strokeDasharray={Math.PI * 2 * 52}
+                strokeDashoffset={Math.PI * 2 * 52 * (1 - progress / 100)}
+              />
+            </svg>
+            <div className="toc-progress__value">
+              <span>{roundedProgress}</span>
+              <small>%</small>
             </div>
-            <div className="mt-4 flex flex-col items-center gap-4">
+          </div>
+
+          <div className="w-full space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center gap-2">
+                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                </svg>
+                <span>{totalHeadings} sections</span>
+              </div>
+            </div>
+
+            {estimatedTimeRemaining && (
+              <div className="flex items-center justify-center rounded-lg bg-blue-50/80 p-2 dark:bg-blue-900/30">
+                <div className="flex items-center gap-2 text-xs font-medium text-blue-700 dark:text-blue-200">
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                  </svg>
+                  <span>{estimatedTimeRemaining}</span>
+                </div>
+              </div>
+            )}
+
+            {post.category && (
+              <div className="flex items-center gap-2 text-xs">
+                <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-blue-600 dark:bg-blue-500/20 dark:text-blue-200">
+                  <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                  {post.category.name}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {totalHeadings > 0 && (
+            <div className="w-full">
+              <h3 className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                Table of Contents
+              </h3>
+              <nav className="mx-auto w-full max-w-[280px]" aria-label="Table of contents">
+                <ol className="space-y-2">
+                  {headings.map((heading, index) => {
+                    const isActive = activeHeading === heading.id
+                    const isCompleted = activeHeadingIndex !== -1 && index < activeHeadingIndex
+                    const isNext = activeHeadingIndex !== -1 && index === activeHeadingIndex + 1
+
+                    return (
+                      <li key={heading.id} className="flex justify-center">
+                        <a
+                          href={`#${heading.id}`}
+                          onClick={event => scrollToHeading(heading.id, event, 'main-toc')}
+                          className={`group relative flex w-full max-w-[260px] items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-150 ${
+                            isActive
+                              ? 'border-blue-200 bg-blue-50/80 text-blue-700 shadow-sm dark:border-blue-500/60 dark:bg-blue-500/20 dark:text-blue-100'
+                              : isCompleted
+                              ? 'border-blue-100/40 bg-blue-50/40 text-gray-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-gray-100'
+                              : 'border-transparent text-gray-600 hover:border-gray-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:border-gray-700 dark:hover:bg-gray-800'
+                          }`}
+                        >
+                          <span
+                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
+                              isActive
+                                ? 'border-blue-500 bg-blue-500 text-white'
+                                : isCompleted
+                                ? 'border-blue-400 bg-blue-400/70 text-white'
+                                : isNext
+                                ? 'border-blue-300 text-blue-500'
+                                : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-300'
+                            }`}
+                          >
+                            {index + 1}
+                          </span>
+                          <span
+                            className={`flex-1 text-left leading-tight ${
+                              heading.level > 2 ? 'text-xs font-medium' : 'text-sm font-medium'
+                            }`}
+                          >
+                            {heading.text}
+                          </span>
+                        </a>
+                      </li>
+                    )
+                  })}
+                </ol>
+              </nav>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <section className="border-t border-gray-200 pt-6 dark:border-gray-700">
+        <Link
+          href={YOUTUBE_CHANNEL_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 p-4 text-white transition-all duration-200 hover:-translate-y-1 hover:from-red-600 hover:to-red-700 hover:shadow-lg dark:from-red-600 dark:to-red-700"
+        >
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20">
+            <svg className="h-6 w-6" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M10 15l5.19-3L10 9v6zm11.56-7.83c-.13-.72-.75-1.27-1.48-1.43C18.88 5.3 12 5.3 12 5.3s-6.88 0-8.08.44c-.73.16-1.35.71-1.48 1.43C2.17 8.27 2.17 12 2.17 12s0 3.73.27 5.83c.13.72.75 1.27 1.48 1.43 1.2.44 8.08.44 8.08.44s6.88 0 8.08-.44c.73-.16 1.35-.71 1.48-1.43.27-2.1.27-5.83.27-5.83s0-3.73-.27-5.83z"/>
+            </svg>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold uppercase tracking-wide text-white/80">Watch the walkthrough</p>
+            <p className="text-base font-semibold">Subscribe to How to MeCM on YouTube</p>
+          </div>
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
+          </svg>
+        </Link>
+      </section>
+
+      <section>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+          Related articles
+        </h2>
+        <div className="mt-4 space-y-4">
+          {relatedPosts.length === 0 && (
+            <p className="text-sm text-gray-500 dark:text-gray-300">More field notes are coming shortly.</p>
+          )}
+          {relatedPosts.slice(0, 4).map(relatedPost => (
+            <Link
+              key={relatedPost.id}
+              href={`/blog/${relatedPost.slug}`}
+              className="block rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100 dark:hover:border-blue-500 dark:hover:text-blue-200"
+            >
+              <span className="block text-xs font-medium uppercase tracking-wide text-blue-500 dark:text-blue-300">
+                {formatDate(relatedPost.created_at)}
+              </span>
+              <span className="mt-1 block text-base">{relatedPost.title}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </aside>
+  )
+
+  const mainContent = () => (
+    <div className="space-y-12 transition-all duration-300 lg:min-w-0">
+      <div className="flex justify-end">
+        <div id="hide-navigation-placeholder" className="hidden lg:flex" />
+      </div>
+
+      <div className="rounded-3xl border border-white/20 bg-gradient-to-br from-white/95 via-blue-50/30 to-purple-50/30 p-8 shadow-xl backdrop-blur dark:border-gray-700/30 dark:from-gray-900/95 dark:via-blue-900/10 dark:to-purple-900/10 lg:p-12">
+        <div className="space-y-8">
+          <header className="space-y-6">
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              {post.category && (
+                <span className="inline-flex items-center rounded-full bg-purple-100/80 px-4 py-2 text-purple-700 font-medium dark:bg-purple-900/30 dark:text-purple-200">
+                  {post.category.name}
+                </span>
+              )}
+              {post.tags && post.tags.length > 0 && <TagList tags={post.tags} />}
+            </div>
+
+            <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl">
+              {post.title}
+            </h1>
+
+            {post.excerpt && (
+              <p className="text-xl font-light leading-relaxed text-gray-600 dark:text-gray-300">{post.excerpt}</p>
+            )}
+          </header>
+
+          <div className="border-t border-gray-200/50 pt-6 dark:border-gray-700/30">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-center gap-4">
+                <div className="relative h-12 w-12 overflow-hidden rounded-full ring-2 ring-blue-100 dark:ring-blue-900/50">
+                  <Image
+                    src={authorAvatar}
+                    alt={authorName}
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+                <div>
+                  <p className="font-semibold text-gray-900 dark:text-white">{authorName}</p>
+                  {authorRole && (
+                    <p className="text-sm font-medium text-blue-600 dark:text-blue-300">{authorRole}</p>
+                  )}
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Published {formatDate(post.created_at)}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 text-sm">
+                <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                  </svg>
+                  <span>{readingTimeLabel}</span>
+                </div>
+                {totalHeadings > 0 && (
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                    </svg>
+                    <span>{totalHeadings} sections</span>
+                  </div>
+                )}
+                {post.view_count && post.view_count > 0 && (
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                    </svg>
+                    <span>{post.view_count} views</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {totalHeadings > 0 && (
+        <div className="rounded-2xl border border-blue-100/50 bg-white/60 p-6 dark:border-blue-800/30 dark:bg-gray-800/30">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white">
+            <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+            </svg>
+            Article Overview
+          </h2>
+          <Link
+            href={YOUTUBE_CHANNEL_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mb-4 block rounded-xl border border-red-200 bg-gradient-to-r from-red-50 to-red-100 p-4 transition-all duration-200 hover:from-red-100 hover:to-red-200 hover:border-red-300 dark:border-red-700/50 dark:from-red-900/20 dark:to-red-800/20 dark:hover:from-red-900/30 dark:hover:to-red-800/30"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 text-white">
+                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-red-700 dark:text-red-300">Watch Video Tutorial</h3>
+                <p className="text-xs text-red-600 dark:text-red-400">Step-by-step walkthrough available on YouTube</p>
+              </div>
+              <svg className="ml-auto h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+              </svg>
+            </div>
+          </Link>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {headings.map((heading, index) => (
+              <a
+                key={heading.id}
+                href={`#${heading.id}`}
+                onClick={event => scrollToHeading(heading.id, event, 'article-overview')}
+                className="flex items-center gap-3 rounded-xl border border-gray-200/50 bg-white/40 p-3 transition-all duration-200 hover:border-blue-200/60 hover:bg-blue-50/60 dark:border-gray-600/30 dark:bg-gray-700/20 dark:hover:bg-blue-900/20 dark:hover:border-blue-700/40"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-600 dark:bg-blue-900/50 dark:text-blue-300">
+                  {index + 1}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-gray-900 dark:text-white">{heading.text}</p>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <article
+        ref={articleRef}
+        className={`prose prose-lg w-full rounded-3xl bg-white/90 p-8 shadow-xl backdrop-blur transition-all duration-300 dark:prose-invert dark:bg-gray-900/90 dark:text-gray-100 lg:p-12 ${articleWidthClass}`}
+      >
+        {post.content ? (
+          <div
+            className="prose prose-lg prose-enhanced max-w-none leading-relaxed text-gray-700 dark:text-gray-200 prose-headings:scroll-mt-24 prose-img:rounded-2xl prose-img:shadow-md"
+            dangerouslySetInnerHTML={{ __html: processedHTML }}
+          />
+        ) : (
+          <p className="text-base text-gray-600 dark:text-gray-300">No content available for this post yet.</p>
+        )}
+      </article>
+
+      <div className="not-prose rounded-3xl bg-white/80 p-8 shadow-xl backdrop-blur dark:bg-gray-900/90">
+        <div className="mb-6 flex flex-wrap items-center gap-3" data-testid="share-actions">
+          <span className="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">Share</span>
+          <a
+            href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl || `https://howtomecm.com/blog/${post.slug}`)}&title=${encodeURIComponent(post.title)}&summary=${encodeURIComponent(post.excerpt || `Expert insights on ${post.title}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 px-4 py-2 text-sm font-medium text-blue-700 transition-colors duration-150 hover:bg-blue-600/20 dark:bg-blue-500/20 dark:text-blue-200 dark:hover:bg-blue-500/30"
+          >
+            LinkedIn
+          </a>
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                if (shareUrl) {
+                  await navigator.clipboard.writeText(shareUrl)
+                  setCopyStatus('copied')
+                  setTimeout(() => setCopyStatus('idle'), 2000)
+                }
+              } catch (error) {
+                console.error('Copy failed', error)
+              }
+            }}
+            className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-150 hover:border-blue-400 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-200"
+          >
+            {copyStatus === 'copied' ? 'Link copied' : 'Copy link'}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (likeStatus === 'idle') {
+                setLikeStatus('liked')
+                setLikeCount(prev => prev + 1)
+              }
+            }}
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
+              likeStatus === 'liked'
+                ? 'scale-105 bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400'
+                : 'bg-gray-100/50 text-gray-600 hover:scale-105 hover:bg-red-50/70 hover:text-red-500 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:bg-red-500/10 dark:hover:text-red-400'
+            }`}
+            disabled={likeStatus === 'liked'}
+          >
+            <svg
+              className={`h-4 w-4 transition-all duration-300 ${likeStatus === 'liked' ? 'animate-pulse' : ''}`}
+              fill={likeStatus === 'liked' ? 'currentColor' : 'none'}
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+            <span>
+              {likeStatus === 'liked' ? 'Liked!' : 'Like'}
+              {likeCount > 0 && ` (${likeCount})`}
+            </span>
+          </button>
+        </div>
+
+        {hasEngagementMetrics && (
+          <div className="grid gap-4 sm:grid-cols-3" data-testid="post-engagement-metrics">
+            {engagementMetrics.map(metric => (
+              <div
+                key={metric.label}
+                className="rounded-2xl border border-gray-200 bg-white/70 px-5 py-4 shadow-sm transition-colors duration-150 dark:border-gray-700 dark:bg-gray-900/70"
+              >
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
+                  {metric.label}
+                </p>
+                <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
+                  {formatMetric(metric.value)}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <CommentSection postId={post.id} />
+    </div>
+  )
+
+  const renderMobileSidebar = () => {
+    if (!isClient || totalHeadings === 0 || showFloatingTOC) {
+      return null
+    }
+
+    return (
+      <aside
+        className="mt-10 space-y-10 rounded-3xl border border-gray-200 bg-white/75 p-8 shadow-lg backdrop-blur transition-shadow duration-200 dark:border-gray-800 dark:bg-gray-900/80 lg:hidden"
+        aria-label="Article navigation"
+      >
+        <section data-testid="table-of-contents">
+          <div className="flex flex-col items-center gap-1 text-center">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
+              Table of contents
+            </h2>
+          </div>
+          {totalHeadings > 0 ? (
+            <div className="mt-4 flex flex-col items-center gap-6">
               <div className="toc-progress mx-auto">
                 <svg viewBox="0 0 120 120" className="toc-progress__svg" aria-hidden="true">
                   <circle className="toc-progress__track" cx="60" cy="60" r="52" />
@@ -895,629 +1285,184 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
                   <small>%</small>
                 </div>
               </div>
+              <nav className="mx-auto w-full max-w-[260px]" aria-label="Table of contents">
+                <ol className="space-y-2">
+                  {headings.map((heading, index) => {
+                    const isActive = activeHeading === heading.id
+                    const isCompleted = activeHeadingIndex !== -1 && index < activeHeadingIndex
+                    const isNext = activeHeadingIndex !== -1 && index === activeHeadingIndex + 1
 
-              {/* Article Navigation Metadata */}
-              <div className="w-full space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-                <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-                    </svg>
-                    <span>{totalHeadings} sections</span>
-                  </div>
-                </div>
-
-                {estimatedTimeRemaining && (
-                  <div className="flex items-center justify-center p-2 rounded-lg bg-blue-50/80 dark:bg-blue-900/30">
-                    <div className="flex items-center gap-2 text-xs font-medium text-blue-700 dark:text-blue-200">
-                      <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
-                      </svg>
-                      <span>{estimatedTimeRemaining}</span>
-                    </div>
-                  </div>
-                )}
-
-                {post.category && (
-                  <div className="flex items-center gap-2 text-xs">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-1 text-blue-600 dark:bg-blue-500/20 dark:text-blue-200">
-                      <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                      </svg>
-                      {post.category.name}
-                    </span>
-                  </div>
-                )}
-              </div>
-              {totalHeadings > 0 && (
-                <div className="w-full">
-                  <h3 className="text-center text-xs font-medium uppercase tracking-wide text-gray-400 dark:text-gray-500 mb-3">
-                    Table of Contents
-                  </h3>
-                  <nav className="mx-auto w-full max-w-[280px]" aria-label="Table of contents">
-                    <ol className="space-y-2">
-                      {headings.map((heading, index) => {
-                        const isActive = activeHeading === heading.id
-                        const isCompleted = activeHeadingIndex !== -1 && index < activeHeadingIndex
-                        const isNext = activeHeadingIndex !== -1 && index === activeHeadingIndex + 1
-
-                        return (
-                          <li key={heading.id} className="flex justify-center">
-                            <a
-                              href={`#${heading.id}`}
-                              onClick={event => scrollToHeading(heading.id, event, 'main-toc')}
-                              className={`group relative flex w-full max-w-[260px] items-center gap-3 rounded-xl border px-3 py-2.5 transition-all duration-150 ${
-                                isActive
-                                  ? 'border-blue-200 bg-blue-50/80 text-blue-700 shadow-sm dark:border-blue-500/60 dark:bg-blue-500/20 dark:text-blue-100'
-                                  : isCompleted
-                                  ? 'border-blue-100/40 bg-blue-50/40 text-gray-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-gray-100'
-                                  : 'border-transparent text-gray-600 hover:border-gray-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:border-gray-700 dark:hover:bg-gray-800'
-                              }`}
-                            >
-                              <span
-                                className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
-                                  isActive
-                                    ? 'border-blue-500 bg-blue-500 text-white'
-                                    : isCompleted
-                                    ? 'border-blue-400 bg-blue-400/70 text-white'
-                                    : isNext
-                                    ? 'border-blue-300 text-blue-500'
-                                    : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-300'
-                                }`}
-                              >
-                                {index + 1}
-                              </span>
-                              <span
-                                className={`flex-1 text-left leading-tight ${
-                                  heading.level > 2
-                                    ? 'text-xs font-medium'
-                                    : 'text-sm font-medium'
-                                }`}
-                              >
-                                {heading.text}
-                              </span>
-                            </a>
-                          </li>
-                        )
-                      })}
-                    </ol>
-                  </nav>
-                </div>
-              )}
-            </div>
-          </section>
-
-          <section className="border-t border-gray-200 pt-6 dark:border-gray-700">
-            <Link
-              href={YOUTUBE_CHANNEL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 p-4 text-white transition-all duration-200 hover:from-red-600 hover:to-red-700 hover:shadow-lg hover:-translate-y-1 dark:from-red-600 dark:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800"
-            >
-              <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm shadow-lg">
-                <Image
-                  src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
-                  alt="YouTube Channel"
-                  width={48}
-                  height={48}
-                  className="h-12 w-12 rounded-lg object-contain"
-                />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium text-white/95">We also have a YouTube channel</p>
-              </div>
-              <svg className="h-4 w-4 fill-current opacity-75" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd"/>
-              </svg>
-            </Link>
-          </section>
-
-          <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
-              Related articles
-            </h2>
-            <div className="mt-4 space-y-3">
-              {relatedPosts.length === 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-300">More field notes are coming shortly.</p>
-              )}
-              {relatedPosts.slice(0, 4).map(relatedPost => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/blog/${relatedPost.slug}`}
-                  className="block rounded-xl border border-gray-200 bg-gray-50/70 px-4 py-3 text-sm font-medium text-gray-700 transition-all duration-200 hover:border-blue-300 hover:bg-blue-50/70 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-800/40 dark:text-gray-100 dark:hover:border-blue-500 dark:hover:bg-blue-900/20 dark:hover:text-blue-200"
-                >
-                  <span className="block text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-                    {formatDate(relatedPost.created_at)}
-                  </span>
-                  <span className="mt-1 block text-sm leading-tight">{relatedPost.title}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-        </aside>
-
-        <div className="space-y-12 transition-all duration-300 lg:min-w-0">
-          {/* Enhanced Article Header */}
-          <div className="rounded-3xl bg-gradient-to-br from-white/95 via-blue-50/30 to-purple-50/30 p-8 lg:p-12 shadow-xl backdrop-blur border border-white/20 dark:from-gray-900/95 dark:via-blue-900/10 dark:to-purple-900/10 dark:border-gray-700/30">
-            <div className="space-y-8">
-              {/* Article Title and Metadata */}
-              <header className="space-y-6">
-                <div className="flex flex-wrap items-center gap-3 text-sm">
-                  {post.category && (
-                    <span className="inline-flex items-center rounded-full bg-purple-100/80 px-4 py-2 text-purple-700 font-medium dark:bg-purple-900/30 dark:text-purple-200">
-                      {post.category.name}
-                    </span>
-                  )}
-                  {post.tags && post.tags.length > 0 && <TagList tags={post.tags} />}
-                </div>
-
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl">
-                  {post.title}
-                </h1>
-
-                {post.excerpt && (
-                  <p className="text-xl leading-relaxed text-gray-600 dark:text-gray-300 font-light">
-                    {post.excerpt}
-                  </p>
-                )}
-              </header>
-
-              {/* Author and Publication Info - Single Source of Truth */}
-              <div className="border-t border-gray-200/50 pt-6 dark:border-gray-700/30">
-                <div className="flex flex-col gap-6">
-                  {/* Author Information and Primary Metadata */}
-                  <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-12 w-12 rounded-full overflow-hidden ring-2 ring-blue-100 dark:ring-blue-900/50">
-                        <Image
-                          src={authorAvatar}
-                          alt={authorName}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                          unoptimized
-                        />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-gray-900 dark:text-white">{authorName}</p>
-                        {authorRole && (
-                          <p className="text-sm text-blue-600 dark:text-blue-300 font-medium">{authorRole}</p>
-                        )}
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          Published {formatDate(post.created_at)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Article Metadata */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm">
-                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
-                        </svg>
-                        <span>{readingTimeLabel}</span>
-                      </div>
-                      {totalHeadings > 0 && (
-                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-                          </svg>
-                          <span>{totalHeadings} sections</span>
-                        </div>
-                      )}
-                      {post.view_count && post.view_count > 0 && (
-                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
-                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
-                          </svg>
-                          <span>{post.view_count} views</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Article Outline */}
-          {totalHeadings > 0 && (
-            <div className="rounded-2xl bg-white/60 p-6 border border-blue-100/50 dark:bg-gray-800/30 dark:border-blue-800/30">
-                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                    <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
-                    </svg>
-                    Article Overview
-                  </h2>
-
-                  {/* Video Tutorial Promotion */}
-                  <Link
-                    href={YOUTUBE_CHANNEL_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mb-4 block rounded-xl bg-gradient-to-r from-red-50 to-red-100 p-4 border border-red-200 hover:from-red-100 hover:to-red-200 hover:border-red-300 transition-all duration-200 dark:from-red-900/20 dark:to-red-800/20 dark:border-red-700/50 dark:hover:from-red-900/30 dark:hover:to-red-800/30"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-500 text-white">
-                        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z"/>
-                        </svg>
-                      </div>
-                      <div>
-                        <h3 className="text-sm font-semibold text-red-700 dark:text-red-300">Watch Video Tutorial</h3>
-                        <p className="text-xs text-red-600 dark:text-red-400">Step-by-step walkthrough available on YouTube</p>
-                      </div>
-                      <svg className="ml-auto h-4 w-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                      </svg>
-                    </div>
-                  </Link>
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {headings.map((heading, index) => (
-                      <a
-                        key={heading.id}
-                        href={`#${heading.id}`}
-                        onClick={event => scrollToHeading(heading.id, event, 'article-overview')}
-                        className="flex items-center gap-3 p-3 rounded-xl border border-gray-200/50 bg-white/40 hover:bg-blue-50/60 hover:border-blue-200/60 transition-all duration-200 dark:border-gray-600/30 dark:bg-gray-700/20 dark:hover:bg-blue-900/20 dark:hover:border-blue-700/40"
-                      >
-                        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 text-sm font-semibold dark:bg-blue-900/50 dark:text-blue-300">
-                          {index + 1}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                            {heading.text}
-                          </p>
-                        </div>
-                      </a>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-
-          <article
-            ref={articleRef}
-            className={`prose prose-lg w-full rounded-3xl bg-white/90 p-8 lg:p-12 shadow-xl backdrop-blur transition-all duration-300 dark:prose-invert dark:bg-gray-900/90 dark:text-gray-100 ${articleWidthClass}`}
-          >
-
-          {post.content ? (
-            <div
-              className="prose prose-lg prose-enhanced max-w-none leading-relaxed text-gray-700 dark:text-gray-200 prose-headings:scroll-mt-24 prose-img:rounded-2xl prose-img:shadow-md"
-              dangerouslySetInnerHTML={{ __html: processedHTML }}
-            />
-          ) : (
-            <p className="text-base text-gray-600 dark:text-gray-300">
-              No content available for this post yet.
-            </p>
-          )}
-
-          </article>
-
-          <div className="not-prose rounded-3xl bg-white/80 p-8 shadow-xl backdrop-blur dark:bg-gray-900/90">
-            <div className="flex flex-wrap items-center gap-3 mb-6" data-testid="share-actions">
-              <span className="text-sm font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
-                Share
-              </span>
-              <a
-                href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl || `https://howtomecm.com/blog/${post.slug}`)}&title=${encodeURIComponent(post.title)}&summary=${encodeURIComponent(post.excerpt || `Expert insights on ${post.title}`)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full bg-blue-600/10 px-4 py-2 text-sm font-medium text-blue-700 transition-colors duration-150 hover:bg-blue-600/20 dark:bg-blue-500/20 dark:text-blue-200 dark:hover:bg-blue-500/30"
-              >
-                LinkedIn
-              </a>
-              <button
-                type="button"
-                onClick={async () => {
-                  try {
-                    if (shareUrl) {
-                      await navigator.clipboard.writeText(shareUrl)
-                      setCopyStatus('copied')
-                      setTimeout(() => setCopyStatus('idle'), 2000)
-                    }
-                  } catch (error) {
-                    console.error('Copy failed', error)
-                  }
-                }}
-                className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-4 py-2 text-sm font-medium text-gray-600 transition-colors duration-150 hover:border-blue-400 hover:text-blue-600 dark:border-gray-700 dark:text-gray-300 dark:hover:border-blue-500 dark:hover:text-blue-200"
-              >
-                {copyStatus === 'copied' ? 'Link copied' : 'Copy link'}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  if (likeStatus === 'idle') {
-                    setLikeStatus('liked')
-                    setLikeCount(prev => prev + 1)
-                    // Here you would typically make an API call to save the like
-                    // For now, we'll just show the visual feedback
-                  }
-                }}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
-                  likeStatus === 'liked'
-                    ? 'bg-red-500/10 text-red-600 dark:bg-red-500/20 dark:text-red-400 scale-105'
-                    : 'bg-gray-100/50 text-gray-600 hover:bg-red-50/70 hover:text-red-500 hover:scale-105 dark:bg-gray-800/50 dark:text-gray-300 dark:hover:bg-red-500/10 dark:hover:text-red-400'
-                }`}
-                disabled={likeStatus === 'liked'}
-              >
-                <svg
-                  className={`w-4 h-4 transition-all duration-300 ${likeStatus === 'liked' ? 'animate-pulse' : ''}`}
-                  fill={likeStatus === 'liked' ? 'currentColor' : 'none'}
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span>
-                  {likeStatus === 'liked' ? 'Liked!' : 'Like'}
-                  {likeCount > 0 && ` (${likeCount})`}
-                </span>
-              </button>
-            </div>
-
-            {hasEngagementMetrics && (
-              <div
-                className="grid gap-4 sm:grid-cols-3"
-                data-testid="post-engagement-metrics"
-              >
-                {engagementMetrics.map(metric => (
-                  <div
-                    key={metric.label}
-                    className="rounded-2xl border border-gray-200 bg-white/70 px-5 py-4 shadow-sm transition-colors duration-150 dark:border-gray-700 dark:bg-gray-900/70"
-                  >
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 dark:text-gray-500">
-                      {metric.label}
-                    </p>
-                    <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-white">
-                      {formatMetric(metric.value)}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <CommentSection postId={post.id} />
-        </div>
-        )}
-
-        {isClient && totalHeadings > 0 && !showFloatingTOC && (
-          <aside
-            className="block space-y-10 rounded-3xl border border-gray-200 bg-white/75 p-8 shadow-lg backdrop-blur transition-shadow duration-200 dark:border-gray-800 dark:bg-gray-900/80 lg:hidden"
-            aria-label="Article navigation"
-          >
-
-          <section data-testid="table-of-contents">
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
-                Table of contents
-              </h2>
-            </div>
-            {totalHeadings > 0 ? (
-              <div className="mt-4 flex flex-col items-center gap-6">
-                <div className="toc-progress mx-auto">
-                  <svg viewBox="0 0 120 120" className="toc-progress__svg" aria-hidden="true">
-                    <circle className="toc-progress__track" cx="60" cy="60" r="52" />
-                    <circle
-                      className="toc-progress__indicator"
-                      cx="60"
-                      cy="60"
-                      r="52"
-                      strokeDasharray={Math.PI * 2 * 52}
-                      strokeDashoffset={Math.PI * 2 * 52 * (1 - progress / 100)}
-                    />
-                  </svg>
-                  <div className="toc-progress__value">
-                    <span>{roundedProgress}</span>
-                    <small>%</small>
-                  </div>
-                </div>
-                <nav className="mx-auto w-full max-w-[260px]" aria-label="Table of contents">
-                  <ol className="space-y-2">
-                    {headings.map((heading, index) => {
-                      const isActive = activeHeading === heading.id
-                      const isCompleted = activeHeadingIndex !== -1 && index < activeHeadingIndex
-                      const isNext = activeHeadingIndex !== -1 && index === activeHeadingIndex + 1
-
-                      return (
-                        <li key={heading.id} className="flex justify-center">
-                          <a
-                            href={`#${heading.id}`}
-                            onClick={event => scrollToHeading(heading.id, event, 'floating-toc')}
-                            className={`group relative flex w-full max-w-[240px] items-center gap-3 rounded-2xl border px-4 py-3 transition-all duration-150 ${
-                              isActive
-                                ? 'border-blue-200 bg-blue-50/80 text-blue-700 shadow-sm dark:border-blue-500/60 dark:bg-blue-500/20 dark:text-blue-100'
-                                : isCompleted
-                                ? 'border-blue-100/40 bg-blue-50/40 text-gray-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-gray-100'
-                                : 'border-transparent text-gray-600 hover:border-gray-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:border-gray-700 dark:hover:bg-gray-800'
-                            }`}
-                          >
-                            <span
-                              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
-                                isActive
-                                  ? 'border-blue-500 bg-blue-500 text-white'
-                                  : isCompleted
-                                  ? 'border-blue-400 bg-blue-400/70 text-white'
-                                  : isNext
-                                  ? 'border-blue-300 text-blue-500'
-                                  : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-300'
-                              }`}
-                            >
-                              {index + 1}
-                            </span>
-                            <span
-                              className={`flex-1 text-left leading-snug ${
-                                heading.level > 2
-                                  ? 'text-xs font-medium md:text-sm'
-                                  : 'text-sm font-semibold'
-                              }`}
-                            >
-                              {heading.text}
-                            </span>
-                          </a>
-                        </li>
-                      )
-                    })}
-                  </ol>
-                </nav>
-              </div>
-            ) : (
-              <p className="mt-4 text-sm text-gray-500 dark:text-gray-300">Headings will appear here as you scroll.</p>
-            )}
-          </section>
-
-          <section>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-300">
-              Related articles
-            </h2>
-            <div className="mt-4 space-y-4">
-              {relatedPosts.length === 0 && (
-                <p className="text-sm text-gray-500 dark:text-gray-300">More field notes are coming shortly.</p>
-              )}
-              {relatedPosts.slice(0, 4).map(relatedPost => (
-                <Link
-                  key={relatedPost.id}
-                  href={`/blog/${relatedPost.slug}`}
-                  className="block rounded-2xl border border-gray-200 bg-white/70 px-4 py-3 text-sm font-semibold text-gray-700 transition-all duration-200 hover:-translate-y-1 hover:border-blue-300 hover:text-blue-700 dark:border-gray-800 dark:bg-gray-900/60 dark:text-gray-100 dark:hover:border-blue-500 dark:hover:text-blue-200"
-                >
-                  <span className="block text-xs font-medium uppercase tracking-wide text-blue-500 dark:text-blue-300">
-                    {formatDate(relatedPost.created_at)}
-                  </span>
-                  <span className="mt-1 block text-base">{relatedPost.title}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        </aside>
-        )}
-
-        {/* Floating TOC for Mobile */}
-        {isClient && showFloatingTOC && totalHeadings > 0 && (
-          <div className="fixed bottom-6 right-6 z-50 lg:hidden">
-            <div className="relative">
-              {/* Floating TOC Toggle Button */}
-              <button
-                type="button"
-                onClick={() => setFloatingTOCOpen(prev => !prev)}
-                className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 ${
-                  floatingTOCOpen ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'
-                }`}
-                aria-label="Toggle table of contents"
-              >
-                <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
-                  {floatingTOCOpen ? (
-                    <path d="M18 6L6 18M6 6l12 12"/>
-                  ) : (
-                    <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-                  )}
-                </svg>
-                <div className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
-                  {totalHeadings}
-                </div>
-              </button>
-
-              {/* Floating TOC Panel */}
-              {floatingTOCOpen && (
-                <div className="absolute bottom-16 right-0 mb-2 w-80 max-w-[calc(100vw-3rem)] rounded-2xl bg-white/95 backdrop-blur-lg border border-gray-200/50 shadow-2xl dark:bg-gray-900/95 dark:border-gray-700/50 animate-in slide-in-from-bottom-2 duration-200">
-                <div className="p-4">
-                  {/* Progress Header */}
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="relative h-12 w-12">
-                        <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
-                          <circle
-                            cx="60"
-                            cy="60"
-                            r="54"
-                            fill="transparent"
-                            stroke="currentColor"
-                            strokeWidth="6"
-                            className="text-gray-200 dark:text-gray-700"
-                          />
-                          <circle
-                            cx="60"
-                            cy="60"
-                            r="54"
-                            fill="transparent"
-                            stroke="currentColor"
-                            strokeWidth="6"
-                            strokeDasharray={Math.PI * 2 * 54}
-                            strokeDashoffset={Math.PI * 2 * 54 * (1 - progress / 100)}
-                            className="text-blue-600 dark:text-blue-400"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-sm font-bold text-gray-900 dark:text-white">
-                            {roundedProgress}%
-                          </span>
-                        </div>
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
-                          Reading Progress
-                        </p>
-                        {estimatedTimeRemaining && (
-                          <p className="text-xs text-blue-600 dark:text-blue-300">
-                            {estimatedTimeRemaining}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Quick Navigation */}
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
-                    {headings.map((heading, index) => {
-                      const isActive = activeHeading === heading.id
-                      const isCompleted = activeHeadingIndex !== -1 && index < activeHeadingIndex
-
-                      return (
+                    return (
+                      <li key={heading.id} className="flex justify-center">
                         <a
-                          key={heading.id}
                           href={`#${heading.id}`}
-                          onClick={event => {
-                            scrollToHeading(heading.id, event, 'mobile-floating-toc')
-                            setFloatingTOCOpen(false)
-                          }}
-                          className={`flex items-center gap-3 p-3 rounded-xl transition-all duration-150 ${
+                          onClick={event => scrollToHeading(heading.id, event, 'floating-toc')}
+                          className={`group relative flex w-full max-w-[240px] items-center gap-3 rounded-2xl border px-4 py-3 transition-all duration-150 ${
                             isActive
-                              ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/50 dark:text-blue-100'
+                              ? 'border-blue-200 bg-blue-50/80 text-blue-700 shadow-sm dark:border-blue-500/60 dark:bg-blue-500/20 dark:text-blue-100'
                               : isCompleted
-                              ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-200'
-                              : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+                              ? 'border-blue-100/40 bg-blue-50/40 text-gray-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-gray-100'
+                              : 'border-transparent text-gray-600 hover:border-gray-200 hover:bg-gray-100 dark:text-gray-300 dark:hover:border-gray-700 dark:hover:bg-gray-800'
                           }`}
                         >
-                          <div
-                            className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                          <span
+                            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-semibold transition-colors ${
                               isActive
-                                ? 'bg-blue-600 text-white'
+                                ? 'border-blue-500 bg-blue-500 text-white'
                                 : isCompleted
-                                ? 'bg-green-500 text-white'
-                                : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                                ? 'border-blue-400 bg-blue-400/70 text-white'
+                                : isNext
+                                ? 'border-blue-300 text-blue-500'
+                                : 'border-gray-300 text-gray-500 dark:border-gray-600 dark:text-gray-300'
                             }`}
                           >
-                            {isCompleted ? '✓' : index + 1}
-                          </div>
-                          <span className="flex-1 text-sm font-medium leading-tight">
+                            {index + 1}
+                          </span>
+                          <span
+                            className={`flex-1 text-left leading-snug ${
+                              heading.level > 2 ? 'text-xs font-medium md:text-sm' : 'text-sm font-semibold'
+                            }`}
+                          >
                             {heading.text}
                           </span>
                         </a>
-                      )
-                    })}
+                      </li>
+                    )
+                  })}
+                </ol>
+              </nav>
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-gray-500 dark:text-gray-300">
+              Headings will appear here as you scroll.
+            </p>
+          )}
+        </section>
+      </aside>
+    )
+  }
+
+  const renderFloatingTOC = () => {
+    if (!isClient || !showFloatingTOC || totalHeadings === 0) {
+      return null
+    }
+
+    return (
+      <div className="fixed bottom-6 right-6 z-50 lg:hidden">
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setFloatingTOCOpen(prev => !prev)}
+            className={`flex h-14 w-14 items-center justify-center rounded-full text-white shadow-xl transition-all duration-200 hover:scale-110 focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-800 ${
+              floatingTOCOpen ? 'bg-purple-600 hover:bg-purple-700' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
+            aria-label="Toggle table of contents"
+          >
+            <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+              {floatingTOCOpen ? (
+                <path d="M18 6L6 18M6 6l12 12"/>
+              ) : (
+                <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+              )}
+            </svg>
+            <div className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs font-bold text-white">
+              {totalHeadings}
+            </div>
+          </button>
+
+          {floatingTOCOpen && (
+            <div className="absolute bottom-16 right-0 mb-2 w-80 max-w-[calc(100vw-3rem)] rounded-2xl border border-gray-200/50 bg-white/95 p-4 shadow-2xl backdrop-blur-lg animate-in slide-in-from-bottom-2 duration-200 dark:border-gray-700/50 dark:bg-gray-900/95">
+              <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-12 w-12">
+                    <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="54"
+                        fill="transparent"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        className="text-gray-200 dark:text-gray-700"
+                      />
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="54"
+                        fill="transparent"
+                        stroke="currentColor"
+                        strokeWidth="6"
+                        strokeDasharray={Math.PI * 2 * 54}
+                        strokeDashoffset={Math.PI * 2 * 54 * (1 - progress / 100)}
+                        className="text-blue-600 dark:text-blue-400"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-sm font-bold text-gray-900 dark:text-white">{roundedProgress}%</span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 dark:text-white">Reading Progress</p>
+                    {estimatedTimeRemaining && (
+                      <p className="text-xs text-blue-600 dark:text-blue-300">{estimatedTimeRemaining}</p>
+                    )}
                   </div>
                 </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+              </div>
 
+              <div className="max-h-64 space-y-2 overflow-y-auto">
+                {headings.map((heading, index) => {
+                  const isActive = activeHeading === heading.id
+                  const isCompleted = activeHeadingIndex !== -1 && index < activeHeadingIndex
+
+                  return (
+                    <a
+                      key={heading.id}
+                      href={`#${heading.id}`}
+                      onClick={event => {
+                        scrollToHeading(heading.id, event, 'mobile-floating-toc')
+                        setFloatingTOCOpen(false)
+                      }}
+                      className={`flex items-center gap-3 rounded-xl p-3 text-sm transition-all duration-150 ${
+                        isActive
+                          ? 'bg-blue-100 text-blue-900 dark:bg-blue-900/50 dark:text-blue-100'
+                          : isCompleted
+                          ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-200'
+                          : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      <div
+                        className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${
+                          isActive
+                            ? 'bg-blue-600 text-white'
+                            : isCompleted
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                        }`}
+                      >
+                        {isCompleted ? '✓' : index + 1}
+                      </div>
+                      <span className="flex-1 text-left font-medium leading-tight">{heading.text}</span>
+                    </a>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <div className="relative">
+      <div className={containerClasses}>
+        {desktopSidebar()}
+        {mainContent()}
+      </div>
+      {renderMobileSidebar()}
+      {renderFloatingTOC()}
     </div>
   )
 }
