@@ -13,7 +13,7 @@
   "endOfLine": "lf",
   "embeddedLanguageFormatting": "auto",
   "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindConfig": "./tailwind.config.ts",
+  "tailwindConfig": "./tailwind.config.js",
   "tailwindFunctions": ["clsx", "cn", "cva"],
   "overrides": [
     {

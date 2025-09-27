@@ -1,0 +1,418 @@
+---
+title: "How to Enroll Ubuntu 24.04 in Microsoft Intune"
+slug: "how-to-enroll-ubuntu-2404-in-microsoft-intune"
+excerpt: "Step-by-step guide to enroll Ubuntu 24.04 devices in Microsoft Intune for unified endpoint management across Windows, macOS, and Linux environments."
+date: "2025-09-27"
+author: "saulo-alves"
+category: "intune"
+tags: ["azure", "powershell"]
+featuredImage: "/images/posts/how-to-enroll-ubuntu-2404-in-microsoft-intune-cover.png"
+featured: false
+---
+
+import { Callout, TopicSection } from '@/components/mdx'
+
+## Overview
+
+Microsoft Intune now supports Linux device enrollment, allowing organizations to manage Ubuntu devices alongside Windows, macOS, and mobile devices from a single console. This comprehensive guide walks you through enrolling Ubuntu 24.04 LTS devices in Microsoft Intune, enabling unified endpoint management across your entire infrastructure.
+
+With Intune's Linux support, you can apply compliance policies, deploy applications, and monitor security status for Ubuntu devices, extending your zero-trust security model to Linux workstations and servers.
+
+<Callout type="important" title="Linux Support Requirements">
+Ubuntu 24.04 LTS is officially supported for Microsoft Intune enrollment. Ensure your devices meet the minimum system requirements and have active internet connectivity for the enrollment process.
+</Callout>
+
+## Prerequisites
+
+Before enrolling Ubuntu devices in Microsoft Intune, verify you have the required licensing, permissions, and system configurations in place.
+
+<TopicSection number={1} title="System Requirements">
+**Ubuntu Requirements:**
+- Ubuntu 24.04 LTS (recommended) or Ubuntu 22.04 LTS
+- 64-bit architecture (x86_64 or ARM64)
+- Minimum 2GB RAM and 10GB available disk space
+- Active internet connection
+
+**RedHat Enterprise Linux (RHEL) Requirements:**
+- RHEL 8.x or RHEL 9.x
+- 64-bit architecture
+- Subscription-manager configured
+- Active internet connection
+</TopicSection>
+
+<TopicSection number={2} title="Licensing and Permissions">
+**Required Licenses:**
+- Microsoft Intune Plan 1 or Plan 2
+- Microsoft Entra ID (Azure AD) Premium P1 or P2
+- Enterprise Mobility + Security (EMS) E3 or E5
+
+**Administrative Permissions:**
+- Intune Administrator or Global Administrator role
+- Device Enrollment Manager permissions
+- Ability to create and manage device groups
+</TopicSection>
+
+<TopicSection number={3} title="Network Configuration">
+**Required Endpoints:**
+- `*.manage.microsoft.com` - Intune service endpoints
+- `*.microsoftonline.com` - Authentication services
+- `*.windowsupdate.com` - Update services
+- `edge.microsoft.com` - Microsoft Edge repositories
+
+**Firewall Requirements:**
+- HTTPS (443) outbound access
+- DNS resolution for Microsoft services
+- Proxy configuration if applicable
+</TopicSection>
+
+## Step 1: Install Microsoft Edge
+
+Microsoft Edge is required for the Intune enrollment process on Linux devices. Install Edge using the official Microsoft repository.
+
+### Download and Install Microsoft Edge
+
+First, configure the Microsoft repository and install Microsoft Edge:
+
+```bash
+# Download the Microsoft GPG key
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+
+# Install the GPG key
+sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+
+# Add the Microsoft repository
+echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
+```
+
+<Callout type="tip" title="Repository Configuration">
+The Microsoft repository provides the latest stable version of Edge with automatic security updates. This ensures compatibility with Intune enrollment services.
+</Callout>
+
+### Update Package Lists and Install Edge
+
+```bash
+# Update package lists
+sudo apt update
+
+# Install Microsoft Edge
+sudo apt install microsoft-edge-stable
+
+# Verify installation
+microsoft-edge --version
+```
+
+## Step 2: Install Microsoft Intune App
+
+The Microsoft Intune app provides the enrollment interface and ongoing management capabilities for Linux devices.
+
+### Download and Install Intune App
+
+Download and install the Microsoft Intune application package:
+
+```bash
+# Navigate to Downloads directory
+cd ~/Downloads
+
+# Download the Intune app package
+wget https://github.com/microsoft/shell-intune-samples/raw/master/Linux/microsoft-intune-app_1.2024.709.2-1_amd64.deb
+
+# Install the Intune app
+sudo dpkg -i microsoft-intune-app_1.2024.709.2-1_amd64.deb
+
+# Fix any dependency issues if they occur
+sudo apt-get install -f
+```
+
+<Callout type="important" title="Package Verification">
+Always verify package integrity and authenticity when downloading from external sources. Check the official Microsoft documentation for the latest download links and checksums.
+</Callout>
+
+### Alternative Installation Method
+
+If the direct download method doesn't work, use the Microsoft repository:
+
+```bash
+# Add the Microsoft Intune repository
+echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/repos/microsoft-intune-app stable main" | sudo tee /etc/apt/sources.list.d/microsoft-intune-app.list
+
+# Update package lists
+sudo apt update
+
+# Install Microsoft Intune app
+sudo apt install microsoft-intune-app
+```
+
+## Step 3: Device Enrollment Process
+
+Begin the enrollment process using the Microsoft Intune app interface.
+
+### Launch Intune Enrollment
+
+Start the enrollment process from the command line or applications menu:
+
+```bash
+# Launch Microsoft Intune app
+microsoft-intune-app
+
+# Alternative: Launch from desktop environment
+# Applications → Internet → Microsoft Intune
+```
+
+### Enrollment Workflow
+
+<TopicSection number={1} title="Initial Authentication">
+1. **Open Microsoft Intune App**: Launch the application from the terminal or desktop
+2. **Select Enrollment Type**: Choose "Enroll this device" from the main interface
+3. **Enter Work Email**: Provide your organizational email address
+4. **Azure AD Authentication**: Complete multi-factor authentication if required
+5. **Accept Terms**: Review and accept the device management terms
+</TopicSection>
+
+<TopicSection number={2} title="Device Registration">
+**Organization Verification:**
+- Confirm your organization details
+- Verify the management server URL
+- Accept device compliance policies
+
+**Device Information:**
+- Set device name (optional customization)
+- Configure device category (if policies require)
+- Assign to device groups (automatic or manual)
+</TopicSection>
+
+<TopicSection number={3} title="Compliance Installation">
+**Security Agents:**
+- Install compliance monitoring components
+- Configure security baselines
+- Enable device encryption (if required)
+
+**Management Certificates:**
+- Download and install management certificates
+- Configure secure communication channels
+- Establish trust relationship with Intune
+</TopicSection>
+
+## Step 4: Verify Enrollment Success
+
+Confirm successful enrollment through both local verification and Intune admin center.
+
+### Local Verification Commands
+
+Check enrollment status directly on the Ubuntu device:
+
+```bash
+# Check Intune service status
+systemctl status microsoft-intune-app
+
+# Verify management certificates
+ls -la /opt/microsoft/intune/
+
+# Check enrollment logs
+journalctl -u microsoft-intune-app --since "1 hour ago"
+
+# Display device compliance status
+microsoft-intune-app --status
+```
+
+### Intune Admin Center Verification
+
+Verify enrollment in the Microsoft Intune admin center:
+
+1. **Navigate to Devices**: Go to `Devices` > `All devices`
+2. **Locate Ubuntu Device**: Search for your enrolled Ubuntu device
+3. **Check Compliance**: Verify compliance status shows "Compliant"
+4. **Review Properties**: Confirm device information and last check-in time
+
+<Callout type="tip" title="Enrollment Confirmation">
+Successful enrollment is indicated by the device appearing in the Intune admin center with "Compliant" status and recent check-in activity within the last 24 hours.
+</Callout>
+
+## Troubleshooting Common Issues
+
+Address common enrollment problems with these systematic troubleshooting steps.
+
+### Authentication Issues
+
+**Problem: Azure AD Authentication Fails**
+
+```bash
+# Clear authentication cache
+rm -rf ~/.config/microsoft-intune-app/
+
+# Reset Edge browser data
+rm -rf ~/.config/microsoft-edge/
+
+# Restart network services
+sudo systemctl restart NetworkManager
+
+# Retry enrollment
+microsoft-intune-app
+```
+
+**Solution Steps:**
+- Verify network connectivity to Microsoft services
+- Check corporate proxy or firewall settings
+- Ensure correct work email address format
+- Validate multi-factor authentication configuration
+
+### Installation Failures
+
+**Problem: Package Installation Errors**
+
+```bash
+# Fix broken dependencies
+sudo apt --fix-broken install
+
+# Update package cache
+sudo apt update && sudo apt upgrade
+
+# Clean package cache
+sudo apt autoclean && sudo apt autoremove
+
+# Reinstall Intune app
+sudo apt remove microsoft-intune-app
+sudo apt install microsoft-intune-app
+```
+
+### Connectivity Problems
+
+**Problem: Cannot Connect to Intune Services**
+
+```bash
+# Test connectivity to Intune endpoints
+curl -I https://enrollment.manage.microsoft.com
+
+# Check DNS resolution
+nslookup manage.microsoft.com
+
+# Test proxy configuration
+curl -I --proxy $http_proxy https://manage.microsoft.com
+
+# Verify firewall settings
+sudo ufw status
+```
+
+<Callout type="warning" title="Corporate Network Considerations">
+Corporate firewalls and proxy servers often require specific configuration for Intune communication. Work with your network team to ensure proper endpoint access.
+</Callout>
+
+## Best Practices for Linux Management
+
+Implement these best practices for effective Linux device management in Intune.
+
+### Security Configuration
+
+**Device Compliance Policies:**
+- Enable automatic security updates
+- Configure password complexity requirements
+- Implement device encryption policies
+- Set up conditional access rules
+
+**Application Management:**
+- Use approved software repositories only
+- Implement application allow/block lists
+- Monitor installed software compliance
+- Configure automatic security patches
+
+### Monitoring and Maintenance
+
+**Regular Health Checks:**
+
+```bash
+# Daily compliance verification
+microsoft-intune-app --check-compliance
+
+# Weekly enrollment status review
+microsoft-intune-app --sync
+
+# Monthly certificate renewal check
+openssl x509 -in /opt/microsoft/intune/cert.pem -text -noout
+```
+
+**Log Management:**
+
+```bash
+# Configure log rotation for Intune logs
+sudo logrotate -f /etc/logrotate.d/microsoft-intune-app
+
+# Monitor enrollment events
+sudo journalctl -f -u microsoft-intune-app
+
+# Export compliance reports
+microsoft-intune-app --export-logs /tmp/intune-logs.tar.gz
+```
+
+## Advanced Configuration Options
+
+Configure advanced settings for enterprise Linux deployment scenarios.
+
+### Bulk Enrollment Scripting
+
+Automate enrollment for multiple Ubuntu devices:
+
+```bash
+#!/bin/bash
+# bulk-enroll.sh - Automated Ubuntu Intune enrollment script
+
+# Configuration variables
+ORG_EMAIL="admin@company.com"
+ENROLLMENT_TOKEN="your-enrollment-token"
+
+# Pre-enrollment system preparation
+sudo apt update && sudo apt upgrade -y
+sudo apt install curl wget gnupg -y
+
+# Install Microsoft Edge and Intune app
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+sudo install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+
+echo "deb [arch=amd64,arm64,armhf signed-by=/etc/apt/trusted.gpg.d/microsoft.gpg] https://packages.microsoft.com/repos/edge stable main" | sudo tee /etc/apt/sources.list.d/microsoft-edge.list
+
+sudo apt update
+sudo apt install microsoft-edge-stable microsoft-intune-app -y
+
+# Automated enrollment (requires pre-configured authentication)
+microsoft-intune-app --enroll --email="$ORG_EMAIL" --token="$ENROLLMENT_TOKEN"
+
+echo "Enrollment initiated. Check Intune admin center for completion status."
+```
+
+### Group Policy Integration
+
+Configure Ubuntu devices to work with Windows-based group policies:
+
+```bash
+# Install policy management tools
+sudo apt install realmd sssd adcli packagekit -y
+
+# Join domain (if required)
+sudo realm join company.domain.com
+
+# Configure SSSD for policy enforcement
+sudo systemctl enable sssd
+sudo systemctl start sssd
+```
+
+## Related Resources
+
+Expand your Linux device management knowledge with these additional resources:
+
+- [Microsoft Intune Linux Support Documentation](https://learn.microsoft.com/en-us/mem/intune/user-help/enroll-device-linux)
+- [Ubuntu Enterprise Security Guide](https://ubuntu.com/security)
+- [Azure AD Device Management Best Practices](https://learn.microsoft.com/en-us/azure/active-directory/devices/)
+- [Intune Compliance Policies for Linux](https://learn.microsoft.com/en-us/mem/intune/protect/compliance-policy-create-linux)
+
+<Callout type="tip" title="Enrollment Complete">
+Your Ubuntu 24.04 device is now successfully enrolled in Microsoft Intune. You can manage compliance policies, deploy applications, and monitor security status alongside your Windows and macOS devices from the unified Intune admin center.
+</Callout>
+
+## Summary
+
+Ubuntu device enrollment in Microsoft Intune extends your endpoint management capabilities to Linux environments, providing:
+
+- **Unified Management**: Single console for Windows, macOS, and Linux devices
+- **Security Compliance**: Enforce security policies across all platforms
+- **Application Control**: Manage software deployment and updates
+- **Zero Trust Integration**: Include Linux devices in conditional access policies
+
+Regular monitoring and maintenance ensure optimal performance and security compliance for your Linux endpoints in the Microsoft ecosystem.
