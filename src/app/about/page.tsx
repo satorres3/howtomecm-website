@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'About - Saulo Alves Torres | Microsoft Technology Expert',
@@ -29,10 +30,13 @@ export default function AboutPage() {
             <div className="mb-8 animate-fade-in">
               <div className="relative inline-block">
                 <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-white/20 to-white/10 backdrop-blur rounded-full flex items-center justify-center border border-white/20 hover:scale-110 transition-transform duration-300">
-                  <img
+                  <Image
                     src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
                     alt="How to MeCM Logo"
+                    width={80}
+                    height={80}
                     className="w-20 h-20 object-contain rounded-full"
+                    priority
                   />
                 </div>
                 {/* Floating accent elements */}
@@ -77,13 +81,13 @@ export default function AboutPage() {
                 </h2>
                 <div className="space-y-4 text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
                   <p>
-                    Hi! I'm Saulo, a passionate Microsoft technology enthusiast with over 15 years of hands-on experience
+                    Hi! I&apos;m Saulo, a passionate Microsoft technology enthusiast with over 15 years of hands-on experience
                     in enterprise environments. My journey began with a curiosity about how technology could solve
                     real-world business challenges.
                   </p>
                   <p>
-                    Throughout my career, I've specialized in Microsoft Configuration Manager (MECM), Azure cloud
-                    technologies, and enterprise device management solutions. I've helped organizations of all sizes
+                    Throughout my career, I&apos;ve specialized in Microsoft Configuration Manager (MECM), Azure cloud
+                    technologies, and enterprise device management solutions. I&apos;ve helped organizations of all sizes
                     modernize their IT infrastructure and embrace cloud-first strategies.
                   </p>
                   <p>
@@ -97,9 +101,11 @@ export default function AboutPage() {
               <div className="relative animate-slide-right">
                 <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-800 dark:to-gray-700 rounded-2xl p-8 transform hover:scale-105 transition-transform duration-300">
                   <div className="text-center">
-                    <img
+                    <Image
                       src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
                       alt="How to MeCM Logo"
+                      width={80}
+                      height={80}
                       className="w-20 h-20 object-contain mx-auto mb-6 bg-white rounded-xl p-2"
                     />
                     <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How to MeCM</h3>
@@ -182,18 +188,17 @@ export default function AboutPage() {
         <div className="container mx-auto px-6">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
-              Let's Connect
+              Let&apos;s Connect
             </h2>
             <p className="text-xl text-blue-100 mb-12 leading-relaxed">
-              I'm always excited to connect with fellow IT professionals, share experiences, and collaborate on innovative solutions.
-              Whether you have questions about Microsoft technologies or want to discuss industry trends, I'd love to hear from you.
+              I&apos;m always excited to connect with fellow IT professionals, share experiences, and collaborate on innovative solutions.
+              Whether you have questions about Microsoft technologies or want to discuss industry trends, I&apos;d love to hear from you.
             </p>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-2xl mx-auto">
               <a
                 href="https://linkedin.com/in/sauloalvestorres"
                 target="_blank"
-                rel="noopener noreferrer"
                 rel="noopener noreferrer"
                 className="group bg-[#0077B5] hover:bg-[#005885] text-white p-8 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
               >
@@ -208,7 +213,6 @@ export default function AboutPage() {
                 href="https://youtube.com/@howtomecm"
                 target="_blank"
                 rel="noopener noreferrer"
-                rel="noopener noreferrer"
                 className="group bg-red-600 hover:bg-red-700 text-white p-8 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl"
               >
                 <svg className="w-12 h-12 mx-auto mb-4 group-hover:scale-110 transition-transform" fill="currentColor" viewBox="0 0 24 24">
@@ -220,7 +224,7 @@ export default function AboutPage() {
             </div>
 
             <div className="mt-12 text-blue-200 text-sm">
-              <p>💡 "Technology is best when it brings people together" - Let's build something amazing!</p>
+              <p>💡 &ldquo;Technology is best when it brings people together&rdquo; - Let&apos;s build something amazing!</p>
             </div>
           </div>
         </div>

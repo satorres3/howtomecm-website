@@ -2,6 +2,8 @@
 
 import React from 'react'
 import { SiteProvider } from '../contexts/SiteContext'
+import { SWRProvider } from './SWRProvider'
+import { LiveRegionProvider } from '../components/accessibility'
 import type { CompleteHomepageContent } from '../../types/homepage'
 import type { Post } from '../../types/content'
 
@@ -50,12 +52,16 @@ export function AppProviders({
   tags = []
 }: AppProvidersProps) {
   return (
-    <SiteProvider
-      initialSettings={siteSettings}
-      initialHomepageContent={homepageContent}
-      initialPreviewMode={isPreviewMode}
-    >
-      {children}
-    </SiteProvider>
+    <SWRProvider>
+      <LiveRegionProvider>
+        <SiteProvider
+          initialSettings={siteSettings}
+          initialHomepageContent={homepageContent}
+          initialPreviewMode={isPreviewMode}
+        >
+          {children}
+        </SiteProvider>
+      </LiveRegionProvider>
+    </SWRProvider>
   )
 }

@@ -1,0 +1,24 @@
+schema: 1
+story: 'unknown.blog-post-creation'
+gate: CONCERNS
+status_reason: 'Blog display system is well-implemented but lacks actual content creation/management functionality.'
+reviewer: 'Quinn'
+updated: '2025-01-27T22:30:00Z'
+top_issues:
+  - id: 'REQ-001'
+    severity: high
+    finding: 'No content creation interface - only demo content display exists'
+    suggested_action: 'Implement admin interface or markdown-based content creation system'
+  - id: 'ARCH-001'
+    severity: medium
+    finding: 'Database layer completely stubbed out for static export mode'
+    suggested_action: 'Decide on content management strategy: file-based, CMS, or hybrid approach'
+  - id: 'TEST-001'
+    severity: medium
+    finding: 'No tests for blog post creation workflow since it does not exist'
+    suggested_action: 'Add test coverage once content creation implementation is decided'
+  - id: 'DOC-001'
+    severity: low
+    finding: 'Content creation workflow not documented'
+    suggested_action: 'Document chosen content management approach and authoring workflow'
+waiver: { active: false }

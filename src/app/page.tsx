@@ -73,7 +73,7 @@ export default async function HomePage() {
     const categoriesResult = await ContentLibrary.getCategories(DOMAIN)
     const cmsCategories = categoriesResult.success ? (categoriesResult.data || []) : []
     const demoCategories = getDemoCategories()
-    const demoCategoryMap = new Map(demoCategories.map(category => [category.slug, category]))
+    const demoCategoryMap = new Map(demoCategories.map((category: any) => [category.slug, category]))
 
     const learningSource = (cmsCategories.length ? cmsCategories : demoCategories).slice(0, 3)
     const learningTracks = learningSource.map((category: any) => {
@@ -148,7 +148,7 @@ export default async function HomePage() {
 
     const postsResult = await ContentLibrary.getRecentPosts(DOMAIN, 5)
     const fetchedPosts: Post[] = postsResult.success ? (postsResult.data || []) : []
-    const recentPosts = getDemoPosts(5)
+    const recentPosts = getDemoPosts().slice(0, 5)
 
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -261,7 +261,7 @@ export default async function HomePage() {
                 </p>
               </div>
               <div className="grid gap-6 md:grid-cols-2">
-                {homepageContent.promotionalCards.map(card => {
+                {homepageContent.promotionalCards.map((card: any) => {
                   const isYoutubeCard = card.type === 'youtube' || /youtube\.com/i.test(card.url || '')
 
                   return (
@@ -284,6 +284,7 @@ export default async function HomePage() {
                             width={220}
                             height={220}
                             className="h-full w-full object-contain"
+                            priority
                           />
                         </div>
                       </div>

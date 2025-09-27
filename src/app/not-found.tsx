@@ -26,7 +26,7 @@ export default function NotFound() {
           </h2>
 
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-            The page you're looking for doesn't exist or may have been moved. This could be due to content not being available in our CMS or an incorrect URL.
+            The page you&apos;re looking for doesn&apos;t exist or may have been moved. This could be due to content not being available in our CMS or an incorrect URL.
           </p>
         </div>
 
@@ -59,7 +59,7 @@ export default function NotFound() {
 
         <div className="mt-8 pt-8 border-t border-gray-200 dark:border-gray-700">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Still can't find what you're looking for?{' '}
+            Still can&apos;t find what you&apos;re looking for?{' '}
             <Link href="/contact" className="text-blue-600 dark:text-blue-400 hover:underline">
               Contact us for help
             </Link>

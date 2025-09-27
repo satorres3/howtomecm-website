@@ -2,12 +2,13 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Header from '@/components/Header'
-import SkipToContentLink from '@/components/SkipToContentLink'
+import { SkipNavigation } from '@/components/accessibility/SkipLink'
 import PageTransition from '@/components/PageTransition'
 import DevOverlayFocusGuard from '@/components/DevOverlayFocusGuard'
 import { AppProviders } from '@/providers/AppProviders'
 import { ContentLibrary } from '../lib/content'
 import Footer from '@/components/Footer'
+import { WebVitals } from '@/components/WebVitals'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -23,6 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const tagline = siteSettings?.tagline || ''
 
   return {
+    metadataBase: new URL(`https://${DOMAIN}`),
     title: {
       template: `%s | ${siteName}`,
       default: tagline ? `${siteName} - ${tagline}` : siteName
@@ -94,10 +96,13 @@ export default async function RootLayout({
       </head>
       <body className={inter.className}>
         <AppProviders siteSettings={siteSettings}>
+          <WebVitals />
           <DevOverlayFocusGuard />
-          <SkipToContentLink />
+          <SkipNavigation />
           <Header />
-          <PageTransition>{children}</PageTransition>
+          <main id="main-content" role="main" aria-label="Main content">
+            <PageTransition>{children}</PageTransition>
+          </main>
           <Footer siteSettings={siteSettings} />
         </AppProviders>
       </body>

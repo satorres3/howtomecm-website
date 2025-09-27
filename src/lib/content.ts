@@ -1,6 +1,6 @@
 import { query, queryOne, select, selectOne, insert, withDatabaseErrorHandling } from './database'
-import type { Page, Post, ContentSection, SEOData, MediaFile } from '../types/content'
-import type { CompleteHomepageContent } from '../types/homepage'
+import type { Page, Post, ContentSection, SEOData, MediaFile } from '../../types/content'
+import type { CompleteHomepageContent } from '../../types/homepage'
 
 // CMS API Configuration
 const CMS_API_URL = process.env.CMS_API_URL || process.env.NEXT_PUBLIC_CMS_URL
@@ -62,7 +62,7 @@ export class ContentLibrary {
     }
 
     return withDatabaseErrorHandling(async () => {
-      const result = await select<MediaFile>('media_files', '*', { domain }, 'created_at DESC')
+      const result = await select<MediaFile>('media_files', '*', { domain })
 
       if (!result.success) {
         return createErrorResult(`Failed to fetch media files: ${result.error}`)
@@ -71,7 +71,7 @@ export class ContentLibrary {
       const mediaFiles = result.data || []
       setCache(cacheKey, mediaFiles)
       return createSuccessResult(mediaFiles)
-    }, 'getMediaFiles')
+    })
   }
 
   /**
@@ -100,7 +100,7 @@ export class ContentLibrary {
       const categories = result.data || []
       setCache(cacheKey, categories)
       return createSuccessResult(categories)
-    }, 'getCategories')
+    })
   }
 
   /**
@@ -115,7 +115,7 @@ export class ContentLibrary {
     }
 
     return withDatabaseErrorHandling(async () => {
-      const result = await select('tags', '*', {}, 'name ASC')
+      const result = await select('tags', '*', {})
 
       if (!result.success) {
         return createErrorResult(`Failed to fetch tags: ${result.error}`)
@@ -124,7 +124,7 @@ export class ContentLibrary {
       const tags = result.data || []
       setCache(cacheKey, tags)
       return createSuccessResult(tags)
-    }, 'getTags')
+    })
   }
 
   /**
@@ -153,7 +153,7 @@ export class ContentLibrary {
       const comments = result.data || []
       setCache(cacheKey, comments)
       return createSuccessResult(comments)
-    }, 'getComments')
+    })
   }
 
   /**
@@ -168,7 +168,7 @@ export class ContentLibrary {
     }
 
     return withDatabaseErrorHandling(async () => {
-      const result = await select('forms', '*', { domain }, 'created_at DESC')
+      const result = await select('forms', '*', { domain })
 
       if (!result.success) {
         return createErrorResult(`Failed to fetch forms: ${result.error}`)
@@ -177,7 +177,7 @@ export class ContentLibrary {
       const forms = result.data || []
       setCache(cacheKey, forms)
       return createSuccessResult(forms)
-    }, 'getForms')
+    })
   }
 
   /**
@@ -198,7 +198,7 @@ export class ContentLibrary {
       }
 
       return createSuccessResult(result.data)
-    }, 'submitForm')
+    })
   }
 
   /**
@@ -296,7 +296,7 @@ export class ContentLibrary {
       const pages = result.data || []
       setCache(cacheKey, pages)
       return createSuccessResult(pages)
-    }, 'getAllPages')
+    })
   }
 
   /**
@@ -349,7 +349,7 @@ export class ContentLibrary {
       const posts = result.data || []
       setCache(cacheKey, posts)
       return createSuccessResult(posts)
-    }, 'getAllPosts')
+    })
   }
 
   /**
@@ -394,7 +394,7 @@ export class ContentLibrary {
 
       setCache(cacheKey, result.data!)
       return createSuccessResult(result.data!)
-    }, 'getPageBySlug')
+    })
   }
 
   /**
@@ -447,7 +447,7 @@ export class ContentLibrary {
       const post = result.data[0]
       setCache(cacheKey, post)
       return createSuccessResult(post)
-    }, 'getPostBySlug')
+    })
   }
 
   /**
@@ -503,7 +503,7 @@ export class ContentLibrary {
       const posts = result.data || []
       setCache(cacheKey, posts)
       return createSuccessResult(posts)
-    }, 'getPostsByCategory')
+    })
   }
 
   /**
@@ -556,7 +556,7 @@ export class ContentLibrary {
       const posts = result.data || []
       setCache(cacheKey, posts)
       return createSuccessResult(posts)
-    }, 'getPostsByTag')
+    })
   }
 
   /**
@@ -620,7 +620,7 @@ export class ContentLibrary {
       const posts = result.data || []
       setCache(cacheKey, posts)
       return createSuccessResult(posts)
-    }, 'getRecentPosts')
+    })
   }
 
   /**
@@ -651,7 +651,7 @@ export class ContentLibrary {
 
       setCache(cacheKey, result.data!)
       return createSuccessResult(result.data!)
-    }, 'getSiteSettings')
+    })
   }
 
   /**
@@ -722,7 +722,7 @@ export class ContentLibrary {
       ].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
 
       return createSuccessResult(results)
-    }, 'searchContent')
+    })
   }
 
   /**
@@ -800,7 +800,7 @@ export class ContentLibrary {
       }
 
       return createSuccessResult(homepageContent)
-    }, 'getHomepageContent')
+    })
   }
 
   /**
@@ -843,7 +843,7 @@ export class ContentLibrary {
         }
 
         return createSuccessResult(homepageContent)
-      }, 'getHomepageContentWithPreview')
+      })
     }
 
     // Regular published content request

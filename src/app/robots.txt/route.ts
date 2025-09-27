@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+export const dynamic = 'force-static'
+export const revalidate = 3600 // 1 hour
+
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 const BASE_URL = `https://${DOMAIN}`
 

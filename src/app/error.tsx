@@ -28,7 +28,7 @@ export default function Error({ error, reset }: ErrorProps) {
           </h1>
 
           <p className="text-lg text-gray-600 dark:text-gray-400 mb-8">
-            We're having trouble loading the content. This could be due to a temporary issue with our content management system.
+            We&apos;re having trouble loading the content. This could be due to a temporary issue with our content management system.
           </p>
         </div>
 

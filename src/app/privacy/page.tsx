@@ -61,7 +61,7 @@ export default function PrivacyPage() {
               <div className="card-modern p-8 mb-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">Introduction</h2>
                 <p className="text-gray-600 leading-relaxed mb-4">
-                  How to MeCM ("we," "our," or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect,
+                  How to MeCM (&ldquo;we,&rdquo; &ldquo;our,&rdquo; or &ldquo;us&rdquo;) is committed to protecting your privacy. This Privacy Policy explains how we collect,
                   use, disclose, and safeguard your information when you visit our website or use our services.
                 </p>
                 <p className="text-gray-600 leading-relaxed">

@@ -5,6 +5,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Post } from '../../../types/content'
 import CommentSection from './CommentSection'
+import TagList from './TagList'
+import { sanitizeHtml } from '@/lib/sanitize'
 
 interface BlogPostContentProps {
   post: Post
@@ -209,10 +211,9 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
   const [isClient, setIsClient] = useState(false)
   const [contentEnhanced, setContentEnhanced] = useState(false)
 
-  // Process HTML content to add IDs to headings BEFORE rendering
-  const { processedHTML, headings: extractedHeadings } = useMemo(() => {
-    return addHeadingIdsToHTML(post.content)
-  }, [post.content])
+  // State for processed HTML to avoid hydration mismatch
+  const [processedHTML, setProcessedHTML] = useState(post.content || '')
+  const [extractedHeadings, setExtractedHeadings] = useState<HeadingItem[]>([])
   const [showFloatingTOC, setShowFloatingTOC] = useState(false)
   const [floatingTOCOpen, setFloatingTOCOpen] = useState(false)
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<string>('')
@@ -274,18 +275,19 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
   }, [post?.slug])
 
 
+  // Process HTML content on client side to avoid hydration mismatch
   useEffect(() => {
-    if (!isClient) return
+    if (!isClient || !post.content) return
 
-    // If we have extracted headings (client-side), use them
-    if (extractedHeadings.length > 0) {
-      setHeadings(extractedHeadings)
-    } else {
-      // Re-process on client side if needed
-      const clientResult = addHeadingIdsToHTML(post.content || '')
-      setHeadings(clientResult.headings)
-    }
-  }, [isClient, extractedHeadings, post.content])
+    // First sanitize the HTML content for security
+    const sanitizedContent = sanitizeHtml(post.content, 'blog')
+
+    // Then process for heading IDs and TOC
+    const result = addHeadingIdsToHTML(sanitizedContent)
+    setProcessedHTML(result.processedHTML)
+    setExtractedHeadings(result.headings)
+    setHeadings(result.headings)
+  }, [isClient, post.content])
 
   useEffect(() => {
     if (!isClient || contentEnhanced || typeof window === 'undefined') return
@@ -618,7 +620,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
       setShowFloatingTOC(showFloating)
 
       if (!headings.length) return
-      let current = headings[0].id
+      let current = headings[0]?.id || ''
 
       // CRITICAL FIX: Use article-scoped search for scroll tracking
       const articleElement = articleRef.current
@@ -645,7 +647,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
     return () => {
       events.forEach(([event, handler]) => window.removeEventListener(event, handler))
     }
-  }, [headings])
+  }, [headings, post.reading_time])
 
   // Keyboard navigation support
   useEffect(() => {
@@ -860,11 +862,12 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
       <div className={containerClasses}>
         <aside
           id="desktop-post-navigation"
-          aria-label="Article navigation"
+          aria-label="Article navigation and reading progress"
           aria-hidden={isSidebarCollapsed}
-          className={`space-y-8 rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-md backdrop-blur transition-all duration-500 ease-in-out dark:border-gray-800 dark:bg-gray-900/90 lg:sticky lg:top-28 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:sidebar-scroll ${
+          role="complementary"
+          className={`hidden space-y-8 rounded-2xl border border-gray-200 bg-white/90 p-6 shadow-md backdrop-blur transition-all duration-500 ease-in-out dark:border-gray-800 dark:bg-gray-900/90 lg:sticky lg:top-28 lg:max-h-[calc(100vh-140px)] lg:overflow-y-auto lg:sidebar-scroll ${
             isSidebarCollapsed
-              ? 'hidden lg:hidden lg:w-0 lg:min-w-0 lg:opacity-0 lg:scale-95 lg:translate-x-8'
+              ? 'lg:hidden lg:w-0 lg:min-w-0 lg:opacity-0 lg:scale-95 lg:translate-x-8'
               : 'lg:block lg:w-[320px] lg:min-w-[320px] lg:opacity-100 lg:scale-100 lg:translate-x-0'
           }`}
         >
@@ -893,18 +896,14 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
                 </div>
               </div>
 
-              {/* Reading Time and Article Metadata */}
+              {/* Article Navigation Metadata */}
               <div className="w-full space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
-                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                <div className="flex items-center justify-center text-xs text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-2">
                     <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                      <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
                     </svg>
-                    <span>{readingTimeLabel}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <span>{totalHeadings}</span>
-                    <span>sections</span>
+                    <span>{totalHeadings} sections</span>
                   </div>
                 </div>
 
@@ -996,9 +995,11 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
               className="flex items-center gap-4 rounded-2xl bg-gradient-to-r from-red-500 to-red-600 p-4 text-white transition-all duration-200 hover:from-red-600 hover:to-red-700 hover:shadow-lg hover:-translate-y-1 dark:from-red-600 dark:to-red-700 dark:hover:from-red-700 dark:hover:to-red-800"
             >
               <div className="flex h-16 w-16 items-center justify-center rounded-xl bg-white/15 backdrop-blur-sm shadow-lg">
-                <img
+                <Image
                   src="https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif"
                   alt="YouTube Channel"
+                  width={48}
+                  height={48}
                   className="h-12 w-12 rounded-lg object-contain"
                 />
               </div>
@@ -1034,33 +1035,6 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             </div>
           </section>
 
-          {(authorName !== 'How to MeCM Team' || authorBio) && (
-            <section className="border-t border-gray-200 pt-6 dark:border-gray-700">
-              <div className="flex items-center gap-3">
-                <div className="relative h-10 w-10">
-                  <Image
-                    src={authorAvatar}
-                    alt={authorName}
-                    fill
-                    sizes="40px"
-                    className="rounded-full object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div>
-                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400">By {authorName}</p>
-                  {authorRole && (
-                    <p className="text-xs text-gray-400 dark:text-gray-500">{authorRole}</p>
-                  )}
-                </div>
-              </div>
-              {authorBio && (
-                <p className="mt-3 text-xs leading-relaxed text-gray-500 dark:text-gray-400">
-                  {authorBio}
-                </p>
-              )}
-            </section>
-          )}
         </aside>
 
         <div className="space-y-12 transition-all duration-300 lg:min-w-0">
@@ -1070,67 +1044,12 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
               {/* Article Title and Metadata */}
               <header className="space-y-6">
                 <div className="flex flex-wrap items-center gap-3 text-sm">
-                  {(post.category || post.category_name) && (
-                    <span className="inline-flex items-center gap-2 rounded-full bg-purple-100/80 px-4 py-2 text-purple-700 font-medium dark:bg-purple-900/30 dark:text-purple-200">
-                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M7 7h10v3l4-4-4-4v3H7z"/>
-                      </svg>
-                      {post.category?.name || post.category_name}
+                  {post.category && (
+                    <span className="inline-flex items-center rounded-full bg-purple-100/80 px-4 py-2 text-purple-700 font-medium dark:bg-purple-900/30 dark:text-purple-200">
+                      {post.category.name}
                     </span>
                   )}
-                  {post.tags && post.tags.length > 0 && (
-                    <>
-                      {post.tags.slice(0, 3).map((tag: any) => {
-                        const getTagIcon = (tagName: string) => {
-                          switch (tagName.toLowerCase()) {
-                            case 'intune':
-                              return (
-                                <img
-                                  src="/images/icons/microsoft-intune.svg"
-                                  alt="Microsoft Intune"
-                                  className="h-3 w-3"
-                                />
-                              )
-                            case 'security':
-                              return (
-                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.4 15.4,18 14.8,18H9.2C8.6,18 8,17.4 8,16V13C8,12.4 8.6,11.5 9.2,11.5V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,10V11.5H13.5V10C13.5,8.7 12.8,8.2 12,8.2Z"/>
-                                </svg>
-                              )
-                            case 'microsoft graph':
-                              return (
-                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2M6.5 12.5L7.5 16.5L11.5 15.5L10.5 11.5L6.5 12.5M12.5 11.5L16.5 12.5L15.5 16.5L11.5 15.5L12.5 11.5Z"/>
-                                </svg>
-                              )
-                            default:
-                              return (
-                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M5.5 7A1.5 1.5 0 004 8.5v7A1.5 1.5 0 005.5 17h13a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0018.5 7h-13zM5.5 9h13v6.5h-13V9z"/>
-                                </svg>
-                              )
-                          }
-                        }
-                        return (
-                          <Link
-                            key={tag.id || tag.slug}
-                            href={`/blog?tag=${tag.slug}`}
-                            className="inline-flex items-center gap-1 rounded-full bg-blue-100/80 px-3 py-1.5 text-blue-700 font-medium transition-all duration-200 hover:bg-blue-200/80 hover:text-blue-800 dark:bg-blue-900/30 dark:text-blue-200 dark:hover:bg-blue-800/40 dark:hover:text-blue-100"
-                            title={`View posts tagged with ${tag.name}`}
-                          >
-                            {getTagIcon(tag.name)}
-                            {tag.name}
-                          </Link>
-                        )
-                      })}
-                    </>
-                  )}
-                  <span className="inline-flex items-center gap-2 rounded-full bg-gray-100/80 px-4 py-2 text-gray-700 font-medium dark:bg-gray-800/50 dark:text-gray-200">
-                    <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
-                    </svg>
-                    {readingTimeLabel}
-                  </span>
+                  {post.tags && post.tags.length > 0 && <TagList tags={post.tags} />}
                 </div>
 
                 <h1 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-4xl lg:text-5xl">
@@ -1144,45 +1063,67 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
                 )}
               </header>
 
-              {/* Author and Publication Info */}
-              <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between border-t border-gray-200/50 pt-6 dark:border-gray-700/30">
-                <div className="flex items-center gap-4">
-                  <div className="relative h-12 w-12 rounded-full overflow-hidden ring-2 ring-blue-100 dark:ring-blue-900/50">
-                    <Image
-                      src={authorAvatar}
-                      alt={authorName}
-                      fill
-                      sizes="48px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">{authorName}</p>
-                    {authorRole && (
-                      <p className="text-sm text-blue-600 dark:text-blue-300 font-medium">{authorRole}</p>
-                    )}
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Published {formatDate(post.created_at)}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                  {totalHeadings > 0 && (
-                    <div className="flex items-center gap-2">
-                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
-                      </svg>
-                      <span>{totalHeadings} sections</span>
+              {/* Author and Publication Info - Single Source of Truth */}
+              <div className="border-t border-gray-200/50 pt-6 dark:border-gray-700/30">
+                <div className="flex flex-col gap-6">
+                  {/* Author Information and Primary Metadata */}
+                  <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="relative h-12 w-12 rounded-full overflow-hidden ring-2 ring-blue-100 dark:ring-blue-900/50">
+                        <Image
+                          src={authorAvatar}
+                          alt={authorName}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-gray-900 dark:text-white">{authorName}</p>
+                        {authorRole && (
+                          <p className="text-sm text-blue-600 dark:text-blue-300 font-medium">{authorRole}</p>
+                        )}
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Published {formatDate(post.created_at)}
+                        </p>
+                      </div>
                     </div>
-                  )}
+
+                    {/* Article Metadata */}
+                    <div className="flex flex-wrap items-center gap-4 text-sm">
+                      <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
+                        </svg>
+                        <span>{readingTimeLabel}</span>
+                      </div>
+                      {totalHeadings > 0 && (
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                          </svg>
+                          <span>{totalHeadings} sections</span>
+                        </div>
+                      )}
+                      {post.view_count && post.view_count > 0 && (
+                        <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
+                          <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z"/>
+                          </svg>
+                          <span>{post.view_count} views</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Article Outline */}
-              {totalHeadings > 0 && (
-                <div className="rounded-2xl bg-white/60 p-6 border border-blue-100/50 dark:bg-gray-800/30 dark:border-blue-800/30">
+          {/* Article Outline */}
+          {totalHeadings > 0 && (
+            <div className="rounded-2xl bg-white/60 p-6 border border-blue-100/50 dark:bg-gray-800/30 dark:border-blue-800/30">
                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
                     <svg className="h-5 w-5 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                       <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
@@ -1236,86 +1177,6 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             </div>
           </div>
 
-          {/* Blog Post Header */}
-          <div data-testid="blog-post-metadata" className="space-y-6">
-            <div className="space-y-4">
-              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
-                {post.category && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-blue-600 dark:bg-blue-500/20 dark:text-blue-200">
-                    {post.category.name}
-                  </span>
-                )}
-
-                {post.tags && post.tags.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2">
-                    {post.tags.map(tag => {
-                      const getTagIcon = (tagName: string) => {
-                        switch (tagName.toLowerCase()) {
-                          case 'intune':
-                            return (
-                              <img
-                                src="/images/icons/microsoft-intune.svg"
-                                alt="Microsoft Intune"
-                                className="h-3 w-3"
-                              />
-                            )
-                          case 'security':
-                            return (
-                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.4 15.4,18 14.8,18H9.2C8.6,18 8,17.4 8,16V13C8,12.4 8.6,11.5 9.2,11.5V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,10V11.5H13.5V10C13.5,8.7 12.8,8.2 12,8.2Z"/>
-                              </svg>
-                            )
-                          default:
-                            return (
-                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M5.5,9A1.5,1.5 0 0,0 7,7.5A1.5,1.5 0 0,0 5.5,6A1.5,1.5 0 0,0 4,7.5A1.5,1.5 0 0,0 5.5,9M17.41,11.58C17.77,11.94 18,12.44 18,13C18,13.56 17.77,14.06 17.41,14.42L12.41,19.42C12.05,19.78 11.55,20 11,20C10.45,20 9.95,19.78 9.59,19.42L2.59,12.42C2.22,12.05 2,11.55 2,11V4C2,2.89 2.89,2 4,2H11C11.55,2 12.05,2.22 12.42,2.59L19.42,9.59C19.78,9.95 20,10.45 20,11C20,11.55 19.78,12.05 19.42,12.42L17.41,11.58Z"/>
-                              </svg>
-                            )
-                        }
-                      }
-
-                      return (
-                        <Link
-                          key={tag.slug}
-                          href={`/blog?tag=${tag.slug}`}
-                          className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-600 hover:bg-gray-200 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-                        >
-                          {getTagIcon(tag.slug)}
-                          {tag.name}
-                        </Link>
-                      )
-                    })}
-                  </div>
-                )}
-
-                <span className="flex items-center gap-1">
-                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22C6.47,22 2,17.5 2,12A10,10 0 0,1 12,2M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
-                  </svg>
-                  {readingTimeLabel}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 pt-2">
-                <div className="relative h-10 w-10">
-                  <Image
-                    src={authorAvatar}
-                    alt={authorName}
-                    fill
-                    sizes="40px"
-                    className="rounded-full object-cover"
-                    unoptimized
-                  />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">{authorName}</p>
-                  {authorRole && (
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{authorRole}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
 
           <article
             ref={articleRef}
@@ -1333,56 +1194,6 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             </p>
           )}
 
-          {post.tags && Array.isArray(post.tags) && post.tags.length > 0 && (
-            <footer className="not-prose mt-10 border-t border-gray-200 pt-6 dark:border-gray-700">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Tags</p>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {post.tags.map(tag => {
-                  const getTagIcon = (tagName: string) => {
-                    switch (tagName.toLowerCase()) {
-                      case 'intune':
-                        return (
-                          <img
-                            src="/images/icons/microsoft-intune.svg"
-                            alt="Microsoft Intune"
-                            className="h-3 w-3"
-                          />
-                        )
-                      case 'security':
-                        return (
-                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12,1L3,5V11C3,16.55 6.84,21.74 12,23C17.16,21.74 21,16.55 21,11V5L12,1M12,7C13.4,7 14.8,8.6 14.8,10V11.5C15.4,11.5 16,12.4 16,13V16C16,17.4 15.4,18 14.8,18H9.2C8.6,18 8,17.4 8,16V13C8,12.4 8.6,11.5 9.2,11.5V10C9.2,8.6 10.6,7 12,7M12,8.2C11.2,8.2 10.5,8.7 10.5,10V11.5H13.5V10C13.5,8.7 12.8,8.2 12,8.2Z"/>
-                          </svg>
-                        )
-                      case 'microsoft graph':
-                        return (
-                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2M6.5 12.5L7.5 16.5L11.5 15.5L10.5 11.5L6.5 12.5M12.5 11.5L16.5 12.5L15.5 16.5L11.5 15.5L12.5 11.5Z"/>
-                          </svg>
-                        )
-                      default:
-                        return (
-                          <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M5.5 7A1.5 1.5 0 004 8.5v7A1.5 1.5 0 005.5 17h13a1.5 1.5 0 001.5-1.5v-7A1.5 1.5 0 0018.5 7h-13zM5.5 9h13v6.5h-13V9z"/>
-                          </svg>
-                        )
-                    }
-                  }
-                  return (
-                    <Link
-                      key={tag.id || tag.slug}
-                      href={`/blog?tag=${tag.slug}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-600 transition-all duration-200 hover:bg-blue-100 hover:text-blue-700 dark:bg-blue-500/20 dark:text-blue-200 dark:hover:bg-blue-500/30 dark:hover:text-blue-100"
-                      title={`View posts tagged with ${tag.name}`}
-                    >
-                      {getTagIcon(tag.name)}
-                      {tag.name}
-                    </Link>
-                  )
-                })}
-              </div>
-            </footer>
-          )}
           </article>
 
           <div className="not-prose rounded-3xl bg-white/80 p-8 shadow-xl backdrop-blur dark:bg-gray-900/90">
@@ -1472,11 +1283,13 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
 
           <CommentSection postId={post.id} />
         </div>
+        )}
 
-        <aside
-          className="space-y-10 rounded-3xl border border-gray-200 bg-white/75 p-8 shadow-lg backdrop-blur transition-shadow duration-200 dark:border-gray-800 dark:bg-gray-900/80 lg:hidden"
-          aria-label="Article navigation"
-        >
+        {isClient && totalHeadings > 0 && !showFloatingTOC && (
+          <aside
+            className="block space-y-10 rounded-3xl border border-gray-200 bg-white/75 p-8 shadow-lg backdrop-blur transition-shadow duration-200 dark:border-gray-800 dark:bg-gray-900/80 lg:hidden"
+            aria-label="Article navigation"
+          >
 
           <section data-testid="table-of-contents">
             <div className="flex flex-col items-center gap-1 text-center">
@@ -1580,6 +1393,7 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
             </div>
           </section>
         </aside>
+        )}
 
         {/* Floating TOC for Mobile */}
         {isClient && showFloatingTOC && totalHeadings > 0 && (
@@ -1703,88 +1517,6 @@ export default function BlogPostContent({ post, relatedPosts }: BlogPostContentP
           </div>
         )}
 
-        {/* Fixed Reading Progress Bar */}
-        {isClient && progress > 0 && (
-          <div className="fixed top-0 left-0 right-0 z-40 h-1 bg-gray-200 dark:bg-gray-800">
-            <div
-              className="h-full bg-gradient-to-r from-blue-600 to-purple-600 transition-all duration-300 ease-out"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        )}
-
-        {/* Keyboard Shortcuts Help */}
-        {showKeyboardHelp && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-            <div className="mx-4 max-w-md rounded-2xl bg-white p-6 shadow-2xl dark:bg-gray-900">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  Keyboard Shortcuts
-                </h3>
-                <button
-                  onClick={() => setShowKeyboardHelp(false)}
-                  className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
-                  aria-label="Close keyboard shortcuts"
-                >
-                  <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18 6L6 18M6 6l12 12"/>
-                  </svg>
-                </button>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-300">Next section</span>
-                  <kbd className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">
-                    Ctrl+J
-                  </kbd>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-300">Previous section</span>
-                  <kbd className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">
-                    Ctrl+K
-                  </kbd>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-300">Toggle TOC</span>
-                  <kbd className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">
-                    Ctrl+T
-                  </kbd>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-300">Show help</span>
-                  <kbd className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">
-                    ?
-                  </kbd>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-700 dark:text-gray-300">Close panels</span>
-                  <kbd className="rounded bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-200">
-                    Esc
-                  </kbd>
-                </div>
-              </div>
-              <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-                These shortcuts work when no input field is focused.
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Quick Action Toolbar */}
-        {isClient && progress > 10 && (
-          <div className="fixed bottom-6 left-6 z-40 hidden lg:flex items-center gap-2">
-            <button
-              onClick={() => setShowKeyboardHelp(true)}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-900/80 text-white shadow-lg backdrop-blur transition-all duration-200 hover:bg-gray-900 hover:scale-110 dark:bg-white/80 dark:text-gray-900 dark:hover:bg-white"
-              aria-label="Show keyboard shortcuts"
-              title="Keyboard shortcuts (?)"
-            >
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M11,5H13V9H11V5M9,7H11V9H9V7M13,7H15V9H13V7M17,7H19V9H17V7M7,7H9V9H7V7M17,11H19V13H17V11M7,11H9V13H7V11M13,15H15V17H13V15M9,15H11V17H9V15M11,11H13V13H11V11M3,3V21H21V3H3M5,5H19V19H5V5Z"/>
-              </svg>
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )

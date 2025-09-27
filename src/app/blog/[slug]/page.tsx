@@ -10,6 +10,14 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string }>
 }
 
+export async function generateStaticParams() {
+  // Generate static params for all demo posts
+  const demoPosts = getDemoPosts()
+  return demoPosts.map((post) => ({
+    slug: post.slug,
+  }))
+}
+
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
   const { slug } = await params

@@ -45,7 +45,7 @@ export default function ContactPage() {
             {/* Contact Information */}
             <div className="animate-slide-up">
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-8">
-                Let's discuss your project
+                Let&apos;s discuss your project
               </h2>
               <div className="space-y-8">
                 <div className="card-modern dark:bg-slate-900 dark:border-slate-800 p-6 hover:shadow-xl transition-all duration-300 group">
@@ -58,7 +58,7 @@ export default function ContactPage() {
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3 group-hover:text-blue-400 transition-colors duration-300">Email us</h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
-                        Send us a detailed message about your project requirements and we'll get back to you within 24 hours.
+                        Send us a detailed message about your project requirements and we&apos;ll get back to you within 24 hours.
                       </p>
                       <a href="mailto:contact@howtomecm.com" className="inline-flex items-center text-blue-600 hover:text-blue-400 font-semibold transition-colors duration-200 group-hover:translate-x-2">
                         contact@howtomecm.com
@@ -109,7 +109,7 @@ export default function ContactPage() {
                   Send us a message
                 </h2>
                 <p className="text-gray-600 dark:text-gray-300">
-                  Tell us about your project and we'll get back to you within 24 hours.
+                  Tell us about your project and we&apos;ll get back to you within 24 hours.
                 </p>
               </div>
 

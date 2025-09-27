@@ -1,9 +1,15 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["dom", "dom.iterable", "es6"],
+    // Performance optimizations
+    "target": "es2020", // Updated from ES5 for better performance and modern browser support
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "es2020", // Updated from ES6 to include modern features
+      "webworker"
+    ],
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true, // Performance: Skip type checking of declaration files
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -12,16 +18,60 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true,
+    "incremental": true, // Performance: Enable incremental compilation
+
+    // Additional strict checks for better code quality (can be gradually enabled)
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+
+    // Performance optimizations
+    "assumeChangesOnlyAffectDirectDependencies": true,
+
+    // Modern TypeScript features
+    "useDefineForClassFields": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/lib/*": [
+        "./src/lib/*"
+      ],
+      "@/components/*": [
+        "./src/components/*"
+      ]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "scripts/**/*"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "next-env.d.ts",
+    "out/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "scripts/**/*",
+    ".next",
+    "out",
+    "dist",
+    "build"
+  ],
+  // TypeScript 5.0+ project references for better performance
+  "ts-node": {
+    "esm": true
+  }
 }

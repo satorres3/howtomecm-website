@@ -1,20 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ContentLibrary } from '../../lib/content'
+import { getDemoPosts } from '../../lib/demoContent'
 import type { RSSItem } from '../../../types/content'
+
+export const dynamic = 'force-static'
+export const revalidate = 3600 // 1 hour
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 const BASE_URL = `https://${DOMAIN}`
 
 export async function GET(): Promise<NextResponse> {
   try {
-    // Fetch site settings and posts
-    const [settingsResult, postsResult] = await Promise.all([
-      ContentLibrary.getSiteSettings(DOMAIN),
-      ContentLibrary.getAllPosts(DOMAIN)
-    ])
-
-    const settings = settingsResult.success ? settingsResult.data : null
-    const posts = postsResult.success ? postsResult.data || [] : []
+    // Use demo content for static export
+    const posts = getDemoPosts()
+    const settings = {
+      site_name: 'How to MeCM',
+      description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
+      author: 'How to MeCM Team'
+    }
 
     // Create RSS items from posts
     const rssItems: RSSItem[] = posts.slice(0, 20).map(post => ({

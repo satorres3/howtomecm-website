@@ -27,7 +27,7 @@ const DEFAULT_FALLBACKS = [
 ]
 
 export default function BlogCard({ post, fallbackImages = DEFAULT_FALLBACKS, index = 0 }: BlogCardProps) {
-  const imageSrc = post.featured_image || fallbackImages[index % fallbackImages.length]
+  const imageSrc: string = post.featured_image || fallbackImages[index % fallbackImages.length] || DEFAULT_FALLBACKS[0]!
   const readingTime = post.reading_time ? `${post.reading_time} min read` : null
 
   return (
@@ -47,9 +47,9 @@ export default function BlogCard({ post, fallbackImages = DEFAULT_FALLBACKS, ind
           />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent opacity-80 transition-opacity duration-300 group-hover:opacity-60" aria-hidden="true" />
-        {post.category_name && (
+        {post.category?.name && (
           <span className="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-900 shadow-lg backdrop-blur">
-            {post.category_name}
+            {post.category.name}
           </span>
         )}
       </div>

@@ -1,20 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { ContentLibrary } from '../../lib/content'
+import { getDemoPosts } from '../../lib/demoContent'
 import type { SitemapEntry } from '../../../types/content'
+
+export const dynamic = 'force-static'
+export const revalidate = 3600 // 1 hour
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 const BASE_URL = `https://${DOMAIN}`
 
 export async function GET(): Promise<NextResponse> {
   try {
-    // Fetch all published content
-    const [pagesResult, postsResult] = await Promise.all([
-      ContentLibrary.getAllPages(DOMAIN),
-      ContentLibrary.getAllPosts(DOMAIN)
-    ])
-
-    const pages = pagesResult.success ? pagesResult.data || [] : []
-    const posts = postsResult.success ? postsResult.data || [] : []
+    // Use demo content for static export
+    const posts = getDemoPosts()
+    const pages = [
+      { slug: 'about', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      { slug: 'contact', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+      { slug: 'privacy', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+    ]
 
     // Create sitemap entries
     const sitemapEntries: SitemapEntry[] = []

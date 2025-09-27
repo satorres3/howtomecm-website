@@ -1,34 +1,21 @@
 import { Metadata } from 'next'
 import Link from 'next/link'
+import { Suspense } from 'react'
 import { ContentLibrary } from '../../lib/content'
 import type { Post } from '../../../types/content'
 import BlogCard from '@/components/blog/BlogCard'
 import { getDemoPosts, getDemoCategories } from '../../lib/demoContent'
+import BlogClientFilter from '@/components/blog/BlogClientFilter'
 
 export const metadata: Metadata = {
   title: 'Blog - How to MeCM',
   description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
 }
 
-interface BlogPageProps {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>
-}
-
-function resolveTestState(params: Record<string, string | string[] | undefined> | undefined, key: string) {
-  const raw = params?.[key]
-  if (!raw) return undefined
-  return Array.isArray(raw) ? raw[0] : raw
-}
-
-export default async function BlogPage({ searchParams }: BlogPageProps) {
+export default async function BlogPage() {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
   try {
-    const resolvedSearchParams = searchParams ? await searchParams : undefined
-    const forcedState = resolveTestState(resolvedSearchParams, 'testState')
-    const activeCategorySlug = resolveTestState(resolvedSearchParams, 'category')
-    const activeTagSlug = resolveTestState(resolvedSearchParams, 'tag')
-
     const postsResult = await ContentLibrary.getAllPosts(DOMAIN)
     const fetchedPosts: Post[] = postsResult.success ? (postsResult.data || []) : []
     const demoPosts = getDemoPosts()
@@ -39,13 +26,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     }
 
     // Use demo posts by default to ensure consistency with homepage
-    // Only show empty state if explicitly forced via testState parameter
-    let posts: Post[] = forcedState === 'empty' ? [] : demoPosts
+    const posts: Post[] = demoPosts
 
     const categoriesResult = await ContentLibrary.getCategories(DOMAIN)
     const cmsCategories = categoriesResult.success ? (categoriesResult.data || []) : []
     const demoCategories = getDemoCategories()
-    const categoryMap = new Map(demoCategories.map(category => [category.slug, category]))
+    const categoryMap = new Map(demoCategories.map((category: any) => [category.slug, category]))
 
     const categoryList = (cmsCategories.length ? cmsCategories : demoCategories).map((category: any) => {
       const enhancement = categoryMap.get(category.slug)
@@ -56,26 +42,11 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
       }
     })
 
-    if (activeCategorySlug) {
-      posts = posts.filter(post => {
-        const slug = (post as any).category_slug || post.category?.slug
-        return slug === activeCategorySlug
-      })
-    }
-
-    if (activeTagSlug) {
-      posts = posts.filter(post => {
-        if (!post.tags || !Array.isArray(post.tags)) return false
-        return post.tags.some((tag: any) => tag.slug === activeTagSlug)
-      })
-    }
-
     const siteSettingsResult = await ContentLibrary.getSiteSettings(DOMAIN)
     const siteSettings = siteSettingsResult.success ? siteSettingsResult.data : null
 
-    const heroTitle = resolveTestState(resolvedSearchParams, 'heroTitle') || 'Latest insights from the How to MeCM team'
-    const heroSubtitle = resolveTestState(resolvedSearchParams, 'heroSubtitle') ||
-      'Deep dives, configuration walkthroughs, and battle-tested guidance for Microsoft Endpoint Configuration Manager, Intune, Azure, and the modern workplace.'
+    const heroTitle = 'Latest insights from the How to MeCM team'
+    const heroSubtitle = 'Deep dives, configuration walkthroughs, and battle-tested guidance for Microsoft Endpoint Configuration Manager, Intune, Azure, and the modern workplace.'
 
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -116,68 +87,27 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             </div>
           </section>
 
-          <section className="container-modern space-y-16">
-            {categoryList.length > 0 && (
-              <nav aria-label="Filter posts by category" className="flex flex-wrap items-center gap-3">
-                <Link
-                  href="/blog"
-                  className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition-colors duration-200 sm:text-sm ${
-                    !activeCategorySlug
-                      ? 'border-blue-500 bg-blue-50 text-blue-600 dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-200'
-                      : 'border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'
-                  }`}
-                >
-                  All field notes
-                </Link>
-                {categoryList.map(category => (
-                  <Link
-                    key={category.slug ?? category.id}
-                    href={`/blog?category=${category.slug}`}
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] transition-colors duration-200 sm:text-sm ${
-                      activeCategorySlug === category.slug
-                        ? 'border-blue-500 bg-blue-50 text-blue-600 dark:border-blue-500 dark:bg-blue-500/20 dark:text-blue-200'
-                        : 'border-gray-200 text-gray-700 hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800'
-                    }`}
-                  >
-                    <span aria-hidden="true">{category.icon ?? '📘'}</span>
-                    {category.name}
-                  </Link>
-                ))}
-              </nav>
-            )}
-
-            <section id="latest" data-testid="blog-posts" className="space-y-10">
-              <header className="text-center">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
-                  Featured articles
-                </h2>
-                <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600 dark:text-gray-300 sm:text-base">
-                  Curated guidance, migration notes, and operational checklists for enterprise endpoint teams.
-                </p>
-              </header>
-
-              {posts.length > 0 ? (
+          {/* Client-side filtering component */}
+          <Suspense fallback={
+            <div className="container-modern">
+              <div className="animate-pulse space-y-8">
+                <div className="flex flex-wrap gap-3">
+                  <div className="h-8 w-24 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                  <div className="h-8 w-32 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                  <div className="h-8 w-28 bg-gray-200 rounded-full dark:bg-gray-700"></div>
+                </div>
                 <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-3 xl:gap-12">
-                  {posts.map((post, index) => (
-                    <BlogCard key={post.id} post={post} index={index} />
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="bg-gray-200 h-96 rounded-lg dark:bg-gray-700"></div>
                   ))}
                 </div>
-              ) : (
-                <div className="rounded-3xl border border-gray-200 bg-white p-12 text-center text-gray-600 shadow-lg dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300">
-                  <h3 className="text-2xl font-semibold text-gray-900 dark:text-white">No posts published yet</h3>
-                  <p className="mt-4 text-base">
-                    We're curating fresh field notes right now. Subscribe to the newsletter or check back soon for the next deep dive.
-                  </p>
-                  <Link
-                    href="/contact"
-                    className="mt-6 inline-flex items-center rounded-full bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-1 dark:bg-white dark:text-gray-900"
-                  >
-                    Get notified when we publish
-                  </Link>
-                </div>
-              )}
-            </section>
+              </div>
+            </div>
+          }>
+            <BlogClientFilter posts={posts} categories={categoryList} />
+          </Suspense>
 
+          <section className="container-modern">
             <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white px-8 py-12 shadow-xl transition-transform duration-200 hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-900">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-600/10 via-purple-500/10 to-transparent" aria-hidden="true" />
               <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
