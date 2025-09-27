@@ -1,55 +1,32 @@
 import type { Post } from '../../types/content'
 import type { SiteSettings } from '@/types/site'
 
-import { demoPosts, demoCategories } from './demoContent'
+import { demoPosts } from './demoContent'
+import {
+  loadAboutPageContent,
+  loadBlogPageContent,
+  loadCategories as loadCategoryConfig,
+  loadContactPageContent,
+  loadFooterContent,
+  loadHomepageContent,
+  loadNavigation,
+  loadSiteSettings,
+  loadTags as loadTagConfig,
+} from './site-content'
+import type {
+  AboutPageContent,
+  BlogPageContent,
+  ContactPageContent,
+  FooterContent,
+  HomepageContent,
+  SiteNavigationConfig,
+} from '@/types/site-content'
 
 const DEFAULT_DOMAIN = 'staging.howtomecm.com'
 
 export type ContentResult<T> =
   | { success: true; data: T; error: null }
   | { success: false; data: null; error: string }
-
-const staticSiteSettings: SiteSettings = {
-  domain: DEFAULT_DOMAIN,
-  site_name: 'How to MeCM',
-  tagline: 'Endpoint management knowledge hub',
-  description:
-    'Deep technical guides, lab notes, and deployment experiments for Microsoft endpoint administrators.',
-  logo: {
-    url: '/images/branding/portal-logo.svg',
-    alt: 'How to MeCM logo',
-    width: 56,
-    height: 56
-  },
-  colors: {
-    primary: '#0ea5e9',
-    secondary: '#6366f1'
-  },
-  social_links: {
-    youtube: 'https://youtube.com/@howtomecm',
-    linkedin: 'https://linkedin.com/in/sauloalvestorres'
-  },
-  author: 'How to MeCM Team',
-  keywords: [
-    'Microsoft Intune',
-    'Microsoft Endpoint Manager',
-    'Configuration Manager',
-    'Device management'
-  ]
-}
-
-const staticHomepageContent = {
-  welcome: {
-    mainHeading: 'Endpoint management knowledge center',
-    subtitle:
-      'Hands-on guides, lab notes, and deployment experiments for Microsoft endpoint administrators.'
-  },
-  seo: {
-    pageTitle: 'How to MeCM – Endpoint management knowledge hub',
-    metaDescription:
-      'Deep technical guides, walkthroughs, and community resources for Microsoft endpoint teams.'
-  }
-}
 
 function normalizeDomain(domain: string | undefined): string {
   return (domain || DEFAULT_DOMAIN).trim().toLowerCase()
@@ -95,24 +72,61 @@ async function getRecentPosts(domain: string, limit: number = 5): Promise<Conten
 
 async function getCategories(domain: string) {
   const normalizedDomain = normalizeDomain(domain)
-  const categories = demoCategories.filter(category => normalizeDomain(category.website_domain) === normalizedDomain)
+  const categories = loadCategoryConfig().filter(category =>
+    !category.website_domain || normalizeDomain(category.website_domain) === normalizedDomain
+  )
   return success(categories)
 }
 
-async function getSiteSettings(domain: string): Promise<ContentResult<SiteSettings>> {
+async function getTags(domain: string) {
   const normalizedDomain = normalizeDomain(domain)
-  if (normalizedDomain !== normalizeDomain(staticSiteSettings.domain)) {
-    return failure(`Unknown domain: ${domain}`)
-  }
-  return success(staticSiteSettings)
+  const tags = loadTagConfig().filter(tag =>
+    !tag.website_domain || normalizeDomain(tag.website_domain) === normalizedDomain
+  )
+  return success(tags)
 }
 
-async function getHomepageContentWithFallback(domain: string) {
+async function getSiteSettings(domain: string): Promise<ContentResult<SiteSettings>> {
+  const siteSettings = loadSiteSettings()
   const normalizedDomain = normalizeDomain(domain)
+  if (normalizeDomain(siteSettings.domain) !== normalizedDomain) {
+    return failure(`Unknown domain: ${domain}`)
+  }
+
+  return success(siteSettings)
+}
+
+async function getHomepageContentWithFallback(
+  domain: string
+): Promise<ContentResult<HomepageContent>> {
+  const normalizedDomain = normalizeDomain(domain)
+  const homepage = loadHomepageContent()
+
   if (normalizedDomain !== normalizeDomain(DEFAULT_DOMAIN)) {
     return failure(`Unknown domain: ${domain}`)
   }
-  return success(staticHomepageContent)
+
+  return success(homepage)
+}
+
+async function getBlogPageContent(): Promise<ContentResult<BlogPageContent>> {
+  return success(loadBlogPageContent())
+}
+
+async function getAboutPageContent(): Promise<ContentResult<AboutPageContent>> {
+  return success(loadAboutPageContent())
+}
+
+async function getContactPageContent(): Promise<ContentResult<ContactPageContent>> {
+  return success(loadContactPageContent())
+}
+
+async function getFooterContent(): Promise<ContentResult<FooterContent>> {
+  return success(loadFooterContent())
+}
+
+async function getNavigation(): Promise<ContentResult<SiteNavigationConfig>> {
+  return success(loadNavigation())
 }
 
 export const ContentLibrary = {
@@ -121,7 +135,13 @@ export const ContentLibrary = {
   getRecentPosts,
   getCategories,
   getSiteSettings,
-  getHomepageContentWithFallback
+  getHomepageContentWithFallback,
+  getBlogPageContent,
+  getAboutPageContent,
+  getContactPageContent,
+  getFooterContent,
+  getNavigation,
+  getTags
 }
 
 export {
@@ -130,5 +150,11 @@ export {
   getRecentPosts,
   getCategories,
   getSiteSettings,
-  getHomepageContentWithFallback
+  getHomepageContentWithFallback,
+  getBlogPageContent,
+  getAboutPageContent,
+  getContactPageContent,
+  getFooterContent,
+  getNavigation,
+  getTags
 }

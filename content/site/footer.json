@@ -1,0 +1,14 @@
+{
+  "intro": {
+    "heading": "Build reliable Microsoft endpoint experiences.",
+    "body": "Weekly guides and lab notes that help MECM, Intune, and automation teams ship with confidence.",
+    "primaryCta": {
+      "label": "Explore the blog",
+      "href": "/blog"
+    },
+    "secondaryCta": {
+      "label": "Suggest a topic",
+      "href": "/contact"
+    }
+  }
+}

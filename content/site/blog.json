@@ -1,0 +1,23 @@
+{
+  "hero": {
+    "badge": "How to MeCM Blog",
+    "title": "Latest insights from the How to MeCM team",
+    "subtitle": "Deep dives, configuration walkthroughs, and battle-tested guidance for Microsoft Endpoint Configuration Manager, Intune, Azure, and the modern workplace.",
+    "primaryCta": {
+      "label": "Back to homepage",
+      "href": "/"
+    },
+    "secondaryCta": {
+      "label": "Jump to latest insights",
+      "href": "#latest"
+    }
+  },
+  "emptyState": {
+    "title": "Need a deep dive that is not here yet?",
+    "body": "Tell us about the deployment blockers or automation challenges you want covered next.",
+    "cta": {
+      "label": "Request a walkthrough",
+      "href": "/contact"
+    }
+  }
+}

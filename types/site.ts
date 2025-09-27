@@ -34,5 +34,5 @@ export interface SiteSettings {
   logo?: SiteLogo
   logo_url?: string
   colors?: SiteColorPalette
-  social_links?: SiteSocialLinkRecord | SiteSocialLinkItem[]
+  social_links?: SiteSocialLinkRecord
 }

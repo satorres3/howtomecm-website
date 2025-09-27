@@ -1,5 +1,7 @@
 import type { Category, Post, Tag, UserProfile } from '../../types/content'
 
+import { loadCategories, loadTags } from './site-content'
+
 export interface DemoCategory extends Category {
   icon: string
   accent: {
@@ -34,58 +36,29 @@ export const demoAuthors: Record<string, DemoAuthor> = {
   },
 }
 
-export const demoCategories: DemoCategory[] = [
-  {
-    id: 'demo-category-intune',
-    name: 'Intune',
-    slug: 'intune',
-    description: 'Real-world policy design, reporting, and zero trust alignment.',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(now.getFullYear(), 1, 5).toISOString(),
-    icon: '📱',
-    accent: {
-      from: '#0EA5E9',
-      to: '#38BDF8',
-    },
-  },
-  {
-    id: 'demo-category-mecm',
-    name: 'MECM',
-    slug: 'mecm',
-    description: 'Baseline configuration, servicing rings, and distribution point strategies.',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(now.getFullYear(), 0, 12).toISOString(),
-    icon: '🚀',
-    accent: {
-      from: '#2563EB',
-      to: '#7C3AED',
-    },
-  },
-]
+const taxonomyCategories = loadCategories()
+const taxonomyTags = loadTags()
 
-const demoTags: Tag[] = [
-  {
-    id: 'demo-tag-intune',
-    name: 'Intune',
-    slug: 'intune',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(now.getFullYear(), 0, 1).toISOString(),
-  },
-  {
-    id: 'demo-tag-security',
-    name: 'Security',
-    slug: 'security',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(now.getFullYear(), 0, 1).toISOString(),
-  },
-  {
-    id: 'demo-tag-microsoft-graph',
-    name: 'Microsoft Graph',
-    slug: 'microsoft-graph',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(now.getFullYear(), 0, 1).toISOString(),
-  },
-]
+export const demoCategories: DemoCategory[] = taxonomyCategories.map(category => ({
+  id: category.id,
+  name: category.name,
+  slug: category.slug,
+  description: category.description || '',
+  website_domain: category.website_domain || 'staging.howtomecm.com',
+  created_at:
+    category.created_at || new Date(now.getFullYear(), 0, 1).toISOString(),
+  icon: category.icon || '📘',
+  accent: category.accent || { from: '#0EA5E9', to: '#38BDF8' },
+}))
+
+const demoTags: Tag[] = taxonomyTags.map(tag => ({
+  id: tag.id,
+  name: tag.name,
+  slug: tag.slug,
+  description: tag.description,
+  website_domain: tag.website_domain || 'staging.howtomecm.com',
+  created_at: tag.created_at || new Date(now.getFullYear(), 0, 1).toISOString(),
+}))
 
 export const demoPosts: Post[] = [
   {

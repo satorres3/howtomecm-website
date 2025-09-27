@@ -1,0 +1,11 @@
+{
+  "primary": [
+    { "id": "home", "label": "Home", "href": "/", "order": 1, "target": "_self" },
+    { "id": "blog", "label": "Blog", "href": "/blog", "order": 2, "target": "_self" },
+    { "id": "about", "label": "About", "href": "/about", "order": 3, "target": "_self" },
+    { "id": "contact", "label": "Contact", "href": "/contact", "order": 4, "target": "_self" }
+  ],
+  "secondary": [
+    { "id": "privacy", "label": "Privacy Policy", "href": "/privacy", "order": 1, "target": "_self" }
+  ]
+}

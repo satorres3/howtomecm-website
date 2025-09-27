@@ -1,12 +1,14 @@
 'use client'
 
 import React, { createContext, useContext, ReactNode } from 'react'
-import type { CompleteHomepageContent } from '../../types/homepage'
 import type { SiteSettings } from '@/types/site'
+import type { FooterContent, HomepageContent, SiteNavigationConfig } from '@/types/site-content'
 
 interface SiteContextType {
   settings: SiteSettings | null
-  homepageContent: CompleteHomepageContent | null
+  homepageContent: HomepageContent | null
+  navigation: SiteNavigationConfig | null
+  footerContent: FooterContent | null
   isPreviewMode: boolean
   theme: 'light' | 'dark'
   toggleTheme: () => void
@@ -17,7 +19,9 @@ const SiteContext = createContext<SiteContextType | undefined>(undefined)
 interface SiteProviderProps {
   children: ReactNode
   initialSettings?: SiteSettings | null
-  initialHomepageContent?: CompleteHomepageContent | null
+  initialHomepageContent?: HomepageContent | null
+  initialNavigation?: SiteNavigationConfig | null
+  initialFooterContent?: FooterContent | null
   initialPreviewMode?: boolean
 }
 
@@ -25,6 +29,8 @@ export function SiteProvider({
   children,
   initialSettings = null,
   initialHomepageContent = null,
+  initialNavigation = null,
+  initialFooterContent = null,
   initialPreviewMode = false
 }: SiteProviderProps) {
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light')
@@ -53,6 +59,8 @@ export function SiteProvider({
   const value: SiteContextType = {
     settings: initialSettings,
     homepageContent: initialHomepageContent,
+    navigation: initialNavigation,
+    footerContent: initialFooterContent,
     isPreviewMode: initialPreviewMode,
     theme,
     toggleTheme

@@ -6,10 +6,10 @@ import { SkipNavigation } from '@/components/accessibility/SkipLink'
 import PageTransition from '@/components/PageTransition'
 import DevOverlayFocusGuard from '@/components/DevOverlayFocusGuard'
 import { AppProviders } from '@/providers/AppProviders'
-import { getSiteSettings } from '../lib/content'
+import { getFooterContent, getHomepageContentWithFallback, getNavigation, getSiteSettings } from '../lib/content'
 import Footer from '@/components/Footer'
 import { WebVitals } from '@/components/WebVitals'
-import type { SiteSettings, SiteSocialLinkItem, SiteSocialLinkRecord } from '@/types/site'
+import type { SiteSettings, SiteSocialLinkRecord } from '@/types/site'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -55,17 +55,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
-function resolveSocialLinks(
-  socialLinks?: SiteSocialLinkRecord | SiteSocialLinkItem[]
-): string[] {
+function resolveSocialLinks(socialLinks?: SiteSocialLinkRecord): string[] {
   if (!socialLinks) {
     return []
-  }
-
-  if (Array.isArray(socialLinks)) {
-    return socialLinks
-      .filter(link => Boolean(link?.url) && link.enabled !== false)
-      .map(link => link.url)
   }
 
   return Object.values(socialLinks).filter((url): url is string => Boolean(url))
@@ -76,8 +68,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Fetch site settings for context
-  const settingsResult = await getSiteSettings(DOMAIN)
+  // Fetch site content for context providers
+  const [settingsResult, homepageResult, navigationResult, footerResult] = await Promise.all([
+    getSiteSettings(DOMAIN),
+    getHomepageContentWithFallback(DOMAIN),
+    getNavigation(),
+    getFooterContent()
+  ])
+
   const siteSettings: SiteSettings = settingsResult.success
     ? settingsResult.data
     : {
@@ -86,6 +84,10 @@ export default async function RootLayout({
         tagline: 'A modern CMS-driven website',
         description: 'Built with Next.js and modern web technologies'
       }
+
+  const homepageContent = homepageResult.success ? homepageResult.data : null
+  const navigation = navigationResult.success ? navigationResult.data : null
+  const footerContent = footerResult.success ? footerResult.data : null
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -114,7 +116,12 @@ export default async function RootLayout({
         <link rel="canonical" href={`https://${DOMAIN}`} />
       </head>
       <body className={inter.className}>
-        <AppProviders siteSettings={siteSettings}>
+        <AppProviders
+          siteSettings={siteSettings}
+          homepageContent={homepageContent}
+          navigation={navigation}
+          footerContent={footerContent}
+        >
           <WebVitals />
           <DevOverlayFocusGuard />
           <SkipNavigation />
@@ -122,7 +129,11 @@ export default async function RootLayout({
           <main id="main-content" role="main" aria-label="Main content">
             <PageTransition>{children}</PageTransition>
           </main>
-          <Footer siteSettings={siteSettings} />
+          <Footer
+            siteSettings={siteSettings}
+            navigation={navigation?.secondary}
+            footerContent={footerContent}
+          />
         </AppProviders>
       </body>
     </html>
