@@ -2,29 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react'
 import type { CompleteHomepageContent } from '../../types/homepage'
-
-interface SiteSettings {
-  domain: string
-  site_name: string
-  tagline: string
-  description: string
-  logo?: {
-    url: string
-    alt: string
-    width?: number
-    height?: number
-  }
-  colors?: {
-    primary: string
-    secondary: string
-  }
-  social_links?: {
-    youtube?: string
-    linkedin?: string
-    twitter?: string
-    github?: string
-  }
-}
+import type { SiteSettings } from '@/types/site'
 
 interface SiteContextType {
   settings: SiteSettings | null

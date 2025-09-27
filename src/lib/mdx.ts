@@ -122,39 +122,50 @@ export function getAllPosts(): Post[] {
       const stats = readingTime(content)
 
       // Find author
-      const author = data.author ? authors[data.author] : undefined
+      const authorId = typeof data.author === 'string' ? data.author : undefined
+      const author = authorId ? authors[authorId] : undefined
 
       // Find category
-      const category = demoCategories.find(cat => cat.slug === data.category)
+      const categorySlug = typeof data.category === 'string' ? data.category : undefined
+      const category = categorySlug
+        ? demoCategories.find(cat => cat.slug === categorySlug)
+        : undefined
 
       // Parse tags
       const postTags = Array.isArray(data.tags)
         ? data.tags
-            .map((tagSlug: string) => demoTags.find(tag => tag.slug === tagSlug))
-            .filter(Boolean)
+            .map(tagSlug =>
+              typeof tagSlug === 'string' ? demoTags.find(tag => tag.slug === tagSlug) : undefined
+            )
+            .filter((tag): tag is Tag => Boolean(tag))
         : []
 
       return {
         id: `mdx-post-${path.basename(name, '.mdx')}`,
-        title: data.title,
-        slug: data.slug,
-        excerpt: data.excerpt,
+        title: typeof data.title === 'string' ? data.title : path.basename(name, '.mdx'),
+        slug: typeof data.slug === 'string' ? data.slug : path.basename(name, '.mdx'),
+        excerpt: typeof data.excerpt === 'string' ? data.excerpt : '',
         content,
         status: 'published' as const,
         website_domain: 'staging.howtomecm.com',
         is_published_to_domain: true,
-        created_at: data.date || new Date().toISOString(),
-        updated_at: data.updated || data.date || new Date().toISOString(),
-        date: data.date || new Date().toISOString(),
-        featured_image: data.featuredImage,
-        author_id: data.author,
+        created_at: typeof data.date === 'string' ? data.date : new Date().toISOString(),
+        updated_at:
+          typeof data.updated === 'string'
+            ? data.updated
+            : typeof data.date === 'string'
+              ? data.date
+              : new Date().toISOString(),
+        date: typeof data.date === 'string' ? data.date : new Date().toISOString(),
+        featured_image: typeof data.featuredImage === 'string' ? data.featuredImage : undefined,
+        author_id: authorId,
         author,
         category_id: category?.id,
         category,
-        category_slug: data.category,
+        category_slug: categorySlug,
         tags: postTags,
         comments_enabled: false,
-        is_featured: data.featured || false,
+        is_featured: Boolean(data.featured),
         reading_time: Math.ceil(stats.minutes),
       } as Post
     })

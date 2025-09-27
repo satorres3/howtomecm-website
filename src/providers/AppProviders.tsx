@@ -6,29 +6,7 @@ import { SWRProvider } from './SWRProvider'
 import { LiveRegionProvider } from '../components/accessibility'
 import type { CompleteHomepageContent } from '../../types/homepage'
 import type { Post } from '../../types/content'
-
-interface SiteSettings {
-  domain: string
-  site_name: string
-  tagline: string
-  description: string
-  logo?: {
-    url: string
-    alt: string
-    width?: number
-    height?: number
-  }
-  colors?: {
-    primary: string
-    secondary: string
-  }
-  social_links?: {
-    youtube?: string
-    linkedin?: string
-    twitter?: string
-    github?: string
-  }
-}
+import type { SiteSettings } from '@/types/site'
 
 interface AppProvidersProps {
   children: React.ReactNode
