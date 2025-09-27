@@ -1,0 +1,35 @@
+{
+  "domain": "staging.howtomecm.com",
+  "site_name": "How to MeCM",
+  "tagline": "Endpoint management knowledge hub",
+  "description": "Deep technical guides, lab notes, and deployment experiments for Microsoft endpoint administrators.",
+  "logo": {
+    "url": "/images/branding/portal-logo.svg",
+    "alt": "How to MeCM logo",
+    "width": 56,
+    "height": 56
+  },
+  "colors": {
+    "primary": "#0ea5e9",
+    "secondary": "#6366f1"
+  },
+  "social_links": [
+    {
+      "platform": "youtube",
+      "url": "https://youtube.com/@howtomecm",
+      "enabled": true
+    },
+    {
+      "platform": "linkedin",
+      "url": "https://linkedin.com/in/sauloalvestorres",
+      "enabled": true
+    }
+  ],
+  "author": "How to MeCM Team",
+  "keywords": [
+    "Microsoft Intune",
+    "Microsoft Endpoint Manager",
+    "Configuration Manager",
+    "Device management"
+  ]
+}

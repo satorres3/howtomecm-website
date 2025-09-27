@@ -2,10 +2,11 @@ import { Metadata } from 'next'
 import Link from 'next/link'
 import { Suspense } from 'react'
 
-import { getAllPosts, getCategories } from '../../lib/content'
+import { getAllPosts, getBlogPageContent, getCategories } from '../../lib/content'
 import type { Post } from '../../../types/content'
 import { getAllPosts as getMDXPosts } from '../../lib/mdx'
 import BlogClientFilter from '@/components/blog/BlogClientFilter'
+import type { BlogPageContent } from '@/types/site-content'
 
 export const metadata: Metadata = {
   title: 'Blog - How to MeCM',
@@ -25,9 +26,18 @@ export default async function BlogPage() {
   const categoriesResult = await getCategories(DOMAIN)
   const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : []
 
-  const heroTitle = 'Latest insights from the How to MeCM team'
+  const blogContentResult = await getBlogPageContent()
+  const blogContent: BlogPageContent | null = blogContentResult.success ? blogContentResult.data : null
+
+  const heroTitle = blogContent?.hero.title || 'Latest insights from the How to MeCM team'
   const heroSubtitle =
+    blogContent?.hero.subtitle ||
     'Deep dives, configuration walkthroughs, and battle-tested guidance for Microsoft Endpoint Configuration Manager, Intune, Azure, and the modern workplace.'
+  const heroBadge = blogContent?.hero.badge || 'How to MeCM Blog'
+  const heroPrimaryCta = blogContent?.hero.primaryCta
+  const heroSecondaryCta = blogContent?.hero.secondaryCta
+
+  const emptyState = blogContent?.emptyState
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -41,7 +51,7 @@ export default async function BlogPage() {
           <div className="container-modern relative">
             <div className="mx-auto max-w-4xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">
-                How to MeCM Blog
+                {heroBadge}
               </span>
               <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
                 {heroTitle}
@@ -50,17 +60,17 @@ export default async function BlogPage() {
 
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                 <Link
-                  href="/"
+                  href={heroPrimaryCta?.href || '/'}
                   className="inline-flex items-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:bg-blue-50"
                 >
-                  Back to homepage
+                  {heroPrimaryCta?.label || 'Back to homepage'}
                 </Link>
-                <a
-                  href="#latest"
+                <Link
+                  href={heroSecondaryCta?.href || '#latest'}
                   className="inline-flex items-center rounded-full border border-white/40 px-6 py-3 text-sm font-semibold text-white transition-all duration-200 hover:-translate-y-1 hover:bg-white/10"
                 >
-                  Jump to latest insights
-                </a>
+                  {heroSecondaryCta?.label || 'Jump to latest insights'}
+                </Link>
               </div>
             </div>
           </div>
@@ -91,16 +101,17 @@ export default async function BlogPage() {
           <section className="relative overflow-hidden rounded-3xl border border-gray-100 bg-white px-8 py-12 text-center shadow-xl transition-transform duration-200 hover:-translate-y-1 dark:border-gray-700 dark:bg-gray-900">
             <div className="mx-auto max-w-3xl space-y-4">
               <h2 className="text-2xl font-semibold text-gray-900 dark:text-white sm:text-3xl">
-                Need a deep dive that is not here yet?
+                {emptyState?.title || 'Need a deep dive that is not here yet?'}
               </h2>
               <p className="text-sm text-gray-600 dark:text-gray-300 sm:text-base">
-                Tell us about the deployment blockers or automation challenges you want covered next.
+                {emptyState?.body ||
+                  'Tell us about the deployment blockers or automation challenges you want covered next.'}
               </p>
               <Link
-                href="/contact"
+                href={emptyState?.cta?.href || '/contact'}
                 className="inline-flex items-center justify-center rounded-2xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition-transform duration-200 hover:-translate-y-0.5 dark:bg-white dark:text-gray-900"
               >
-                Request a walkthrough
+                {emptyState?.cta?.label || 'Request a walkthrough'}
               </Link>
             </div>
           </section>

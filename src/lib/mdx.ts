@@ -6,6 +6,8 @@ import { serialize } from 'next-mdx-remote/serialize'
 import type { Post, UserProfile, Category, Tag } from '../../types/content'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 
+import { loadCategories, loadTags } from './site-content'
+
 const contentDirectory = path.join(process.cwd(), 'content')
 const postsDirectory = path.join(contentDirectory, 'posts')
 const authorsDirectory = path.join(contentDirectory, 'authors')
@@ -39,45 +41,23 @@ export function getAuthors(): Record<string, UserProfile> {
   return authorsCache
 }
 
-// Demo categories - keeping these static for now
-const demoCategories: Category[] = [
-  {
-    id: 'demo-category-intune',
-    name: 'Intune',
-    slug: 'intune',
-    description: 'Real-world policy design, reporting, and zero trust alignment.',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(2025, 1, 5).toISOString(),
-  },
-  {
-    id: 'demo-category-mecm',
-    name: 'Microsoft Endpoint Configuration Manager',
-    slug: 'mecm',
-    description: 'Real-world MECM guides for on-premise device management.',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(2025, 1, 10).toISOString(),
-  },
-]
+const demoCategories: Category[] = loadCategories().map(category => ({
+  id: category.id,
+  name: category.name,
+  slug: category.slug,
+  description: category.description,
+  website_domain: category.website_domain || 'staging.howtomecm.com',
+  created_at: category.created_at || new Date(2025, 1, 1).toISOString(),
+}))
 
-// Demo tags - keeping these static for now
-const demoTags: Tag[] = [
-  {
-    id: 'demo-tag-azure',
-    name: 'Azure',
-    slug: 'azure',
-    description: 'Microsoft Azure cloud platform',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(2025, 1, 1).toISOString(),
-  },
-  {
-    id: 'demo-tag-powershell',
-    name: 'PowerShell',
-    slug: 'powershell',
-    description: 'PowerShell automation and scripting',
-    website_domain: 'staging.howtomecm.com',
-    created_at: new Date(2025, 1, 2).toISOString(),
-  },
-]
+const demoTags: Tag[] = loadTags().map(tag => ({
+  id: tag.id,
+  name: tag.name,
+  slug: tag.slug,
+  description: tag.description,
+  website_domain: tag.website_domain || 'staging.howtomecm.com',
+  created_at: tag.created_at || new Date(2025, 1, 1).toISOString(),
+}))
 
 // Get post with serialized MDX content
 export async function getPostWithSerializedContent(
