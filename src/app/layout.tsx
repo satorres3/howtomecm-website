@@ -9,6 +9,7 @@ import { AppProviders } from '@/providers/AppProviders'
 import { getSiteSettings } from '../lib/content'
 import Footer from '@/components/Footer'
 import { WebVitals } from '@/components/WebVitals'
+import type { SiteSettings, SiteSocialLinkItem, SiteSocialLinkRecord } from '@/types/site'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.example.com').trim()
 
   const settingsResult = await getSiteSettings(DOMAIN)
-  const siteSettings = settingsResult.success ? settingsResult.data : null
+  const siteSettings: SiteSettings | null = settingsResult.success ? settingsResult.data : null
 
   const siteName = siteSettings?.site_name || 'Website'
   const description = siteSettings?.description || 'A modern website built with Next.js and CMS'
@@ -30,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
       default: tagline ? `${siteName} - ${tagline}` : siteName
     },
     description,
-    keywords: siteSettings?.keywords || undefined,
+    keywords: siteSettings?.keywords,
     authors: siteSettings?.author ? [{ name: siteSettings.author }] : undefined,
     openGraph: {
       type: 'website',
@@ -54,6 +55,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
 const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
 
+function resolveSocialLinks(
+  socialLinks?: SiteSocialLinkRecord | SiteSocialLinkItem[]
+): string[] {
+  if (!socialLinks) {
+    return []
+  }
+
+  if (Array.isArray(socialLinks)) {
+    return socialLinks
+      .filter(link => Boolean(link?.url) && link.enabled !== false)
+      .map(link => link.url)
+  }
+
+  return Object.values(socialLinks).filter((url): url is string => Boolean(url))
+}
+
 export default async function RootLayout({
   children,
 }: {
@@ -61,12 +78,14 @@ export default async function RootLayout({
 }) {
   // Fetch site settings for context
   const settingsResult = await getSiteSettings(DOMAIN)
-  const siteSettings = settingsResult.success ? settingsResult.data : {
-    domain: DOMAIN,
-    site_name: 'Website',
-    tagline: 'A modern CMS-driven website',
-    description: 'Built with Next.js and modern web technologies'
-  }
+  const siteSettings: SiteSettings = settingsResult.success
+    ? settingsResult.data
+    : {
+        domain: DOMAIN,
+        site_name: 'Website',
+        tagline: 'A modern CMS-driven website',
+        description: 'Built with Next.js and modern web technologies'
+      }
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -74,8 +93,8 @@ export default async function RootLayout({
     "name": siteSettings.site_name,
     "description": siteSettings.description,
     "url": `https://${DOMAIN}`,
-    "logo": siteSettings.logo_url || `https://${DOMAIN}/images/branding/portal-logo.svg`,
-    "sameAs": siteSettings.social_links?.filter((link: any) => link.enabled).map((link: any) => link.url) || [],
+    "logo": siteSettings.logo?.url || siteSettings.logo_url || `https://${DOMAIN}/images/branding/portal-logo.svg`,
+    "sameAs": resolveSocialLinks(siteSettings.social_links),
     "contactPoint": {
       "@type": "ContactPoint",
       "contactType": "customer service",

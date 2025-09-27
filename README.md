@@ -64,6 +64,12 @@ These posts serve as templates for future content creation.
 - `npm run test` - Run Jest tests
 - `npm run test:e2e` - Run Playwright E2E tests
 
+### BMad Development Workflow
+
+- Follow the [BMad-driven development workflow](docs/dev-process/bmad-dev-workflow.md) for day-to-day delivery guidance, team activation, and checklist usage.
+- Review the [package landscape & maintenance plan](docs/dev-process/package-analysis.md) when planning dependency updates or conducting sprint health checks.
+- Run `npm run check-all` after each change to execute type checking, linting, and formatting in one command, ensuring consistency with the documented process.
+
 ### Project Structure
 
 ```

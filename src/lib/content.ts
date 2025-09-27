@@ -1,4 +1,5 @@
 import type { Post } from '../../types/content'
+import type { SiteSettings } from '@/types/site'
 
 import { demoPosts, demoCategories } from './demoContent'
 
@@ -8,7 +9,7 @@ export type ContentResult<T> =
   | { success: true; data: T; error: null }
   | { success: false; data: null; error: string }
 
-const staticSiteSettings = {
+const staticSiteSettings: SiteSettings = {
   domain: DEFAULT_DOMAIN,
   site_name: 'How to MeCM',
   tagline: 'Endpoint management knowledge hub',
@@ -27,7 +28,14 @@ const staticSiteSettings = {
   social_links: {
     youtube: 'https://youtube.com/@howtomecm',
     linkedin: 'https://linkedin.com/in/sauloalvestorres'
-  }
+  },
+  author: 'How to MeCM Team',
+  keywords: [
+    'Microsoft Intune',
+    'Microsoft Endpoint Manager',
+    'Configuration Manager',
+    'Device management'
+  ]
 }
 
 const staticHomepageContent = {
@@ -91,7 +99,7 @@ async function getCategories(domain: string) {
   return success(categories)
 }
 
-async function getSiteSettings(domain: string) {
+async function getSiteSettings(domain: string): Promise<ContentResult<SiteSettings>> {
   const normalizedDomain = normalizeDomain(domain)
   if (normalizedDomain !== normalizeDomain(staticSiteSettings.domain)) {
     return failure(`Unknown domain: ${domain}`)
