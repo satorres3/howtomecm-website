@@ -143,9 +143,7 @@ export function useRelatedPosts(currentPost: Post | null, limit = 4) {
   const relatedPosts = useMemo(() => {
     if (!result.posts || !currentPost) return []
 
-    return result.posts
-      .filter(post => post.id !== currentPost.id)
-      .slice(0, limit)
+    return result.posts.filter(post => post.id !== currentPost.id).slice(0, limit)
   }, [result.posts, currentPost, limit])
 
   return {

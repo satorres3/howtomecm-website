@@ -4,41 +4,21 @@ import React from 'react'
 import { SiteProvider } from '../contexts/SiteContext'
 import { SWRProvider } from './SWRProvider'
 import { LiveRegionProvider } from '../components/accessibility'
-import type { CompleteHomepageContent } from '../../types/homepage'
 import type { Post } from '../../types/content'
-
-interface SiteSettings {
-  domain: string
-  site_name: string
-  tagline: string
-  description: string
-  logo?: {
-    url: string
-    alt: string
-    width?: number
-    height?: number
-  }
-  colors?: {
-    primary: string
-    secondary: string
-  }
-  social_links?: {
-    youtube?: string
-    linkedin?: string
-    twitter?: string
-    github?: string
-  }
-}
+import type { SiteSettings } from '@/types/site'
+import type { FooterContent, HomepageContent, SiteNavigationConfig } from '@/types/site-content'
 
 interface AppProvidersProps {
   children: React.ReactNode
   siteSettings?: SiteSettings | null
-  homepageContent?: CompleteHomepageContent | null
+  homepageContent?: HomepageContent | null
   isPreviewMode?: boolean
   currentPost?: Post | null
   relatedPosts?: Post[]
   categories?: Array<{ id: string; name: string; slug: string }>
   tags?: Array<{ id: string; name: string; slug: string }>
+  navigation?: SiteNavigationConfig | null
+  footerContent?: FooterContent | null
 }
 
 export function AppProviders({
@@ -49,7 +29,9 @@ export function AppProviders({
   currentPost = null,
   relatedPosts = [],
   categories = [],
-  tags = []
+  tags = [],
+  navigation = null,
+  footerContent = null,
 }: AppProvidersProps) {
   return (
     <SWRProvider>
@@ -58,6 +40,8 @@ export function AppProviders({
           initialSettings={siteSettings}
           initialHomepageContent={homepageContent}
           initialPreviewMode={isPreviewMode}
+          initialNavigation={navigation}
+          initialFooterContent={footerContent}
         >
           {children}
         </SiteProvider>

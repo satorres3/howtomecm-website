@@ -14,8 +14,16 @@ export async function GET(): Promise<NextResponse> {
     const posts = getDemoPosts()
     const pages = [
       { slug: 'about', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { slug: 'contact', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-      { slug: 'privacy', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
+      {
+        slug: 'contact',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        slug: 'privacy',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
     ]
 
     // Create sitemap entries
@@ -26,7 +34,7 @@ export async function GET(): Promise<NextResponse> {
       url: BASE_URL,
       lastModified: new Date().toISOString(),
       changeFrequency: 'daily',
-      priority: 1.0
+      priority: 1.0,
     })
 
     // Add blog index page
@@ -35,18 +43,19 @@ export async function GET(): Promise<NextResponse> {
         url: `${BASE_URL}/blog`,
         lastModified: posts[0]?.updated_at || posts[0]?.created_at || new Date().toISOString(),
         changeFrequency: 'daily',
-        priority: 0.8
+        priority: 0.8,
       })
     }
 
     // Add pages
     pages.forEach(page => {
-      if (page.slug !== 'home') { // Skip home page as it's already added
+      if (page.slug !== 'home') {
+        // Skip home page as it's already added
         sitemapEntries.push({
           url: `${BASE_URL}/${page.slug}`,
           lastModified: page.updated_at || page.created_at,
           changeFrequency: 'weekly',
-          priority: 0.7
+          priority: 0.7,
         })
       }
     })
@@ -57,7 +66,7 @@ export async function GET(): Promise<NextResponse> {
         url: `${BASE_URL}/blog/${post.slug}`,
         lastModified: post.updated_at || post.created_at,
         changeFrequency: 'monthly',
-        priority: 0.6
+        priority: 0.6,
       })
     })
 
@@ -67,8 +76,8 @@ export async function GET(): Promise<NextResponse> {
     return new NextResponse(sitemap, {
       headers: {
         'Content-Type': 'application/xml',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600'
-      }
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      },
     })
   } catch (error) {
     console.error('Error generating sitemap:', error)
@@ -79,26 +88,36 @@ export async function GET(): Promise<NextResponse> {
 function generateSitemapXML(entries: SitemapEntry[]): string {
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${entries.map(entry => `  <url>
+${entries
+  .map(
+    entry => `  <url>
     <loc>${escapeXml(entry.url)}</loc>
     <lastmod>${entry.lastModified}</lastmod>
     <changefreq>${entry.changeFrequency}</changefreq>
     <priority>${entry.priority}</priority>
-  </url>`).join('\n')}
+  </url>`
+  )
+  .join('\n')}
 </urlset>`
 
   return xml
 }
 
 function escapeXml(unsafe: string): string {
-  return unsafe.replace(/[<>&'"]/g, (c) => {
+  return unsafe.replace(/[<>&'"]/g, c => {
     switch (c) {
-      case '<': return '&lt;'
-      case '>': return '&gt;'
-      case '&': return '&amp;'
-      case "'": return '&apos;'
-      case '"': return '&quot;'
-      default: return c
+      case '<':
+        return '&lt;'
+      case '>':
+        return '&gt;'
+      case '&':
+        return '&amp;'
+      case "'":
+        return '&apos;'
+      case '"':
+        return '&quot;'
+      default:
+        return c
     }
   })
 }

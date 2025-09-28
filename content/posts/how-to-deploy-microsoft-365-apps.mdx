@@ -1,0 +1,303 @@
+---
+title: 'How to Deploy Microsoft 365 Apps to macOS and Windows Devices with Microsoft Intune'
+slug: 'how-to-deploy-microsoft-365-apps-to-macos-and-windows-devices-with-intune'
+excerpt: 'Complete step-by-step guide to deploy Microsoft 365 apps (Word, Excel, PowerPoint, Outlook, OneNote, Teams, and OneDrive) to both macOS and Windows devices using Microsoft Intune.'
+date: '2025-09-27'
+author: 'saulo-alves'
+category: 'intune'
+tags: ['azure', 'powershell']
+featuredImage: '/images/posts/how-to-deploy-microsoft-365-apps-to-macos-devices-with-intune-cover.png'
+featured: false
+---
+
+import { Callout, TopicSection } from '@/components/mdx'
+
+## Overview
+
+Deploying Microsoft 365 apps through Microsoft Intune streamlines software management and ensures your organization has consistent, secure access to essential productivity tools across both macOS and Windows devices. This comprehensive guide walks you through the entire process of setting up Microsoft 365 apps using Intune's built-in app suite functionality for both platforms.
+
+By using this app type, you can install Word, Excel, PowerPoint, Outlook, OneNote, Teams, and OneDrive as a single deployment. The apps come with Microsoft AutoUpdate (MAU) for macOS or Click-to-Run updates for Windows to help keep them secure and up to date, and they appear as one app in the list of apps in the Intune admin center.
+
+This guide covers deployment to both platforms with detailed configuration options, monitoring capabilities, and best practices for enterprise rollouts.
+
+<Callout type="important" title="Important macOS Version Requirements">
+  With Office for Mac update (16.67), macOS Big Sur 11 or later is required to receive updates to
+  Office for Mac. If you continue with an older version of macOS, your Microsoft 365 apps will still
+  work, but you'll no longer receive any updates, including security updates. The October 2022
+  Office for Mac update (16.66) was the last build to support macOS Catalina 10.15.
+</Callout>
+
+## Prerequisites
+
+Before you begin deploying Microsoft 365 apps to your devices, ensure you have the following requirements in place:
+
+<TopicSection number={1} title="Licensing Requirements">
+  - **Microsoft Intune Subscription:** Active Intune licensing for device management - **Microsoft
+  365 Licenses:** Appropriate licenses that include Microsoft 365 Apps for enterprise: - Microsoft
+  365 E3 or E5 - Microsoft 365 Business Premium - Office 365 E3 or E5 - Microsoft 365 Apps for
+  enterprise (standalone)
+</TopicSection>
+
+<TopicSection number={2} title="Device Requirements">
+**For macOS devices:**
+- macOS Big Sur 11.0 or later (recommended for latest updates)
+- Device enrolled in Microsoft Intune
+- Apple ID signed in to Mac App Store (for some features)
+- Internet connectivity for download and activation
+
+**For Windows devices:**
+
+- Windows 10 version 1909 or later, or Windows 11
+- Device enrolled in Microsoft Intune or Azure AD joined
+- .NET Framework 4.6.1 or later
+- Internet connectivity for download and activation
+  </TopicSection>
+
+<TopicSection number={3} title="Administrative Requirements">
+  - **Global Administrator** or **Intune Service Administrator** role - Access to Microsoft Endpoint
+  Manager admin center - Understanding of your organization's device compliance policies - Knowledge
+  of user groups and device groups for targeted deployment
+</TopicSection>
+
+## Step 1: Access Microsoft Endpoint Manager
+
+Navigate to the Microsoft Endpoint Manager admin center and access the Apps workload:
+
+```bash
+# Direct URL to Microsoft Endpoint Manager
+https://endpoint.microsoft.com
+```
+
+1. Sign in with your administrative credentials
+2. Navigate to **Apps** > **All apps**
+3. Click **Add** to begin adding a new application
+
+## Step 2: Select Microsoft 365 Apps
+
+From the app type selection:
+
+1. In the **App type** dropdown, select **Microsoft 365 Apps**
+2. Choose the platform:
+   - **macOS** for Mac devices
+   - **Windows 10 and later** for Windows devices
+3. Click **Select** to proceed to configuration
+
+<Callout type="tip" title="Platform-Specific Deployment">
+  You'll need to create separate app deployments for macOS and Windows devices, as each platform has
+  different configuration options and requirements.
+</Callout>
+
+## Step 3: Configure App Suite Information
+
+### For macOS Deployment:
+
+**App Suite Information:**
+
+- **Name:** Microsoft 365 Apps for macOS
+- **Description:** Complete Microsoft 365 productivity suite including Word, Excel, PowerPoint, Outlook, OneNote, Teams, and OneDrive
+- **Publisher:** Microsoft Corporation
+- **Category:** Productivity (or select appropriate category)
+
+**App Suite Settings:**
+
+- **Update Channel:** Current Channel (recommended for most organizations)
+- **Remove other versions:** Yes (to ensure clean installation)
+- **Use shared computer activation:** Configure based on your licensing scenario
+
+### For Windows Deployment:
+
+**App Suite Information:**
+
+- **Name:** Microsoft 365 Apps for Windows
+- **Description:** Complete Microsoft 365 productivity suite with latest features and security updates
+- **Publisher:** Microsoft Corporation
+- **Category:** Productivity
+
+**App Suite Settings:**
+
+- **Update Channel:** Current Channel or Semi-Annual Enterprise Channel
+- **Architecture:** 64-bit (recommended) or 32-bit based on your environment
+- **Default file format:** Office Open XML formats
+- **Languages:** Select required languages for your organization
+
+## Step 4: Advanced Configuration Options
+
+### Language and Region Settings
+
+Configure language preferences for your deployment:
+
+```xml
+<!-- Example configuration XML for specific languages -->
+<Configuration>
+  <Add OfficeClientEdition="64" Channel="Current">
+    <Product ID="O365ProPlusRetail">
+      <Language ID="en-US" />
+      <Language ID="es-ES" />
+      <Language ID="fr-FR" />
+    </Product>
+  </Add>
+</Configuration>
+```
+
+### Update Settings
+
+- **Automatic Updates:** Enable for security and feature updates
+- **Update Deadline:** Set appropriate deadlines for your organization
+- **Update Notification:** Configure how users are notified of pending updates
+
+## Step 5: Assignment Configuration
+
+Create targeted assignments for effective deployment:
+
+<TopicSection number={1} title="Required Assignments">
+  Assign to groups that must have Microsoft 365 apps: - **All Corporate Devices** - for
+  organization-wide deployment - **Finance Department** - for department-specific requirements -
+  **Executive Team** - for priority user groups
+</TopicSection>
+
+<TopicSection number={2} title="Available Assignments">
+  Make available to groups that can optionally install: - **BYOD Devices** - for personal devices
+  with business access - **Contractor Devices** - for temporary access requirements
+</TopicSection>
+
+<TopicSection number={3} title="Exclusion Groups">
+  Exclude specific groups if needed: - **Test Device Group** - during pilot phases - **Legacy
+  Systems** - for devices that can't support current versions
+</TopicSection>
+
+## Step 6: Monitoring and Deployment Verification
+
+### Installation Status Monitoring
+
+Monitor deployment progress through multiple channels:
+
+1. **Intune Admin Center:**
+   - Navigate to **Apps** > **All apps**
+   - Select your Microsoft 365 app deployment
+   - Review **Device install status** and **User install status**
+
+2. **Device Compliance:**
+   - Check device compliance reports
+   - Verify successful installation across target groups
+   - Identify and resolve installation failures
+
+### User Experience Monitoring
+
+Track user adoption and issues:
+
+```powershell
+# PowerShell script to check Office installation on Windows devices
+Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\* |
+Where-Object {$_.DisplayName -like "*Microsoft 365*"} |
+Select-Object DisplayName, DisplayVersion, InstallDate
+```
+
+## Troubleshooting Common Issues
+
+### macOS Specific Issues
+
+**Issue: Installation fails with permission errors**
+
+- **Solution:** Ensure devices have proper MDM enrollment
+- **Check:** Device enrollment status in Intune
+- **Verify:** User has administrator privileges for installation
+
+**Issue: Apps don't appear in Applications folder**
+
+- **Solution:** Check installation logs in Company Portal app
+- **Verify:** Network connectivity during download
+- **Review:** Device compliance with macOS version requirements
+
+### Windows Specific Issues
+
+**Issue: Click-to-Run installation hangs**
+
+- **Solution:** Clear Office installation cache and retry
+- **Check:** Available disk space (minimum 4GB required)
+- **Verify:** .NET Framework version compatibility
+
+```cmd
+# Clear Office installation cache on Windows
+cd %PROGRAMFILES%\Common Files\Microsoft Shared\ClickToRun
+OfficeC2RClient.exe /update user
+```
+
+**Issue: Licensing activation problems**
+
+- **Solution:** Verify user has proper Microsoft 365 license assigned
+- **Check:** Azure AD license assignment in admin center
+- **Test:** Manual activation using Office applications
+
+## Best Practices for Enterprise Deployment
+
+### Phased Rollout Strategy
+
+1. **Pilot Phase (Week 1-2):**
+   - Deploy to IT department and key stakeholders
+   - Gather feedback and identify configuration issues
+   - Refine deployment settings based on pilot results
+
+2. **Department Rollout (Week 3-6):**
+   - Deploy to individual departments in phases
+   - Provide department-specific training and support
+   - Monitor adoption rates and user feedback
+
+3. **Organization-wide Deployment (Week 7+):**
+   - Roll out to remaining user groups
+   - Maintain help desk support for transition period
+   - Monitor overall deployment success metrics
+
+### Performance Optimization
+
+- **Bandwidth Management:** Schedule deployments during off-peak hours
+- **Update Distribution:** Use Windows Update for Business or macOS Software Update for coordinated updates
+- **Local Content Caching:** Configure local content caching where possible
+
+### Security Considerations
+
+- **App Protection Policies:** Implement data loss prevention policies
+- **Conditional Access:** Require compliant devices for app access
+- **Multi-Factor Authentication:** Enforce MFA for Microsoft 365 app access
+
+## Advanced Scenarios
+
+### Shared Computer Activation
+
+For environments with shared devices:
+
+```xml
+<!-- Configuration for shared computer activation -->
+<Configuration>
+  <Add OfficeClientEdition="64" Channel="Current">
+    <Product ID="O365ProPlusRetail">
+      <Language ID="MatchOS" />
+    </Product>
+  </Add>
+  <Property Name="SharedComputerLicensing" Value="1" />
+</Configuration>
+```
+
+### Custom Installation Packages
+
+For organizations requiring specific Office applications only:
+
+1. Use Office Deployment Tool (ODT) for Windows
+2. Create custom configuration files
+3. Deploy through Intune as Win32 apps
+4. Monitor deployment through custom detection scripts
+
+## Additional Resources
+
+For more detailed information and advanced configurations:
+
+- [Microsoft Intune App Management Documentation](https://learn.microsoft.com/en-us/intune/apps/)
+- [Microsoft 365 Apps Deployment Guide](https://learn.microsoft.com/en-us/deployoffice/)
+- [Conditional Access with Intune](https://learn.microsoft.com/en-us/intune/protect/conditional-access)
+- [Microsoft Intune Tech Community](https://techcommunity.microsoft.com/t5/microsoft-intune/bd-p/Microsoft-Intune)
+
+<Callout type="tip" title="Deployment Complete">
+  Your Microsoft 365 apps are now configured for deployment across both macOS and Windows devices.
+  The apps will be delivered according to your assignment settings, with automatic updates ensuring
+  ongoing security and feature access. Remember to monitor deployment progress and address any
+  issues promptly for the best user experience.
+</Callout>

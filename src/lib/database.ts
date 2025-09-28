@@ -19,7 +19,7 @@ export function withDatabaseErrorHandling<T>(
   return Promise.resolve({
     success: false,
     data: null,
-    error: 'Database disabled for static export'
+    error: 'Database disabled for static export',
   })
 }
 
@@ -53,9 +53,7 @@ export async function deleteFrom<T>(...args: any[]): Promise<DatabaseResult<T>> 
 }
 
 // Stub transaction functions
-export async function withTransaction<T>(
-  operation: () => Promise<T>
-): Promise<DatabaseResult<T>> {
+export async function withTransaction<T>(operation: () => Promise<T>): Promise<DatabaseResult<T>> {
   return { success: false, data: null, error: 'Static export mode' }
 }
 

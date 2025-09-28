@@ -1,0 +1,23 @@
+[
+  {
+    "id": "demo-tag-intune",
+    "name": "Intune",
+    "slug": "intune",
+    "website_domain": "staging.howtomecm.com",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-tag-security",
+    "name": "Security",
+    "slug": "security",
+    "website_domain": "staging.howtomecm.com",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "demo-tag-microsoft-graph",
+    "name": "Microsoft Graph",
+    "slug": "microsoft-graph",
+    "website_domain": "staging.howtomecm.com",
+    "created_at": "2025-01-01T00:00:00.000Z"
+  }
+]

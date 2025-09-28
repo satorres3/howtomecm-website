@@ -42,7 +42,7 @@ Sitemap: ${BASE_URL}/sitemap.xml`
   return new NextResponse(robotsContent, {
     headers: {
       'Content-Type': 'text/plain',
-      'Cache-Control': 'public, max-age=86400, s-maxage=86400' // 24 hours
-    }
+      'Cache-Control': 'public, max-age=86400, s-maxage=86400', // 24 hours
+    },
   })
 }
