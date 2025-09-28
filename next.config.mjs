@@ -27,8 +27,8 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://youtube.com https://www.youtube.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self' data:",
               "img-src 'self' data: blob: https://assets.zyrosite.com https://i.ytimg.com https://img.youtube.com",
               "media-src 'self' https://youtube.com https://www.youtube.com",
               "frame-src 'self' https://youtube.com https://www.youtube.com",

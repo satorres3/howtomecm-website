@@ -6,28 +6,18 @@ import { getPostBySlug, getRecentPosts } from '../../../lib/content'
 import type { Post } from '../../../../types/content'
 import BlogPostContent from '@/components/blog/BlogPostContent'
 import { findDemoPost, getDemoPosts } from '../../../lib/demoContent'
-import {
-  getAllPosts as getMDXPosts,
-  getPostWithSerializedContent,
-} from '../../../lib/mdx'
+import { getPostWithSerializedContent } from '../../../lib/mdx'
 
 interface BlogPostPageProps {
-  params: Promise<{ slug: string }>
+  params: { slug: string }
 }
 
-export async function generateStaticParams() {
-  const demoPosts = getDemoPosts()
-  const mdxPosts = getMDXPosts()
-  const allPosts = [...demoPosts, ...mdxPosts]
-
-  return allPosts.map(post => ({
-    slug: post.slug,
-  }))
-}
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
-  const { slug } = await params
+  const { slug } = params
 
   const postResult = await getPostBySlug(DOMAIN, slug)
   if (postResult.success && postResult.data) {
@@ -46,7 +36,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
-  const { slug } = await params
+  const { slug } = params
 
   const postResult = await getPostBySlug(DOMAIN, slug)
   let post = postResult.success && postResult.data ? postResult.data : null

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
+import '@fontsource-variable/inter'
+import '@fontsource-variable/inter/wght-italic.css'
 import Header from '@/components/Header'
 import { SkipNavigation } from '@/components/accessibility/SkipLink'
 import PageTransition from '@/components/PageTransition'
@@ -10,8 +11,6 @@ import { getFooterContent, getHomepageContentWithFallback, getNavigation, getSit
 import Footer from '@/components/Footer'
 import { WebVitals } from '@/components/WebVitals'
 import type { SiteSettings, SiteSocialLinkRecord } from '@/types/site'
-
-const inter = Inter({ subsets: ['latin'] })
 
 // Dynamic metadata generation based on CMS settings
 export async function generateMetadata(): Promise<Metadata> {
@@ -115,7 +114,7 @@ export default async function RootLayout({
         />
         <link rel="canonical" href={`https://${DOMAIN}`} />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <AppProviders
           siteSettings={siteSettings}
           homepageContent={homepageContent}
