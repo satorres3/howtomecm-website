@@ -10,7 +10,8 @@ import type { BlogPageContent } from '@/types/site-content'
 
 export const metadata: Metadata = {
   title: 'Blog - How to MeCM',
-  description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.'
+  description:
+    'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
 }
 
 export default async function BlogPage() {
@@ -27,7 +28,9 @@ export default async function BlogPage() {
   const categories = categoriesResult.success && categoriesResult.data ? categoriesResult.data : []
 
   const blogContentResult = await getBlogPageContent()
-  const blogContent: BlogPageContent | null = blogContentResult.success ? blogContentResult.data : null
+  const blogContent: BlogPageContent | null = blogContentResult.success
+    ? blogContentResult.data
+    : null
 
   const heroTitle = blogContent?.hero.title || 'Latest insights from the How to MeCM team'
   const heroSubtitle =
@@ -77,7 +80,7 @@ export default async function BlogPage() {
         </section>
 
         <Suspense
-          fallback={(
+          fallback={
             <div className="container-modern">
               <div className="animate-pulse space-y-8">
                 <div className="flex flex-wrap gap-3">
@@ -92,7 +95,7 @@ export default async function BlogPage() {
                 </div>
               </div>
             </div>
-          )}
+          }
         >
           <BlogClientFilter posts={posts} categories={categories} />
         </Suspense>

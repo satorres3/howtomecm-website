@@ -72,16 +72,17 @@ async function getRecentPosts(domain: string, limit: number = 5): Promise<Conten
 
 async function getCategories(domain: string) {
   const normalizedDomain = normalizeDomain(domain)
-  const categories = loadCategoryConfig().filter(category =>
-    !category.website_domain || normalizeDomain(category.website_domain) === normalizedDomain
+  const categories = loadCategoryConfig().filter(
+    category =>
+      !category.website_domain || normalizeDomain(category.website_domain) === normalizedDomain
   )
   return success(categories)
 }
 
 async function getTags(domain: string) {
   const normalizedDomain = normalizeDomain(domain)
-  const tags = loadTagConfig().filter(tag =>
-    !tag.website_domain || normalizeDomain(tag.website_domain) === normalizedDomain
+  const tags = loadTagConfig().filter(
+    tag => !tag.website_domain || normalizeDomain(tag.website_domain) === normalizedDomain
   )
   return success(tags)
 }
@@ -141,7 +142,7 @@ export const ContentLibrary = {
   getContactPageContent,
   getFooterContent,
   getNavigation,
-  getTags
+  getTags,
 }
 
 export {
@@ -156,5 +157,5 @@ export {
   getContactPageContent,
   getFooterContent,
   getNavigation,
-  getTags
+  getTags,
 }

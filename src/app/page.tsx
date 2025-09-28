@@ -13,14 +13,15 @@ const defaultVideoHighlights: HomepageVideoHighlight[] = [
       'Step-by-step Microsoft 365 Apps deployment using the Intune admin center, including channel and licensing guidance.',
     url: 'https://www.youtube.com/watch?v=Y0KfzfGQ3_0',
     duration: '21 min',
-    topic: 'Intune apps'
+    topic: 'Intune apps',
   },
   {
     title: 'Intune & MECM co-management lab',
-    description: 'Configure workload splits, enrollment, and reporting for co-managed Windows devices.',
+    description:
+      'Configure workload splits, enrollment, and reporting for co-managed Windows devices.',
     url: 'https://www.youtube.com/watch?v=PXk1te_FYJ8',
     duration: '18 min',
-    topic: 'Co-management'
+    topic: 'Co-management',
   },
   {
     title: 'Automating application updates with MECM',
@@ -28,21 +29,24 @@ const defaultVideoHighlights: HomepageVideoHighlight[] = [
       'PowerShell strategies for packaging, pre-flight checks, and phased deployments in ConfigMgr.',
     url: 'https://www.youtube.com/watch?v=t4NCSbI7ZJM',
     duration: '22 min',
-    topic: 'Automation'
+    topic: 'Automation',
   },
   {
     title: 'Windows Autopilot reality check',
-    description: 'Hybrid join setup, ESP tuning, and troubleshooting device provisioning end-to-end.',
+    description:
+      'Hybrid join setup, ESP tuning, and troubleshooting device provisioning end-to-end.',
     url: 'https://www.youtube.com/watch?v=btV4Z1eC4AY',
     duration: '16 min',
-    topic: 'Autopilot'
-  }
+    topic: 'Autopilot',
+  },
 ]
 
 export async function generateMetadata(): Promise<Metadata> {
   const DOMAIN = (process.env.WEBSITE_DOMAIN || 'staging.howtomecm.com').trim()
   const homepageResult = await getHomepageContentWithFallback(DOMAIN)
-  const homepageContent: HomepageContent | null = homepageResult.success ? homepageResult.data : null
+  const homepageContent: HomepageContent | null = homepageResult.success
+    ? homepageResult.data
+    : null
 
   const defaultTitle = 'How to MeCM – Endpoint management knowledge hub'
   const defaultDescription =
@@ -50,7 +54,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: homepageContent?.seo?.title || defaultTitle,
-    description: homepageContent?.seo?.description || defaultDescription
+    description: homepageContent?.seo?.description || defaultDescription,
   }
 }
 
@@ -59,9 +63,10 @@ export default async function HomePage() {
   const homepageResult = await getHomepageContentWithFallback(DOMAIN)
   const homepageContent = homepageResult.success ? homepageResult.data : null
 
-  const heroHeading = homepageContent?.hero?.heading?.trim() ||
-    'Endpoint management knowledge center'
-  const heroSubtitle = homepageContent?.hero?.subtitle?.trim() ||
+  const heroHeading =
+    homepageContent?.hero?.heading?.trim() || 'Endpoint management knowledge center'
+  const heroSubtitle =
+    homepageContent?.hero?.subtitle?.trim() ||
     'Hands-on guides, lab notes, and deployment experiments for Microsoft endpoint administrators.'
   const heroBadge = homepageContent?.hero?.badge?.trim() || 'How to MeCM Knowledge Base'
   const heroPrimaryCta = homepageContent?.hero?.primaryCta
@@ -116,12 +121,12 @@ export default async function HomePage() {
       <main id="main-content" className="space-y-24">
         <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-blue-800 py-24 text-white">
           <div className="absolute inset-0 opacity-40" aria-hidden="true">
-            <div className="absolute top-10 left-12 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+            <div className="absolute left-12 top-10 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
             <div className="absolute bottom-10 right-10 h-40 w-40 rounded-full bg-purple-300/30 blur-3xl" />
-            <div className="absolute top-1/2 left-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-300/20 blur-3xl" />
+            <div className="absolute left-1/2 top-1/2 h-56 w-56 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-300/20 blur-3xl" />
           </div>
 
-          <div className="relative container-modern">
+          <div className="container-modern relative">
             <div className="mx-auto max-w-4xl text-center">
               <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-blue-100">
                 {heroBadge}
@@ -129,9 +134,7 @@ export default async function HomePage() {
               <h1 className="mt-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
                 {heroHeading}
               </h1>
-              <p className="mt-6 text-lg text-blue-100 md:text-xl">
-                {heroSubtitle}
-              </p>
+              <p className="mt-6 text-lg text-blue-100 md:text-xl">{heroSubtitle}</p>
               <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
                 {renderCta(heroPrimaryCta, 'primary')}
                 {renderCta(heroSecondaryCta, 'secondary')}
@@ -166,8 +169,19 @@ export default async function HomePage() {
                     className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition-transform duration-200 hover:-translate-y-1 dark:bg-white dark:text-gray-900"
                   >
                     {latestPostsContent.cta.label || 'Explore all articles'}
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 12h14M12 5l7 7-7 7"
+                      />
                     </svg>
                   </Link>
                 ) : (
@@ -176,8 +190,19 @@ export default async function HomePage() {
                     className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition-transform duration-200 hover:-translate-y-1 dark:bg-white dark:text-gray-900"
                   >
                     Explore all articles
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                    <svg
+                      className="h-4 w-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      aria-hidden="true"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M5 12h14M12 5l7 7-7 7"
+                      />
                     </svg>
                   </Link>
                 )}
@@ -190,7 +215,8 @@ export default async function HomePage() {
           <header className="max-w-3xl">
             <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Video deep dives</h2>
             <p className="mt-3 text-lg text-gray-600 dark:text-gray-300">
-              Watch practical walkthroughs for deployment patterns, automation, and troubleshooting recorded directly from lab and production environments.
+              Watch practical walkthroughs for deployment patterns, automation, and troubleshooting
+              recorded directly from lab and production environments.
             </p>
           </header>
 
@@ -208,8 +234,12 @@ export default async function HomePage() {
                         {video.topic}
                       </span>
                     )}
-                    <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">{video.title}</h3>
-                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">{video.description}</p>
+                    <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">
+                      {video.title}
+                    </h3>
+                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-300">
+                      {video.description}
+                    </p>
                   </div>
                   <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                     <span>{video.duration || 'On-demand session'}</span>
@@ -220,8 +250,19 @@ export default async function HomePage() {
                       className="inline-flex items-center gap-2 rounded-full bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-blue-700"
                     >
                       Watch now
-                      <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+                      <svg
+                        className="h-4 w-4"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        aria-hidden="true"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M5 12h14M12 5l7 7-7 7"
+                        />
                       </svg>
                     </Link>
                   </div>
@@ -233,7 +274,9 @@ export default async function HomePage() {
 
         <section className="bg-gray-900 py-20 text-white">
           <div className="container-modern text-center">
-            <h2 className="text-3xl font-bold">{ctaPanel?.heading || 'What should we explore next?'}</h2>
+            <h2 className="text-3xl font-bold">
+              {ctaPanel?.heading || 'What should we explore next?'}
+            </h2>
             <p className="mt-3 text-lg text-blue-100">
               {ctaPanel?.body ||
                 'Share the scenarios, blockers, or deployment questions you want broken down in an upcoming article or video.'}

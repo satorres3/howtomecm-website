@@ -1,13 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/eslintrc",
-  "extends": [
-    "next/core-web-vitals",
-    "plugin:jsx-a11y/recommended",
-    "prettier"
-  ],
-  "plugins": [
-    "jsx-a11y"
-  ],
+  "extends": ["next/core-web-vitals", "plugin:jsx-a11y/recommended", "prettier"],
+  "plugins": ["jsx-a11y"],
   "rules": {
     // Accessibility rules - enforce WCAG 2.1 AA compliance
     "jsx-a11y/alt-text": "error",

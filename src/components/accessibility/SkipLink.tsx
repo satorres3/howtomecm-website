@@ -32,7 +32,7 @@ export function SkipLink({ href, children, className = '' }: SkipLinkProps) {
       className={`${baseClasses} ${className}`}
       onFocus={handleFocus}
       onBlur={handleBlur}
-      onClick={(e) => {
+      onClick={e => {
         // Smooth scroll to target
         e.preventDefault()
         const target = document.querySelector(href)
@@ -58,8 +58,12 @@ export function SkipNavigation() {
   return (
     <nav aria-label="Skip navigation links" className="sr-only focus-within:not-sr-only">
       <SkipLink href="#main-content">Skip to main content</SkipLink>
-      <SkipLink href="#navigation" className="ml-2">Skip to navigation</SkipLink>
-      <SkipLink href="#footer" className="ml-2">Skip to footer</SkipLink>
+      <SkipLink href="#navigation" className="ml-2">
+        Skip to navigation
+      </SkipLink>
+      <SkipLink href="#footer" className="ml-2">
+        Skip to footer
+      </SkipLink>
     </nav>
   )
 }

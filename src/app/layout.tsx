@@ -7,7 +7,12 @@ import { SkipNavigation } from '@/components/accessibility/SkipLink'
 import PageTransition from '@/components/PageTransition'
 import DevOverlayFocusGuard from '@/components/DevOverlayFocusGuard'
 import { AppProviders } from '@/providers/AppProviders'
-import { getFooterContent, getHomepageContentWithFallback, getNavigation, getSiteSettings } from '../lib/content'
+import {
+  getFooterContent,
+  getHomepageContentWithFallback,
+  getNavigation,
+  getSiteSettings,
+} from '../lib/content'
 import Footer from '@/components/Footer'
 import { WebVitals } from '@/components/WebVitals'
 import type { SiteSettings, SiteSocialLinkRecord } from '@/types/site'
@@ -27,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(`https://${DOMAIN}`),
     title: {
       template: `%s | ${siteName}`,
-      default: tagline ? `${siteName} - ${tagline}` : siteName
+      default: tagline ? `${siteName} - ${tagline}` : siteName,
     },
     description,
     keywords: siteSettings?.keywords,
@@ -38,12 +43,12 @@ export async function generateMetadata(): Promise<Metadata> {
       url: `https://${DOMAIN}`,
       siteName,
       title: siteName,
-      description
+      description,
     },
     twitter: {
       card: 'summary_large_image',
       title: siteName,
-      description
+      description,
     },
     robots: {
       index: true,
@@ -62,17 +67,13 @@ function resolveSocialLinks(socialLinks?: SiteSocialLinkRecord): string[] {
   return Object.values(socialLinks).filter((url): url is string => Boolean(url))
 }
 
-export default async function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Fetch site content for context providers
   const [settingsResult, homepageResult, navigationResult, footerResult] = await Promise.all([
     getSiteSettings(DOMAIN),
     getHomepageContentWithFallback(DOMAIN),
     getNavigation(),
-    getFooterContent()
+    getFooterContent(),
   ])
 
   const siteSettings: SiteSettings = settingsResult.success
@@ -81,7 +82,7 @@ export default async function RootLayout({
         domain: DOMAIN,
         site_name: 'Website',
         tagline: 'A modern CMS-driven website',
-        description: 'Built with Next.js and modern web technologies'
+        description: 'Built with Next.js and modern web technologies',
       }
 
   const homepageContent = homepageResult.success ? homepageResult.data : null
@@ -89,18 +90,21 @@ export default async function RootLayout({
   const footerContent = footerResult.success ? footerResult.data : null
 
   const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": siteSettings.site_name,
-    "description": siteSettings.description,
-    "url": `https://${DOMAIN}`,
-    "logo": siteSettings.logo?.url || siteSettings.logo_url || `https://${DOMAIN}/images/branding/portal-logo.svg`,
-    "sameAs": resolveSocialLinks(siteSettings.social_links),
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer service",
-      "availableLanguage": "English"
-    }
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: siteSettings.site_name,
+    description: siteSettings.description,
+    url: `https://${DOMAIN}`,
+    logo:
+      siteSettings.logo?.url ||
+      siteSettings.logo_url ||
+      `https://${DOMAIN}/images/branding/portal-logo.svg`,
+    sameAs: resolveSocialLinks(siteSettings.social_links),
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'customer service',
+      availableLanguage: 'English',
+    },
   }
 
   return (

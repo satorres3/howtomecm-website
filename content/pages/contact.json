@@ -37,30 +37,49 @@
     "fields": [
       { "id": "firstName", "label": "First name", "type": "text", "required": true, "placeholder": "John" },
       { "id": "lastName", "label": "Last name", "type": "text", "required": true, "placeholder": "Doe" },
-      { "id": "email", "label": "Email address", "type": "email", "required": true, "placeholder": "john.doe@company.com" },
+      {
+        "id": "email",
+        "label": "Email address",
+        "type": "email",
+        "required": true,
+        "placeholder": "john.doe@company.com"
+      },
       { "id": "company", "label": "Company", "type": "text", "required": false, "placeholder": "Contoso" },
-      { "id": "projectType", "label": "Project type", "type": "select", "required": true, "options": [
-        "Microsoft Intune",
-        "Microsoft MECM",
-        "Automation & PowerShell",
-        "Azure Infrastructure",
-        "Training & Workshops",
-        "Other"
-      ] },
-      { "id": "message", "label": "How can we help?", "type": "textarea", "required": true, "placeholder": "Describe your project goals, timelines, and any key constraints." },
-      { "id": "timeline", "label": "Project timeline", "type": "select", "required": false, "options": [
-        "Urgent (0-30 days)",
-        "Near term (30-60 days)",
-        "Planning (60-90 days)",
-        "Researching options"
-      ] },
-      { "id": "budget", "label": "Estimated budget", "type": "select", "required": false, "options": [
-        "Under $10k",
-        "$10k - $25k",
-        "$25k - $50k",
-        "$50k+",
-        "Unsure"
-      ] }
+      {
+        "id": "projectType",
+        "label": "Project type",
+        "type": "select",
+        "required": true,
+        "options": [
+          "Microsoft Intune",
+          "Microsoft MECM",
+          "Automation & PowerShell",
+          "Azure Infrastructure",
+          "Training & Workshops",
+          "Other"
+        ]
+      },
+      {
+        "id": "message",
+        "label": "How can we help?",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "Describe your project goals, timelines, and any key constraints."
+      },
+      {
+        "id": "timeline",
+        "label": "Project timeline",
+        "type": "select",
+        "required": false,
+        "options": ["Urgent (0-30 days)", "Near term (30-60 days)", "Planning (60-90 days)", "Researching options"]
+      },
+      {
+        "id": "budget",
+        "label": "Estimated budget",
+        "type": "select",
+        "required": false,
+        "options": ["Under $10k", "$10k - $25k", "$25k - $50k", "$50k+", "Unsure"]
+      }
     ],
     "consent": "By submitting this form, you agree to our privacy policy and consent to being contacted about your inquiry.",
     "submit": "Submit message"

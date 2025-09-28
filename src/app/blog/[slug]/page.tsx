@@ -30,7 +30,8 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
 
   return {
     title: 'Blog Post - How to MeCM',
-    description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
+    description:
+      'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
   }
 }
 
@@ -57,7 +58,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
   }
 
   const recentPostsResult = await getRecentPosts(DOMAIN, 5)
-  const fetchedRelated: Post[] = recentPostsResult.success && recentPostsResult.data ? recentPostsResult.data : []
+  const fetchedRelated: Post[] =
+    recentPostsResult.success && recentPostsResult.data ? recentPostsResult.data : []
   const fallbackRelated = getDemoPosts().filter(p => p.slug !== slug)
   const relatedPosts = (fetchedRelated.length > 0 ? fetchedRelated : fallbackRelated)
     .filter(p => p.slug !== slug)

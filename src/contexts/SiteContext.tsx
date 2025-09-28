@@ -31,7 +31,7 @@ export function SiteProvider({
   initialHomepageContent = null,
   initialNavigation = null,
   initialFooterContent = null,
-  initialPreviewMode = false
+  initialPreviewMode = false,
 }: SiteProviderProps) {
   const [theme, setTheme] = React.useState<'light' | 'dark'>('light')
 
@@ -53,7 +53,7 @@ export function SiteProvider({
   }, [theme])
 
   const toggleTheme = React.useCallback(() => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light')
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'))
   }, [])
 
   const value: SiteContextType = {
@@ -63,14 +63,10 @@ export function SiteProvider({
     footerContent: initialFooterContent,
     isPreviewMode: initialPreviewMode,
     theme,
-    toggleTheme
+    toggleTheme,
   }
 
-  return (
-    <SiteContext.Provider value={value}>
-      {children}
-    </SiteContext.Provider>
-  )
+  return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>
 }
 
 export function useSite() {

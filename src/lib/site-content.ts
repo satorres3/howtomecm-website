@@ -304,7 +304,12 @@ const defaultSiteSettingsSource = {
     { platform: 'linkedin', url: 'https://linkedin.com/in/sauloalvestorres', enabled: true },
   ],
   author: 'How to MeCM Team',
-  keywords: ['Microsoft Intune', 'Microsoft Endpoint Manager', 'Configuration Manager', 'Device management'],
+  keywords: [
+    'Microsoft Intune',
+    'Microsoft Endpoint Manager',
+    'Configuration Manager',
+    'Device management',
+  ],
 } satisfies z.infer<typeof SiteSettingsSchema>
 
 const defaultSiteSettings: SiteSettings = {
@@ -319,7 +324,9 @@ const defaultNavigation: SiteNavigationConfig = {
     { id: 'about', label: 'About', href: '/about', order: 3, target: '_self' },
     { id: 'contact', label: 'Contact', href: '/contact', order: 4, target: '_self' },
   ],
-  secondary: [{ id: 'privacy', label: 'Privacy Policy', href: '/privacy', order: 1, target: '_self' }],
+  secondary: [
+    { id: 'privacy', label: 'Privacy Policy', href: '/privacy', order: 1, target: '_self' },
+  ],
 }
 
 const defaultHomepageContent: HomepageContent = {
@@ -478,7 +485,11 @@ function normalizeSocialLinks(
 }
 
 export function loadSiteSettings(): SiteSettings {
-  const settings = loadWithSchema('site/settings.json', SiteSettingsSchema, defaultSiteSettingsSource)
+  const settings = loadWithSchema(
+    'site/settings.json',
+    SiteSettingsSchema,
+    defaultSiteSettingsSource
+  )
   const { social_links, ...rest } = settings
   const normalized = normalizeSocialLinks(social_links ?? defaultSiteSettingsSource.social_links)
   return {

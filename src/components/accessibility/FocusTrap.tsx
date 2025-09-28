@@ -119,9 +119,7 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     '[contenteditable="true"]',
   ].join(', ')
 
-  const elements = Array.from(
-    container.querySelectorAll<HTMLElement>(focusableSelectors)
-  )
+  const elements = Array.from(container.querySelectorAll<HTMLElement>(focusableSelectors))
 
   return elements.filter(element => {
     // Check if element is visible and not hidden

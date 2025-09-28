@@ -31,7 +31,7 @@ export function AppProviders({
   categories = [],
   tags = [],
   navigation = null,
-  footerContent = null
+  footerContent = null,
 }: AppProvidersProps) {
   return (
     <SWRProvider>

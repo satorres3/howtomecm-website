@@ -5,7 +5,5 @@
     { "id": "about", "label": "About", "href": "/about", "order": 3, "target": "_self" },
     { "id": "contact", "label": "Contact", "href": "/contact", "order": 4, "target": "_self" }
   ],
-  "secondary": [
-    { "id": "privacy", "label": "Privacy Policy", "href": "/privacy", "order": 1, "target": "_self" }
-  ]
+  "secondary": [{ "id": "privacy", "label": "Privacy Policy", "href": "/privacy", "order": 1, "target": "_self" }]
 }

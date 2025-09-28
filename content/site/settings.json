@@ -26,10 +26,5 @@
     }
   ],
   "author": "How to MeCM Team",
-  "keywords": [
-    "Microsoft Intune",
-    "Microsoft Endpoint Manager",
-    "Configuration Manager",
-    "Device management"
-  ]
+  "keywords": ["Microsoft Intune", "Microsoft Endpoint Manager", "Configuration Manager", "Device management"]
 }

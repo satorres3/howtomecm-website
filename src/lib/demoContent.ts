@@ -45,8 +45,7 @@ export const demoCategories: DemoCategory[] = taxonomyCategories.map(category =>
   slug: category.slug,
   description: category.description || '',
   website_domain: category.website_domain || 'staging.howtomecm.com',
-  created_at:
-    category.created_at || new Date(now.getFullYear(), 0, 1).toISOString(),
+  created_at: category.created_at || new Date(now.getFullYear(), 0, 1).toISOString(),
   icon: category.icon || '📘',
   accent: category.accent || { from: '#0EA5E9', to: '#38BDF8' },
 }))
