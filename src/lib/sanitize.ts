@@ -5,16 +5,64 @@ const SANITIZE_CONFIGS = {
   // For blog post content - allows most HTML but removes dangerous elements
   blog: {
     ALLOWED_TAGS: [
-      'p', 'br', 'strong', 'em', 'u', 'i', 'b', 'a', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'ul', 'ol', 'li', 'blockquote', 'pre', 'code', 'table', 'thead', 'tbody', 'tr', 'td', 'th',
-      'figure', 'figcaption', 'div', 'span', 'dl', 'dt', 'dd', 'iframe'
+      'p',
+      'br',
+      'strong',
+      'em',
+      'u',
+      'i',
+      'b',
+      'a',
+      'img',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'ul',
+      'ol',
+      'li',
+      'blockquote',
+      'pre',
+      'code',
+      'table',
+      'thead',
+      'tbody',
+      'tr',
+      'td',
+      'th',
+      'figure',
+      'figcaption',
+      'div',
+      'span',
+      'dl',
+      'dt',
+      'dd',
+      'iframe',
     ] as string[],
     ALLOWED_ATTR: [
-      'href', 'src', 'alt', 'title', 'class', 'id', 'target', 'rel', 'loading', 'width', 'height',
-      'aria-label', 'aria-describedby', 'role', 'data-testid', 'allowfullscreen', 'frameborder'
+      'href',
+      'src',
+      'alt',
+      'title',
+      'class',
+      'id',
+      'target',
+      'rel',
+      'loading',
+      'width',
+      'height',
+      'aria-label',
+      'aria-describedby',
+      'role',
+      'data-testid',
+      'allowfullscreen',
+      'frameborder',
     ] as string[],
     ALLOW_DATA_ATTR: false,
-    ALLOWED_URI_REGEXP: /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i,
+    ALLOWED_URI_REGEXP:
+      /^(?:(?:(?:f|ht)tps?|mailto|tel|callto|sms|cid|xmpp):|[^a-z]|[a-z+.-]+(?:[^a-z+.-:]|$))/i,
   },
   // For comments - more restrictive
   comment: {
@@ -27,7 +75,7 @@ const SANITIZE_CONFIGS = {
     ALLOWED_TAGS: ['p', 'br', 'strong', 'em'] as string[],
     ALLOWED_ATTR: [] as string[],
     ALLOW_DATA_ATTR: false,
-  }
+  },
 }
 
 type SanitizeType = keyof typeof SANITIZE_CONFIGS
@@ -131,7 +179,7 @@ export function useSanitizedHtml(content: string, type: SanitizeType = 'basic') 
   const sanitizedContent = sanitizeHtml(content, type)
 
   return {
-    __html: sanitizedContent
+    __html: sanitizedContent,
   }
 }
 

@@ -97,3 +97,7 @@ pnpm-lock.yaml
 # Generated files that shouldn't be formatted
 CHANGELOG.md
 LICENSE.md
+
+# Development tooling - not part of production codebase
+.bmad-core/
+.claude/

@@ -38,11 +38,15 @@ export const PostSchema = BaseSchema.extend({
   reading_time: z.number().min(1).optional(),
   author: AuthorSchema.optional(),
   category: CategorySchema.optional(),
-  tags: z.array(z.object({
-    id: z.string(),
-    name: z.string(),
-    slug: z.string(),
-  })).default([]),
+  tags: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+        slug: z.string(),
+      })
+    )
+    .default([]),
   meta_title: z.string().optional(),
   meta_description: z.string().optional(),
   canonical_url: z.string().url().optional(),

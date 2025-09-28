@@ -1,0 +1,28 @@
+[
+  {
+    "id": "demo-category-intune",
+    "name": "Intune",
+    "slug": "intune",
+    "description": "Real-world policy design, reporting, and zero trust alignment.",
+    "website_domain": "staging.howtomecm.com",
+    "created_at": "2025-02-05T00:00:00.000Z",
+    "icon": "📱",
+    "accent": {
+      "from": "#0EA5E9",
+      "to": "#38BDF8"
+    }
+  },
+  {
+    "id": "demo-category-mecm",
+    "name": "MECM",
+    "slug": "mecm",
+    "description": "Baseline configuration, servicing rings, and distribution point strategies.",
+    "website_domain": "staging.howtomecm.com",
+    "created_at": "2025-01-12T00:00:00.000Z",
+    "icon": "🚀",
+    "accent": {
+      "from": "#2563EB",
+      "to": "#7C3AED"
+    }
+  }
+]

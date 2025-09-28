@@ -89,6 +89,7 @@ export function FocusTrap({
     return <div className={className}>{children}</div>
   }
 
+  /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
   return (
     <div
       ref={containerRef}
@@ -101,6 +102,7 @@ export function FocusTrap({
       {children}
     </div>
   )
+  /* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 }
 
 /**
@@ -117,9 +119,7 @@ function getFocusableElements(container: HTMLElement): HTMLElement[] {
     '[contenteditable="true"]',
   ].join(', ')
 
-  const elements = Array.from(
-    container.querySelectorAll<HTMLElement>(focusableSelectors)
-  )
+  const elements = Array.from(container.querySelectorAll<HTMLElement>(focusableSelectors))
 
   return elements.filter(element => {
     // Check if element is visible and not hidden

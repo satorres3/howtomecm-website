@@ -116,14 +116,12 @@ export default function BlogClientFilter({ posts, categories }: BlogClientFilter
           <h2 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">
             {activeCategorySlug
               ? `${categories.find(c => c.slug === activeCategorySlug)?.name || 'Filtered'} Articles`
-              : 'Featured articles'
-            }
+              : 'Featured articles'}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-600 dark:text-gray-300 sm:text-base">
             {activeCategorySlug
               ? `${filteredPosts.length} article${filteredPosts.length !== 1 ? 's' : ''} in ${categories.find(c => c.slug === activeCategorySlug)?.name || 'this category'}`
-              : 'Curated guidance, migration notes, and operational checklists for enterprise endpoint teams.'
-            }
+              : 'Curated guidance, migration notes, and operational checklists for enterprise endpoint teams.'}
           </p>
         </header>
 
@@ -141,8 +139,7 @@ export default function BlogClientFilter({ posts, categories }: BlogClientFilter
             <p className="mt-4 text-base">
               {activeCategorySlug
                 ? 'Try browsing other categories or check back later for new content.'
-                : 'We&apos;re curating fresh field notes right now. Subscribe to the newsletter or check back soon for the next deep dive.'
-              }
+                : 'We&apos;re curating fresh field notes right now. Subscribe to the newsletter or check back soon for the next deep dive.'}
             </p>
             {activeCategorySlug ? (
               <button

@@ -41,35 +41,14 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/types/*": [
-        "./types/*"
-      ],
-      "@/lib/*": [
-        "./src/lib/*"
-      ],
-      "@/components/*": [
-        "./src/components/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/types/*": ["./types/*"],
+      "@/lib/*": ["./src/lib/*"],
+      "@/components/*": ["./src/components/*"]
     }
   },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts",
-    "next-env.d.ts",
-    "out/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "scripts/**/*",
-    ".next",
-    "out",
-    "dist",
-    "build"
-  ],
+  "include": ["**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "next-env.d.ts", "out/types/**/*.ts"],
+  "exclude": ["node_modules", "scripts/**/*", ".next", "out", "dist", "build"],
   // TypeScript 5.0+ project references for better performance
   "ts-node": {
     "esm": true

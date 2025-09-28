@@ -12,7 +12,7 @@ interface SkipToContentLinkProps {
  */
 export default function SkipToContentLink({
   targetId = 'main-content',
-  className = ''
+  className = '',
 }: SkipToContentLinkProps) {
   const linkRef = useRef<HTMLAnchorElement | null>(null)
 
@@ -28,11 +28,7 @@ export default function SkipToContentLink({
   }, [])
 
   return (
-    <a
-      ref={linkRef}
-      href={`#${targetId}`}
-      className={`skip-to-content ${className}`.trim()}
-    >
+    <a ref={linkRef} href={`#${targetId}`} className={`skip-to-content ${className}`.trim()}>
       Skip to main content
     </a>
   )

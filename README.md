@@ -1,10 +1,13 @@
 # How to MeCM Portal
 
-A knowledge portal for Microsoft endpoint management featuring guides, tutorials, and best practices for Intune, MECM, and modern workplace technologies.
+A knowledge portal for Microsoft endpoint management featuring guides,
+tutorials, and best practices for Intune, MECM, and modern workplace
+technologies.
 
 ## Features
 
-- 📚 **Technical Guides**: In-depth tutorials for Microsoft endpoint technologies
+- 📚 **Technical Guides**: In-depth tutorials for Microsoft endpoint
+  technologies
 - 🚀 **Modern Stack**: Built with Next.js 15, React 19, and TypeScript
 - 📱 **Responsive Design**: Optimized for all devices with Tailwind CSS
 - 🔍 **SEO Optimized**: Built-in SEO features for better discoverability
@@ -23,6 +26,7 @@ A knowledge portal for Microsoft endpoint management featuring guides, tutorials
 ## Quick Start
 
 1. **Clone and install**:
+
    ```bash
    git clone <repository-url>
    cd howtomecm-portal
@@ -30,25 +34,29 @@ A knowledge portal for Microsoft endpoint management featuring guides, tutorials
    ```
 
 2. **Environment setup**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
 3. **Run development server**:
+
    ```bash
    npm run dev
    ```
 
-4. **View the portal**:
-   Open [http://localhost:3000](http://localhost:3000)
+4. **View the portal**: Open [http://localhost:3000](http://localhost:3000)
 
 ## Content Structure
 
-The portal currently features two template blog posts that demonstrate the content structure:
+The portal currently features two template blog posts that demonstrate the
+content structure:
 
-- **Microsoft Edge Configuration**: Guide for configuring Edge homepage and start page via Intune
-- **Security Copilot Updates**: Coverage of RBAC updates and identity controls for vulnerability remediation
+- **Microsoft Edge Configuration**: Guide for configuring Edge homepage and
+  start page via Intune
+- **Security Copilot Updates**: Coverage of RBAC updates and identity controls
+  for vulnerability remediation
 
 These posts serve as templates for future content creation.
 
@@ -63,6 +71,18 @@ These posts serve as templates for future content creation.
 - `npm run type-check` - Run TypeScript checks
 - `npm run test` - Run Jest tests
 - `npm run test:e2e` - Run Playwright E2E tests
+
+### BMad Development Workflow
+
+- Follow the
+  [BMad-driven development workflow](docs/dev-process/bmad-dev-workflow.md) for
+  day-to-day delivery guidance, team activation, and checklist usage.
+- Review the
+  [package landscape & maintenance plan](docs/dev-process/package-analysis.md)
+  when planning dependency updates or conducting sprint health checks.
+- Run `npm run check-all` after each change to execute type checking, linting,
+  and formatting in one command, ensuring consistency with the documented
+  process.
 
 ### Project Structure
 
