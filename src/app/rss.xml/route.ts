@@ -14,8 +14,9 @@ export async function GET(): Promise<NextResponse> {
     const posts = getDemoPosts()
     const settings = {
       site_name: 'How to MeCM',
-      description: 'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
-      author: 'How to MeCM Team'
+      description:
+        'Expert insights on Microsoft Configuration Manager, Azure, and enterprise solutions.',
+      author: 'How to MeCM Team',
     }
 
     // Create RSS items from posts
@@ -31,9 +32,9 @@ export async function GET(): Promise<NextResponse> {
         enclosure: {
           url: post.featured_image,
           type: 'image/jpeg',
-          length: 0 // We don't have file size info
-        }
-      })
+          length: 0, // We don't have file size info
+        },
+      }),
     }))
 
     // Generate RSS XML
@@ -43,14 +44,14 @@ export async function GET(): Promise<NextResponse> {
       link: BASE_URL,
       language: 'en-us',
       lastBuildDate: new Date().toUTCString(),
-      items: rssItems
+      items: rssItems,
     })
 
     return new NextResponse(rssXml, {
       headers: {
         'Content-Type': 'application/rss+xml',
-        'Cache-Control': 'public, max-age=3600, s-maxage=3600'
-      }
+        'Cache-Control': 'public, max-age=3600, s-maxage=3600',
+      },
     })
   } catch (error) {
     console.error('Error generating RSS feed:', error)
@@ -78,16 +79,24 @@ function generateRSSXML(channel: RSSChannel): string {
     <lastBuildDate>${channel.lastBuildDate}</lastBuildDate>
     <atom:link href="${escapeXml(channel.link)}/rss.xml" rel="self" type="application/rss+xml" />
     <generator>How to MeCM</generator>
-${channel.items.map(item => `    <item>
+${channel.items
+  .map(
+    item => `    <item>
       <title>${escapeXml(item.title)}</title>
       <description>${escapeXml(item.description)}</description>
       <link>${escapeXml(item.link)}</link>
       <guid isPermaLink="true">${escapeXml(item.guid)}</guid>
       <pubDate>${item.pubDate}</pubDate>
       <author>${escapeXml(item.author || '')}</author>
-      <category>${escapeXml(item.category || '')}</category>${item.enclosure ? `
-      <enclosure url="${escapeXml(item.enclosure.url)}" type="${item.enclosure.type}" length="${item.enclosure.length}" />` : ''}
-    </item>`).join('\n')}
+      <category>${escapeXml(item.category || '')}</category>${
+        item.enclosure
+          ? `
+      <enclosure url="${escapeXml(item.enclosure.url)}" type="${item.enclosure.type}" length="${item.enclosure.length}" />`
+          : ''
+      }
+    </item>`
+  )
+  .join('\n')}
   </channel>
 </rss>`
 
@@ -114,14 +123,20 @@ function extractExcerpt(content: string, maxLength: number): string {
 }
 
 function escapeXml(unsafe: string): string {
-  return unsafe.replace(/[<>&'"]/g, (c) => {
+  return unsafe.replace(/[<>&'"]/g, c => {
     switch (c) {
-      case '<': return '&lt;'
-      case '>': return '&gt;'
-      case '&': return '&amp;'
-      case "'": return '&apos;'
-      case '"': return '&quot;'
-      default: return c
+      case '<':
+        return '&lt;'
+      case '>':
+        return '&gt;'
+      case '&':
+        return '&amp;'
+      case "'":
+        return '&apos;'
+      case '"':
+        return '&quot;'
+      default:
+        return c
     }
   })
 }

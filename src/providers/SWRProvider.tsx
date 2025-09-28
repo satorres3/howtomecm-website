@@ -9,11 +9,7 @@ interface SWRProviderProps {
 }
 
 export function SWRProvider({ children, fallback = {} }: SWRProviderProps) {
-  return (
-    <SWRConfig value={{ ...swrConfig, fallback }}>
-      {children}
-    </SWRConfig>
-  )
+  return <SWRConfig value={{ ...swrConfig, fallback }}>{children}</SWRConfig>
 }
 
 export default SWRProvider

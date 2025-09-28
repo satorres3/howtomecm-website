@@ -13,11 +13,24 @@
 
   body {
     @apply bg-white text-gray-900;
+    font-family:
+      'Inter Variable',
+      'Inter',
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      'Helvetica Neue',
+      sans-serif;
     font-feature-settings: 'cv03', 'cv04', 'cv11';
   }
 
   /* Modern Typography */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-feature-settings: 'cv03', 'cv04', 'cv11';
     letter-spacing: -0.025em;
   }
@@ -33,7 +46,7 @@
 /* Enhanced Tailwind Components */
 @layer components {
   .skip-to-content {
-    @apply absolute left-[-999px] top-4 z-[9999] bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg transition-transform duration-200 focus-visible:left-4 focus-visible:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70;
+    @apply absolute left-[-999px] top-4 z-[9999] rounded-lg bg-blue-600 px-4 py-2 text-white shadow-lg transition-transform duration-200 focus-visible:left-4 focus-visible:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70;
     transform: translateY(-10px);
   }
 
@@ -43,29 +56,29 @@
 
   /* Modern Button Variants */
   .btn-primary {
-    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:from-blue-700 hover:to-blue-800 hover:scale-105 hover:shadow-lg active:scale-95;
+    @apply rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-3 font-medium text-white transition-all duration-300 hover:scale-105 hover:from-blue-700 hover:to-blue-800 hover:shadow-lg active:scale-95;
   }
 
   .btn-secondary {
-    @apply bg-white text-blue-600 border-2 border-blue-600 px-6 py-3 rounded-xl font-medium transition-all duration-300 hover:bg-blue-50 hover:scale-105 hover:shadow-lg active:scale-95;
+    @apply rounded-xl border-2 border-blue-600 bg-white px-6 py-3 font-medium text-blue-600 transition-all duration-300 hover:scale-105 hover:bg-blue-50 hover:shadow-lg active:scale-95;
   }
 
   .btn-ghost {
-    @apply text-gray-600 hover:text-gray-900 hover:bg-gray-100 px-4 py-2 rounded-lg transition-all duration-200;
+    @apply rounded-lg px-4 py-2 text-gray-600 transition-all duration-200 hover:bg-gray-100 hover:text-gray-900;
   }
 
   /* Modern Card Variants */
   .card-modern {
-    @apply bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2;
+    @apply rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
   }
 
   .card-glass {
-    @apply backdrop-blur-lg bg-white/70 rounded-2xl border border-white/20 shadow-xl;
+    @apply rounded-2xl border border-white/20 bg-white/70 shadow-xl backdrop-blur-lg;
   }
 
   /* Modern Input Styles */
   .input-modern {
-    @apply w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-200;
+    @apply w-full rounded-xl border-2 border-gray-200 px-4 py-3 transition-all duration-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100;
   }
 
   /* Section Spacing */
@@ -74,7 +87,7 @@
   }
 
   .container-modern {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
   .prose .video-wrapper {
@@ -95,7 +108,6 @@
     border: 0;
     border-radius: 1rem;
   }
-
 
   .toc-progress {
     position: relative;
@@ -379,46 +391,47 @@
 
   /* Improved heading spacing */
   .prose-enhanced h1 {
-    @apply text-4xl font-bold text-gray-900 dark:text-white mt-12 mb-8 first:mt-0;
+    @apply mb-8 mt-12 text-4xl font-bold text-gray-900 first:mt-0 dark:text-white;
   }
 
   .prose-enhanced h2 {
-    @apply text-3xl font-bold text-gray-900 dark:text-white mt-12 mb-6 first:mt-0;
+    @apply mb-6 mt-12 text-3xl font-bold text-gray-900 first:mt-0 dark:text-white;
   }
 
   .prose-enhanced h3 {
-    @apply text-2xl font-semibold text-gray-900 dark:text-white mt-10 mb-5;
+    @apply mb-5 mt-10 text-2xl font-semibold text-gray-900 dark:text-white;
   }
 
   .prose-enhanced h4 {
-    @apply text-xl font-semibold text-gray-900 dark:text-white mt-8 mb-4;
+    @apply mb-4 mt-8 text-xl font-semibold text-gray-900 dark:text-white;
   }
 
   .prose-enhanced h5 {
-    @apply text-lg font-semibold text-gray-900 dark:text-white mt-6 mb-3;
+    @apply mb-3 mt-6 text-lg font-semibold text-gray-900 dark:text-white;
   }
 
   /* Enhanced paragraph spacing */
   .prose-enhanced p {
-    @apply text-gray-700 dark:text-gray-300 leading-relaxed mb-6 text-lg;
+    @apply mb-6 text-lg leading-relaxed text-gray-700 dark:text-gray-300;
   }
 
   /* Better list spacing */
-  .prose-enhanced ul, .prose-enhanced ol {
+  .prose-enhanced ul,
+  .prose-enhanced ol {
     @apply mb-8 space-y-3;
   }
 
   .prose-enhanced li {
-    @apply text-gray-700 dark:text-gray-300 leading-relaxed text-lg;
+    @apply text-lg leading-relaxed text-gray-700 dark:text-gray-300;
   }
 
   /* Enhanced code styling */
   .prose-enhanced code {
-    @apply text-blue-600 dark:text-blue-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded-md text-sm font-mono;
+    @apply rounded-md bg-gray-100 px-2 py-1 font-mono text-sm text-blue-600 dark:bg-gray-800 dark:text-blue-400;
   }
 
   .prose-enhanced pre {
-    @apply bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 mb-8 overflow-x-auto;
+    @apply mb-8 overflow-x-auto rounded-lg border border-gray-200 bg-gray-100 p-4 dark:border-gray-700 dark:bg-gray-800;
   }
 
   .code-block-wrapper {
@@ -456,7 +469,10 @@
     color: rgb(226 232 240);
     background: rgba(15, 23, 42, 0.78);
     backdrop-filter: blur(8px);
-    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    transition:
+      transform 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease;
   }
 
   .code-copy-trigger:hover,
@@ -502,7 +518,9 @@
     color: #fff !important;
     background: linear-gradient(135deg, #2563eb, #7c3aed);
     box-shadow: 0 18px 40px rgba(59, 130, 246, 0.25);
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
   }
 
   .prose-cta-button:hover,
@@ -996,6 +1014,12 @@
     border-bottom: 2px solid rgba(148, 163, 184, 0.15);
   }
 
+  /* Adjust layout when no number is present */
+  .topic-section__header:not(:has(.topic-section__number)) {
+    display: block;
+    gap: 0;
+  }
+
   .dark .topic-section__header {
     border-bottom-color: rgba(71, 85, 105, 0.3);
   }
@@ -1023,6 +1047,22 @@
 
   .dark .topic-section__title {
     color: #f1f5f9;
+  }
+
+  /* Remove native numbering from ordered lists inside TopicSection */
+  .topic-section ol {
+    list-style: none !important;
+    padding-left: 0 !important;
+  }
+
+  .topic-section ol li {
+    list-style: none !important;
+  }
+
+  /* If the content needs indentation, add it without numbers */
+  .topic-section ol li {
+    padding-left: 1.5rem;
+    position: relative;
   }
 
   /* Step-by-step Enhancement */
@@ -1116,21 +1156,27 @@
     margin-bottom: 0;
   }
 
-  /* Drop caps for first paragraph after headings */
+  /* Only apply lead styling to the excerpt paragraph, not all first paragraphs */
+  .prose-enhanced > p:first-of-type {
+    @apply mb-8 text-xl leading-relaxed text-gray-600 dark:text-gray-300;
+  }
+
+  /* Remove drop caps - they were causing typography issues in MDX */
   .prose-enhanced h2 + p::first-letter,
   .prose-enhanced h3 + p::first-letter {
-    float: left;
-    font-size: 3.5rem;
-    line-height: 3rem;
-    padding-right: 0.5rem;
-    margin-top: 0.25rem;
-    font-weight: 700;
-    color: #3b82f6;
+    /* Drop caps removed for better readability */
+    float: none;
+    font-size: inherit;
+    line-height: inherit;
+    padding-right: 0;
+    margin-top: 0;
+    font-weight: inherit;
+    color: inherit;
   }
 
   .dark .prose-enhanced h2 + p::first-letter,
   .dark .prose-enhanced h3 + p::first-letter {
-    color: #60a5fa;
+    color: inherit;
   }
 
   /* Enhanced blockquotes */
@@ -1395,30 +1441,31 @@
 
   /* Enhanced blockquote styling */
   .prose-enhanced blockquote {
-    @apply border-l-4 border-blue-600 bg-blue-50 dark:bg-blue-900/20 p-6 rounded-r-lg mb-8 not-italic;
+    @apply mb-8 rounded-r-lg border-l-4 border-blue-600 bg-blue-50 p-6 not-italic dark:bg-blue-900/20;
   }
 
   /* Better image spacing */
   .prose-enhanced img {
-    @apply rounded-xl shadow-lg mb-8 w-full;
+    @apply mb-8 w-full rounded-xl shadow-lg;
   }
 
   /* Enhanced table styling */
   .prose-enhanced table {
-    @apply w-full border-collapse border border-gray-200 dark:border-gray-700 mb-8;
+    @apply mb-8 w-full border-collapse border border-gray-200 dark:border-gray-700;
   }
 
-  .prose-enhanced th, .prose-enhanced td {
-    @apply border border-gray-200 dark:border-gray-700 px-4 py-2 text-left;
+  .prose-enhanced th,
+  .prose-enhanced td {
+    @apply border border-gray-200 px-4 py-2 text-left dark:border-gray-700;
   }
 
   .prose-enhanced th {
-    @apply bg-gray-50 dark:bg-gray-800 font-semibold;
+    @apply bg-gray-50 font-semibold dark:bg-gray-800;
   }
 
   /* Section dividers */
   .prose-enhanced hr {
-    @apply border-gray-200 dark:border-gray-700 my-12;
+    @apply my-12 border-gray-200 dark:border-gray-700;
   }
 }
 

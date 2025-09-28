@@ -1,3 +1,5 @@
+import createMDX from '@next/mdx'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Security configurations
@@ -5,6 +7,9 @@ const nextConfig = {
 
   // Performance configurations
   compress: true, // Performance: Compress responses
+
+  // MDX support
+  pageExtensions: ['js', 'jsx', 'mdx', 'ts', 'tsx'],
 
   // Bundle optimization
   experimental: {
@@ -22,8 +27,8 @@ const nextConfig = {
             value: [
               "default-src 'self'",
               "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://youtube.com https://www.youtube.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
+              "style-src 'self' 'unsafe-inline'",
+              "font-src 'self' data:",
               "img-src 'self' data: blob: https://assets.zyrosite.com https://i.ytimg.com https://img.youtube.com",
               "media-src 'self' https://youtube.com https://www.youtube.com",
               "frame-src 'self' https://youtube.com https://www.youtube.com",
@@ -32,35 +37,35 @@ const nextConfig = {
               "base-uri 'self'",
               "form-action 'self'",
               "frame-ancestors 'none'",
-              "upgrade-insecure-requests"
-            ].join('; ')
+              'upgrade-insecure-requests',
+            ].join('; '),
           },
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on'
+            value: 'on',
           },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=31536000; includeSubDomains'
+            value: 'max-age=31536000; includeSubDomains',
           },
           {
             key: 'X-Frame-Options',
-            value: 'DENY'
+            value: 'DENY',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'Referrer-Policy',
-            value: 'strict-origin-when-cross-origin'
+            value: 'strict-origin-when-cross-origin',
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
-          }
-        ]
-      }
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
     ]
   },
 
@@ -82,7 +87,7 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'img.youtube.com',
         pathname: '/**',
-      }
+      },
     ],
   },
 
@@ -107,7 +112,10 @@ const nextConfig = {
     }
     return config
   },
-
 }
 
-export default nextConfig
+const withMDX = createMDX({
+  // Add markdown plugins here, as desired
+})
+
+export default withMDX(nextConfig)

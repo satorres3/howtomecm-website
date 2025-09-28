@@ -27,7 +27,7 @@ export const getCachedPost = cache(async (slug: string): Promise<Post | null> =>
       cache: 'force-cache',
       next: {
         revalidate: 3600, // Revalidate every hour
-        tags: [`post-${slug}`, 'posts'] // Tags for selective revalidation
+        tags: [`post-${slug}`, 'posts'], // Tags for selective revalidation
       },
     })
 
@@ -50,52 +50,54 @@ export const getCachedPost = cache(async (slug: string): Promise<Post | null> =>
  * Cached function to fetch blog posts with query parameters
  * Memoizes results based on the stringified query parameters
  */
-export const getCachedPosts = cache(async (query: Partial<PostsQuery> = {}): Promise<PostsResponse> => {
-  try {
-    // Build query string from parameters
-    const searchParams = new URLSearchParams()
-    Object.entries(query).forEach(([key, value]) => {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, String(value))
+export const getCachedPosts = cache(
+  async (query: Partial<PostsQuery> = {}): Promise<PostsResponse> => {
+    try {
+      // Build query string from parameters
+      const searchParams = new URLSearchParams()
+      Object.entries(query).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          searchParams.append(key, String(value))
+        }
+      })
+
+      const url = `${API_BASE_URL}/posts?${searchParams.toString()}`
+      const sanitizedUrl = sanitizeUrl(url)
+
+      if (!sanitizedUrl) {
+        throw new Error('Invalid URL for posts fetch')
       }
-    })
 
-    const url = `${API_BASE_URL}/posts?${searchParams.toString()}`
-    const sanitizedUrl = sanitizeUrl(url)
+      const response = await fetch(sanitizedUrl, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache: 'force-cache',
+        next: {
+          revalidate: 1800, // Revalidate every 30 minutes for lists
+          tags: ['posts', `posts-page-${query.page || 1}`],
+        },
+      })
 
-    if (!sanitizedUrl) {
-      throw new Error('Invalid URL for posts fetch')
-    }
+      if (!response.ok) {
+        throw new Error(`Failed to fetch posts: ${response.status}`)
+      }
 
-    const response = await fetch(sanitizedUrl, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      cache: 'force-cache',
-      next: {
-        revalidate: 1800, // Revalidate every 30 minutes for lists
-        tags: ['posts', `posts-page-${query.page || 1}`]
-      },
-    })
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch posts: ${response.status}`)
-    }
-
-    const data = await response.json()
-    return data as PostsResponse
-  } catch (error) {
-    console.error('Error fetching cached posts:', error)
-    // Return empty response on error
-    return {
-      data: [],
-      total: 0,
-      page: query.page || 1,
-      limit: query.limit || 10,
-      has_more: false,
+      const data = await response.json()
+      return data as PostsResponse
+    } catch (error) {
+      console.error('Error fetching cached posts:', error)
+      // Return empty response on error
+      return {
+        data: [],
+        total: 0,
+        page: query.page || 1,
+        limit: query.limit || 10,
+        has_more: false,
+      }
     }
   }
-})
+)
 
 /**
  * Cached function to fetch featured posts for homepage
@@ -115,65 +117,66 @@ export const getCachedFeaturedPosts = cache(async (limit = 6): Promise<Post[]> =
 /**
  * Cached function to fetch posts by category
  */
-export const getCachedPostsByCategory = cache(async (categorySlug: string, limit = 10): Promise<Post[]> => {
-  const response = await getCachedPosts({
-    category: categorySlug,
-    limit,
-    page: 1,
-    published: true,
-    sort: 'created_at',
-    order: 'desc',
-  })
+export const getCachedPostsByCategory = cache(
+  async (categorySlug: string, limit = 10): Promise<Post[]> => {
+    const response = await getCachedPosts({
+      category: categorySlug,
+      limit,
+      page: 1,
+      published: true,
+      sort: 'created_at',
+      order: 'desc',
+    })
 
-  return response.data
-})
+    return response.data
+  }
+)
 
 /**
  * Cached function to fetch related posts based on current post
  */
-export const getCachedRelatedPosts = cache(async (currentPost: Post, limit = 4): Promise<Post[]> => {
-  if (!currentPost.category) {
-    return []
+export const getCachedRelatedPosts = cache(
+  async (currentPost: Post, limit = 4): Promise<Post[]> => {
+    if (!currentPost.category) {
+      return []
+    }
+
+    const response = await getCachedPosts({
+      category: currentPost.category.slug,
+      limit: limit * 2, // Fetch more to filter out current post
+      page: 1,
+      published: true,
+      sort: 'created_at',
+      order: 'desc',
+    })
+
+    // Filter out the current post and limit results
+    return response.data.filter(post => post.id !== currentPost.id).slice(0, limit)
   }
-
-  const response = await getCachedPosts({
-    category: currentPost.category.slug,
-    limit: limit * 2, // Fetch more to filter out current post
-    page: 1,
-    published: true,
-    sort: 'created_at',
-    order: 'desc',
-  })
-
-  // Filter out the current post and limit results
-  return response.data
-    .filter(post => post.id !== currentPost.id)
-    .slice(0, limit)
-})
+)
 
 /**
  * Cached function for search functionality
  */
-export const getCachedSearchResults = cache(async (
-  searchTerm: string,
-  options: Partial<PostsQuery> = {}
-): Promise<Post[]> => {
-  if (searchTerm.trim().length < 2) {
-    return []
+export const getCachedSearchResults = cache(
+  async (searchTerm: string, options: Partial<PostsQuery> = {}): Promise<Post[]> => {
+    if (searchTerm.trim().length < 2) {
+      return []
+    }
+
+    const response = await getCachedPosts({
+      search: searchTerm.trim(),
+      limit: 20,
+      page: 1,
+      published: true,
+      sort: 'created_at',
+      order: 'desc',
+      ...options,
+    })
+
+    return response.data
   }
-
-  const response = await getCachedPosts({
-    search: searchTerm.trim(),
-    limit: 20,
-    page: 1,
-    published: true,
-    sort: 'created_at',
-    order: 'desc',
-    ...options,
-  })
-
-  return response.data
-})
+)
 
 /**
  * Preload function to warm the cache for a specific post
