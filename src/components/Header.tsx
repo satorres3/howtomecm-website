@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useSite } from '../contexts/SiteContext'
+import type { SiteNavigationItem } from '@/types/site-content'
 // Removed direct database import - data should be passed as props
 import DarkModeToggle from './DarkModeToggle'
 
@@ -73,10 +74,17 @@ function SocialIcon({ platform }: { platform: string }) {
   }
 }
 
+const fallbackNavigation: SiteNavigationItem[] = [
+  { id: 'home', label: 'Home', href: '/', target: '_self', is_active: true, order: 1 },
+  { id: 'blog', label: 'Blog', href: '/blog', target: '_self', is_active: true, order: 2 },
+  { id: 'about', label: 'About', href: '/about', target: '_self', is_active: true, order: 3 },
+  { id: 'contact', label: 'Contact', href: '/contact', target: '_self', is_active: true, order: 4 },
+]
+
 export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isSearchFocused, setIsSearchFocused] = useState(false)
-  const { settings } = useSite()
+  const { settings, navigation } = useSite()
 
   if (!settings) {
     return (
@@ -93,13 +101,9 @@ export default function Header() {
     )
   }
 
-  // Define navigation links
-  const headerNavigation = [
-    { id: '1', label: 'Home', url: '/', target: '_self', is_active: true, order: 1 },
-    { id: '2', label: 'Blog', url: '/blog', target: '_self', is_active: true, order: 2 },
-    { id: '3', label: 'About', url: '/about', target: '_self', is_active: true, order: 3 },
-    { id: '4', label: 'Contact', url: '/contact', target: '_self', is_active: true, order: 4 }
-  ]
+  const headerNavigation = (navigation?.primary?.length ? navigation.primary : fallbackNavigation).filter(
+    item => item.is_active !== false
+  )
   const socialLinks: any[] = []
   const showSearch = false
   const fallbackLogo = {
@@ -154,7 +158,7 @@ export default function Header() {
               {headerNavigation.map((item: any) => (
                 <Link
                   key={item.id}
-                  href={item.url}
+                  href={item.href || item.url || '#'}
                   target={item.target || '_self'}
                   rel={item.target === '_blank' ? 'noopener noreferrer' : undefined}
                   className="relative text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 font-medium transition-all duration-200 group"
@@ -241,7 +245,7 @@ export default function Header() {
               {headerNavigation.map((item: any) => (
                 <Link
                   key={`mobile-${item.id}`}
-                  href={item.url}
+                  href={item.href || item.url || '#'}
                   target={item.target || '_self'}
                   className="block px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 focus:bg-gray-50 dark:focus:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset transition-colors"
                   onClick={() => setIsMobileMenuOpen(false)}

@@ -266,9 +266,6 @@ export interface Post extends BaseContent {
   tags?: Tag[]
   comments_enabled?: boolean
   is_featured?: boolean
-  view_count?: number
-  share_count?: number
-  like_count?: number
   reading_time?: number
 }
 

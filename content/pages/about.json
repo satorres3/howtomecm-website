@@ -1,0 +1,64 @@
+{
+  "hero": {
+    "logo": "https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif",
+    "name": "Saulo Alves Torres",
+    "title": "Microsoft Technology Expert & IT Consultant",
+    "location": "Global Remote",
+    "experience": "15+ Years Experience"
+  },
+  "story": {
+    "heading": "My Journey in Technology",
+    "paragraphs": [
+      "Hi! I'm Saulo, a passionate Microsoft technology enthusiast with over 15 years of hands-on experience in enterprise environments. My journey began with a curiosity about how technology could solve real-world business challenges.",
+      "Throughout my career, I've specialized in Microsoft Configuration Manager (MECM), Azure cloud technologies, and enterprise device management solutions. I've helped organizations of all sizes modernize their IT infrastructure and embrace cloud-first strategies.",
+      "What drives me is the opportunity to share knowledge and help fellow IT professionals navigate the ever-evolving Microsoft ecosystem. Through this blog and my YouTube channel, I aim to provide practical, real-world solutions that you can implement immediately."
+    ],
+    "origin": {
+      "logo": "https://assets.zyrosite.com/A0xw0LoMOVtarQa0/how-to-mk3zRRxqrQFyKNnl.gif",
+      "title": "How to MeCM",
+      "body": "Born from the need to demystify Microsoft Configuration Manager and share practical solutions with the IT community.",
+      "stats": [
+        { "label": "Professionals Helped", "value": "10K+" },
+        { "label": "Tutorials Created", "value": "50+" }
+      ]
+    }
+  },
+  "expertise": [
+    {
+      "icon": "🚀",
+      "title": "Microsoft MECM/SCCM",
+      "description": "Advanced configuration, deployment strategies, and troubleshooting techniques for enterprise environments."
+    },
+    {
+      "icon": "☁️",
+      "title": "Azure Cloud Solutions",
+      "description": "Cloud migration strategies, hybrid configurations, and modern device management with Intune."
+    },
+    {
+      "icon": "🔧",
+      "title": "Enterprise IT Solutions",
+      "description": "Comprehensive IT infrastructure design, automation, and best practices for large-scale deployments."
+    }
+  ],
+  "connect": {
+    "heading": "Let's Connect",
+    "body": "I'm always excited to connect with fellow IT professionals, share experiences, and collaborate on innovative solutions. Whether you have questions about Microsoft technologies or want to discuss industry trends, I'd love to hear from you.",
+    "links": [
+      {
+        "id": "linkedin",
+        "label": "Professional Network",
+        "description": "Connect on LinkedIn for industry insights and professional discussions",
+        "url": "https://linkedin.com/in/sauloalvestorres",
+        "background": "#0077B5"
+      },
+      {
+        "id": "youtube",
+        "label": "Video Tutorials",
+        "description": "Subscribe for detailed walkthroughs and hands-on demonstrations",
+        "url": "https://youtube.com/@howtomecm",
+        "background": "#FF0000"
+      }
+    ],
+    "footer": "💡 “Technology is best when it brings people together” - Let's build something amazing!"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "hero": {
+    "badge": "How to MeCM Knowledge Base",
+    "heading": "Endpoint management knowledge center",
+    "subtitle": "Hands-on guides, lab notes, and deployment experiments for Microsoft endpoint administrators.",
+    "primaryCta": {
+      "label": "Explore the latest guides",
+      "href": "/blog",
+      "style": "primary"
+    },
+    "secondaryCta": {
+      "label": "Watch the lab sessions",
+      "href": "https://youtube.com/@howtomecm",
+      "style": "outline",
+      "external": true
+    }
+  },
+  "latestPosts": {
+    "heading": "Latest field notes",
+    "subtitle": "Configuration walkthroughs and automation experiments pulled straight from enterprise deployments.",
+    "cta": {
+      "label": "Explore all articles",
+      "href": "/blog"
+    }
+  },
+  "videoHighlights": [
+    {
+      "title": "Deploy Microsoft 365 Apps with Intune",
+      "description": "Step-by-step Microsoft 365 Apps deployment using the Intune admin center, including channel and licensing guidance.",
+      "url": "https://www.youtube.com/watch?v=Y0KfzfGQ3_0",
+      "duration": "21 min",
+      "topic": "Intune apps"
+    },
+    {
+      "title": "Intune & MECM co-management lab",
+      "description": "Configure workload splits, enrollment, and reporting for co-managed Windows devices.",
+      "url": "https://www.youtube.com/watch?v=PXk1te_FYJ8",
+      "duration": "18 min",
+      "topic": "Co-management"
+    },
+    {
+      "title": "Automating application updates with MECM",
+      "description": "PowerShell strategies for packaging, pre-flight checks, and phased deployments in ConfigMgr.",
+      "url": "https://www.youtube.com/watch?v=t4NCSbI7ZJM",
+      "duration": "22 min",
+      "topic": "Automation"
+    },
+    {
+      "title": "Windows Autopilot reality check",
+      "description": "Hybrid join setup, ESP tuning, and troubleshooting device provisioning end-to-end.",
+      "url": "https://www.youtube.com/watch?v=btV4Z1eC4AY",
+      "duration": "16 min",
+      "topic": "Autopilot"
+    }
+  ],
+  "ctaPanel": {
+    "heading": "Need a configuration walkthrough for your next rollout?",
+    "body": "Tell us about the deployment blockers or automation challenges you want covered next and we will add it to the editorial backlog.",
+    "primaryCta": {
+      "label": "Request a walkthrough",
+      "href": "/contact"
+    },
+    "secondaryCta": {
+      "label": "Read the blog",
+      "href": "/blog"
+    }
+  },
+  "seo": {
+    "title": "How to MeCM – Endpoint management knowledge hub",
+    "description": "Deep technical guides, walkthroughs, and community resources for Microsoft endpoint teams."
+  }
+}
