@@ -7,6 +7,7 @@ import type { Post, UserProfile, Category, Tag } from '../../types/content'
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
 
 import { loadCategories, loadTags } from './site-content'
+import { validateContent, sanitizeHtml } from './sanitize'
 
 const contentDirectory = path.join(process.cwd(), 'content')
 const postsDirectory = path.join(contentDirectory, 'posts')
@@ -15,7 +16,10 @@ const authorsDirectory = path.join(contentDirectory, 'authors')
 // Author cache
 let authorsCache: Record<string, UserProfile> | null = null
 
-// Load authors from JSON files
+/**
+ * Enhanced authors loader with comprehensive JSON parsing protection
+ * @returns Dictionary of loaded author profiles with error handling
+ */
 export function getAuthors(): Record<string, UserProfile> {
   if (authorsCache) {
     return authorsCache
@@ -23,19 +27,117 @@ export function getAuthors(): Record<string, UserProfile> {
 
   authorsCache = {}
 
-  if (!fs.existsSync(authorsDirectory)) {
-    return authorsCache
-  }
-
-  const authorFiles = fs.readdirSync(authorsDirectory)
-
-  for (const file of authorFiles) {
-    if (file.endsWith('.json')) {
-      const filePath = path.join(authorsDirectory, file)
-      const fileContent = fs.readFileSync(filePath, 'utf8')
-      const author = JSON.parse(fileContent)
-      authorsCache[author.id] = author
+  try {
+    // Check if authors directory exists
+    if (!fs.existsSync(authorsDirectory)) {
+      if (process.env.NODE_ENV === 'development') {
+        console.info('Authors directory not found, using empty authors cache')
+      }
+      return authorsCache
     }
+
+    // Read directory with error handling
+    let authorFiles: string[]
+    try {
+      authorFiles = fs.readdirSync(authorsDirectory)
+    } catch (dirError) {
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Failed to read authors directory:', dirError)
+      }
+      return authorsCache
+    }
+
+    // Process each author file with individual error handling
+    for (const file of authorFiles) {
+      if (!file.endsWith('.json')) {
+        continue
+      }
+
+      try {
+        const filePath = path.join(authorsDirectory, file)
+
+        // Security check: ensure the path is within authors directory
+        const resolvedPath = path.resolve(filePath)
+        const resolvedAuthorsDir = path.resolve(authorsDirectory)
+        if (!resolvedPath.startsWith(resolvedAuthorsDir)) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Skipped author file outside directory: ${file}`)
+          }
+          continue
+        }
+
+        // Check file size to prevent memory exhaustion
+        const stats = fs.statSync(filePath)
+        const maxFileSize = 1024 * 1024 // 1MB limit for author files
+        if (stats.size > maxFileSize) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Skipped oversized author file: ${file} (${stats.size} bytes)`)
+          }
+          continue
+        }
+
+        // Read and parse file with comprehensive error handling
+        const fileContent = fs.readFileSync(filePath, 'utf8')
+
+        if (!fileContent.trim()) {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Skipped empty author file: ${file}`)
+          }
+          continue
+        }
+
+        let author: any
+        try {
+          author = JSON.parse(fileContent)
+        } catch (parseError) {
+          if (process.env.NODE_ENV === 'development') {
+            const errorMsg = parseError instanceof Error ? parseError.message : 'Unknown error'
+            console.warn(`Failed to parse author file ${file}: ${errorMsg}`)
+          }
+          continue
+        }
+
+        // Validate author object structure
+        if (!author || typeof author !== 'object') {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Invalid author object in file ${file}: not an object`)
+          }
+          continue
+        }
+
+        if (!author.id || typeof author.id !== 'string') {
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(`Invalid author in file ${file}: missing or invalid id`)
+          }
+          continue
+        }
+
+        // Store valid author
+        authorsCache[author.id] = author as UserProfile
+
+        if (process.env.NODE_ENV === 'development') {
+          console.debug(`Loaded author: ${author.id} from ${file}`)
+        }
+      } catch (fileError) {
+        if (process.env.NODE_ENV === 'development') {
+          const errorMsg = fileError instanceof Error ? fileError.message : 'Unknown error'
+          console.warn(`Error processing author file ${file}: ${errorMsg}`)
+        }
+        // Continue processing other files
+        continue
+      }
+    }
+
+    if (process.env.NODE_ENV === 'development') {
+      console.info(`Loaded ${Object.keys(authorsCache).length} author profiles`)
+    }
+  } catch (unexpectedError) {
+    if (process.env.NODE_ENV === 'development') {
+      const errorMsg = unexpectedError instanceof Error ? unexpectedError.message : 'Unknown error'
+      console.warn(`Unexpected error loading authors: ${errorMsg}`)
+    }
+    // Return empty cache on unexpected errors
+    authorsCache = {}
   }
 
   return authorsCache
@@ -59,23 +161,50 @@ const demoTags: Tag[] = loadTags().map(tag => ({
   created_at: tag.created_at || new Date(2025, 1, 1).toISOString(),
 }))
 
-// Get post with serialized MDX content
-export async function getPostWithSerializedContent(
-  slug: string
-): Promise<{ post: Post; serializedContent: MDXRemoteSerializeResult } | null> {
+// Get post with serialized MDX content with security validation
+export async function getPostWithSerializedContent(slug: string): Promise<{
+  post: Post
+  serializedContent: MDXRemoteSerializeResult
+  validationWarnings?: string[]
+} | null> {
   const posts = getAllPosts()
   const post = posts.find(p => p.slug === slug)
 
   if (!post) return null
 
   try {
-    const serializedContent = await serialize(post.content || '', {
+    // Validate content before processing
+    const validation = validateContent(post.content || '', {
+      allowMDX: true,
+      allowIframes: true,
+      trustedDomains: ['youtube.com', 'www.youtube.com', 'player.vimeo.com'],
+    })
+
+    if (!validation.isValid) {
+      console.warn(`Content validation failed for ${slug}:`, validation.errors)
+      // For development, continue with warnings; for production, could reject
+      if (
+        process.env.NODE_ENV === 'production' &&
+        validation.errors.some(e => e.includes('Invalid iframe'))
+      ) {
+        return null
+      }
+    }
+
+    // Sanitize content for blog rendering (allows iframes from trusted sources)
+    const sanitizedContent = sanitizeHtml(post.content || '', 'blog')
+
+    const serializedContent = await serialize(sanitizedContent, {
       mdxOptions: {
         development: process.env.NODE_ENV === 'development',
       },
     })
 
-    return { post, serializedContent }
+    return {
+      post,
+      serializedContent,
+      validationWarnings: validation.warnings.length > 0 ? validation.warnings : undefined,
+    }
   } catch (error) {
     console.error(`Error serializing MDX content for ${slug}:`, error)
     return null

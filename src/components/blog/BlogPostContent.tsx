@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Post } from '../../../types/content'
 import TagList from './TagList'
-import { sanitizeHtml } from '@/lib/sanitize'
+import { sanitizeHtml, validateContent, extractHeadingsSecure } from '@/lib/sanitize'
 import MDXRenderer from '../mdx/MDXRenderer'
 
 interface BlogPostContentProps {
@@ -206,6 +206,8 @@ export default function BlogPostContent({ post, relatedPosts, mdxSource }: BlogP
   const [estimatedTimeRemaining, setEstimatedTimeRemaining] = useState<string>('')
   const [focusedSection, setFocusedSection] = useState<string>('')
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false)
+  const [contentValidationWarnings, setContentValidationWarnings] = useState<string[]>([])
+  const [headingExtractionError, setHeadingExtractionError] = useState<string | null>(null)
 
   const totalHeadings = headings.length
   const roundedProgress = Math.min(100, Math.max(0, Math.round(progress)))
@@ -240,10 +242,10 @@ export default function BlogPostContent({ post, relatedPosts, mdxSource }: BlogP
     return estimate ? `${estimate} min read` : null
   }, [post.content, post.reading_time])
 
-  // Client-side initialization - ensure hydration complete
+  // Enhanced client-side initialization with proper hydration detection
   useEffect(() => {
-    // Small delay to ensure hydration is complete
-    const timer = setTimeout(() => {
+    // Use requestAnimationFrame for better performance instead of setTimeout
+    const initializeClient = () => {
       setIsClient(true)
       if (typeof window !== 'undefined') {
         // Use production URL for sharing instead of localhost
@@ -256,66 +258,201 @@ export default function BlogPostContent({ post, relatedPosts, mdxSource }: BlogP
           setShareUrl(window.location.href)
         }
       }
-    }, 100)
+    }
 
-    return () => clearTimeout(timer)
+    // Use requestAnimationFrame for smoother initialization
+    const rafId = requestAnimationFrame(() => {
+      // Additional frame to ensure DOM is fully ready
+      requestAnimationFrame(initializeClient)
+    })
+
+    return () => cancelAnimationFrame(rafId)
   }, [post?.slug])
 
   // Process HTML content on client side to avoid hydration mismatch
   useEffect(() => {
     if (!isClient || !post.content || isMDXContent) return
 
-    // First sanitize the HTML content for security
-    const sanitizedContent = sanitizeHtml(post.content, 'blog')
+    try {
+      // First validate content for security issues
+      const validation = validateContent(post.content, {
+        allowMDX: false,
+        allowIframes: true,
+        trustedDomains: ['youtube.com', 'www.youtube.com', 'player.vimeo.com'],
+      })
 
-    // Then process for heading IDs and TOC
-    const result = addHeadingIdsToHTML(sanitizedContent)
-    setProcessedHTML(result.processedHTML)
-    setExtractedHeadings(result.headings)
-    setHeadings(result.headings)
+      if (validation.warnings.length > 0) {
+        setContentValidationWarnings(validation.warnings)
+      }
+
+      if (!validation.isValid) {
+        console.warn('Content validation failed:', validation.errors)
+        // For production, you might want to show a warning to admins
+        if (process.env.NODE_ENV === 'development') {
+          setContentValidationWarnings(prev => [...prev, ...validation.errors])
+        }
+      }
+
+      // Sanitize the HTML content for security
+      const sanitizedContent = sanitizeHtml(post.content, 'blog')
+
+      // Extract headings using the secure, optimized method
+      const secureHeadings = extractHeadingsSecure(sanitizedContent)
+      if (secureHeadings.length > 0) {
+        setExtractedHeadings(secureHeadings)
+        setHeadings(secureHeadings)
+        setHeadingExtractionError(null)
+      } else {
+        // Fallback to original method if secure extraction fails
+        const result = addHeadingIdsToHTML(sanitizedContent)
+        setExtractedHeadings(result.headings)
+        setHeadings(result.headings)
+        setHeadingExtractionError(null)
+      }
+
+      setProcessedHTML(sanitizedContent)
+    } catch (error) {
+      console.error('Content processing error:', error)
+      setHeadingExtractionError('Failed to process content safely')
+      // Fallback to original content processing
+      const result = addHeadingIdsToHTML(post.content)
+      setProcessedHTML(result.processedHTML)
+      setExtractedHeadings(result.headings)
+      setHeadings(result.headings)
+    }
   }, [isClient, post.content, isMDXContent])
 
-  // Process MDX content to extract headings for TOC
+  // Enhanced MDX heading extraction with MutationObserver for better performance
   useEffect(() => {
     if (!isClient || !isMDXContent) return
 
-    // Wait for MDX content to be rendered, then extract headings
-    const timer = setTimeout(() => {
-      const article = articleRef.current
-      if (!article) return
+    const article = articleRef.current
+    if (!article) {
+      setHeadingExtractionError('Article container not found')
+      return
+    }
 
-      const headingElements = article.querySelectorAll('h1, h2, h3, h4, h5, h6')
-      const extractedHeadings: HeadingItem[] = []
+    let timeoutId: NodeJS.Timeout | null = null
 
-      headingElements.forEach((heading, index) => {
-        const text = heading.textContent?.trim() || ''
-        if (!text) return
+    // Function to extract headings with enhanced error handling
+    const extractHeadings = () => {
+      try {
+        const headingElements = article.querySelectorAll('h1, h2, h3, h4, h5, h6')
+        const extractedHeadings: HeadingItem[] = []
 
-        // Generate ID from text content
-        const id = text
-          .toLowerCase()
-          .replace(/[^\w\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .trim()
+        headingElements.forEach((heading, index) => {
+          const text = heading.textContent?.trim() || ''
+          if (!text) return
 
-        // Add ID to heading if it doesn't exist
-        if (!heading.id) {
-          heading.id = id
+          // Enhanced ID generation with security and uniqueness checks
+          const baseId = text
+            .toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
+            .replace(/--+/g, '-')
+            .replace(/^-|-$/g, '')
+            .trim()
+
+          // Ensure unique IDs to prevent duplicates with collision detection
+          let uniqueId = baseId
+          let counter = 1
+          while (
+            extractedHeadings.some(h => h.id === uniqueId) ||
+            document.getElementById(uniqueId)
+          ) {
+            uniqueId = `${baseId}-${counter}`
+            counter++
+          }
+
+          // Add ID to heading if it doesn't exist
+          if (!heading.id) {
+            heading.id = uniqueId
+          }
+
+          // Add to headings array
+          extractedHeadings.push({
+            id: heading.id,
+            text,
+            level: parseInt(heading.tagName.charAt(1)),
+          })
+        })
+
+        setExtractedHeadings(extractedHeadings)
+        setHeadings(extractedHeadings)
+        setHeadingExtractionError(null)
+
+        if (process.env.NODE_ENV === 'development') {
+          console.info(`Extracted ${extractedHeadings.length} headings using MutationObserver`)
+        }
+      } catch (error) {
+        console.error('MDX heading extraction error:', error)
+        setHeadingExtractionError('Failed to extract headings from MDX content')
+      }
+    }
+
+    // Debounced extraction function to prevent excessive calls
+    const debouncedExtraction = () => {
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+      timeoutId = setTimeout(extractHeadings, 50) // Minimal delay for batching
+    }
+
+    // Create MutationObserver for efficient DOM monitoring
+    const observer = new MutationObserver(mutations => {
+      let shouldExtract = false
+
+      for (const mutation of mutations) {
+        // Check if any added nodes contain headings
+        if (mutation.type === 'childList') {
+          for (const node of Array.from(mutation.addedNodes)) {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+              const element = node as Element
+              // Check if the added node is a heading or contains headings
+              if (
+                element.matches('h1, h2, h3, h4, h5, h6') ||
+                element.querySelector('h1, h2, h3, h4, h5, h6')
+              ) {
+                shouldExtract = true
+                break
+              }
+            }
+          }
+        }
+        // Check for attribute changes on heading elements
+        else if (mutation.type === 'attributes' && mutation.target.nodeType === Node.ELEMENT_NODE) {
+          const element = mutation.target as Element
+          if (element.matches('h1, h2, h3, h4, h5, h6')) {
+            shouldExtract = true
+          }
         }
 
-        // Add to headings array
-        extractedHeadings.push({
-          id: heading.id,
-          text,
-          level: parseInt(heading.tagName.charAt(1)),
-        })
-      })
+        if (shouldExtract) break
+      }
 
-      setExtractedHeadings(extractedHeadings)
-      setHeadings(extractedHeadings)
-    }, 100)
+      if (shouldExtract) {
+        debouncedExtraction()
+      }
+    })
 
-    return () => clearTimeout(timer)
+    // Configure observer to watch for heading-related changes
+    observer.observe(article, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['id', 'class'], // Monitor ID and class changes on headings
+    })
+
+    // Initial extraction
+    debouncedExtraction()
+
+    // Cleanup function
+    return () => {
+      observer.disconnect()
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
   }, [isClient, isMDXContent, mdxSource])
 
   useEffect(() => {
@@ -324,8 +461,8 @@ export default function BlogPostContent({ post, relatedPosts, mdxSource }: BlogP
     const article = articleRef.current
     if (!article) return
 
-    // Add additional delay to ensure DOM is stable after hydration
-    const timer = setTimeout(() => {
+    // Enhanced content processing with MutationObserver for better performance
+    const processContent = () => {
       // Clean up old embed elements first
       Array.from(article.querySelectorAll('.video-embed-cta, .video-embed-wrapper')).forEach(
         element => {
@@ -513,9 +650,15 @@ export default function BlogPostContent({ post, relatedPosts, mdxSource }: BlogP
       })
 
       setContentEnhanced(true)
-    }, 200) // Delay DOM manipulation
+    }
 
-    return () => clearTimeout(timer)
+    // Use requestAnimationFrame for better performance instead of setTimeout
+    const rafId = requestAnimationFrame(() => {
+      // Additional frame to ensure DOM is stable
+      requestAnimationFrame(processContent)
+    })
+
+    return () => cancelAnimationFrame(rafId)
   }, [post.content, isClient, contentEnhanced])
 
   useEffect(() => {
@@ -1175,6 +1318,45 @@ export default function BlogPostContent({ post, relatedPosts, mdxSource }: BlogP
           </svg>
         </div>
       </Link>
+
+      {/* Development warnings for content validation issues */}
+      {process.env.NODE_ENV === 'development' &&
+        (contentValidationWarnings.length > 0 || headingExtractionError) && (
+          <div className="mb-6 rounded-xl border border-yellow-300 bg-yellow-50 p-4 dark:border-yellow-600 dark:bg-yellow-900/20">
+            <div className="mb-3 flex items-center gap-2">
+              <svg className="h-5 w-5 text-yellow-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
+              </svg>
+              <h3 className="text-sm font-semibold text-yellow-800 dark:text-yellow-200">
+                Content Validation Warnings (Development Only)
+              </h3>
+            </div>
+            {contentValidationWarnings.length > 0 && (
+              <div className="mb-2">
+                <p className="mb-1 text-xs font-medium text-yellow-700 dark:text-yellow-300">
+                  Content Issues:
+                </p>
+                <ul className="list-inside list-disc space-y-1">
+                  {contentValidationWarnings.map((warning, index) => (
+                    <li key={index} className="text-xs text-yellow-700 dark:text-yellow-300">
+                      {warning}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {headingExtractionError && (
+              <div>
+                <p className="mb-1 text-xs font-medium text-yellow-700 dark:text-yellow-300">
+                  Heading Extraction Error:
+                </p>
+                <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                  {headingExtractionError}
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
       <article
         ref={articleRef}
